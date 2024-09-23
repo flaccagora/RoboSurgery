@@ -1,3 +1,16 @@
+# Table of Contents
+- [Table of Contents](#table-of-contents)
+- [Surgical Robot Lung Exploration Simulation](#surgical-robot-lung-exploration-simulation)
+  - [Introduction](#introduction)
+  - [Simulation](#simulation)
+    - [Libraries](#libraries)
+    - [Action Space](#action-space)
+    - [Observation Space](#observation-space)
+    - [Reward Function](#reward-function)
+  - [Agent and Training](#agent-and-training)
+- [Run](#run)
+- [TODO](#todo)
+
 # Surgical Robot Lung Exploration Simulation
 
 ## Introduction
