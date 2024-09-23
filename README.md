@@ -10,6 +10,7 @@
   - [Agent and Training](#agent-and-training)
 - [Run](#run)
 - [TODO](#todo)
+- [Ideas](#ideas)
 
 # Surgical Robot Lung Exploration Simulation
 
@@ -106,4 +107,7 @@ open and run jupyter notebook [test.ipynb](./test.ipynb)
 - [ ] add observation of the maze in robot proximity
 - [ ] Maze deformation
 - [ ] POMDP
-- [ ] Migrate to RL-games
+- [ ] Migrate to RL-games / RSL RL
+
+# Ideas
+- https://isaac-sim.github.io/IsaacLab/source/overview/reinforcement-learning/rl_frameworks.html
