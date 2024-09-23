@@ -106,3 +106,4 @@ open and run jupyter notebook [test.ipynb](./test.ipynb)
 - [ ] add observation of the maze in robot proximity
 - [ ] Maze deformation
 - [ ] POMDP
+- [ ] Migrate to RL-games
