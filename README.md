@@ -23,7 +23,7 @@ In addition, the ball velocity is clipped in a range of `[-5, 5] m/s` in order f
 ### Observation Space
 
 
-The observation is a `goal-aware observation space`. It consists of a dictionary with information about the robot's position and goal. The dictionary consists of the following 4 keys:
+The observation consists of a dictionary with information about the robot's position and goal. The dictionary consists of the following 4 keys:
 
 * `observation`: its value is an `ndarray` of shape `(4,)`. It consists of kinematic information of the force-actuated ball. The elements of the array correspond to the following:
 
@@ -49,7 +49,7 @@ The observation is a `goal-aware observation space`. It consists of a dictionary
     | 0   | Current goal ball position in the x coordinate | -Inf   | Inf    | ball_x                                | position (m) |
     | 1   | Current goal ball position in the y coordinate | -Inf   | Inf    | ball_y                                | position (m) |
 
-* `maze_map`: this key represents the maze map. The value is an `ndarray` with shape `(n**2)`, The elements of the array are the following:
+* `maze_map`: this key represents the maze map. The value is an `ndarray` with shape `(n*m)`, The elements of the array are the following:
 
     | Num | Observation | Min | Max | Unit |
     |-----|-------------|-----|-----|------|
@@ -87,3 +87,9 @@ pip install -e .
 ```
 
 open and run jupyter notebook [test.ipynb](./test.ipynb)
+
+# TODO
+- [ ] Multimodal Architecture ?? 
+- [ ] add observation of the maze in robot proximity
+- [ ] Maze deformation
+- [ ] POMDP
