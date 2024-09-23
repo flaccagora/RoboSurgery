@@ -79,7 +79,11 @@ conda activate RoboSurg
 ```
 install requirements
 ```bash
+pip install -r requirements.txt
+```
+install the package as editable to register the environment
+```bash
 pip install -e .
 ```
 
-open and run jupyter notebook [test.py](./test.py)
+open and run jupyter notebook [test.ipynb](./test.ipynb)

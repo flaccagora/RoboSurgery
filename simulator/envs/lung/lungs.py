@@ -357,7 +357,7 @@ class LungEnv(MazeEnv, EzPickle):
                 ),
                 achieved_goal=spaces.Box(-np.inf, np.inf, shape=(2,), dtype="float64"),
                 desired_goal=spaces.Box(-np.inf, np.inf, shape=(2,), dtype="float64"),
-                maze_map=spaces.Box(-np.inf, np.inf, shape=(len(self.maze_map),), dtype="int64"),
+                maze_map=spaces.Box(-np.inf, np.inf, shape=(len(self.maze_map),), dtype="float64"),
             )
         )
 
