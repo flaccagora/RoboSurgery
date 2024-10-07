@@ -31,7 +31,7 @@ Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where
   $R: S\times A \rightarrow \mathbb{R}$  is the reward function. \
   $\Omega$ is a set of observations, \
   $O$ is a set of conditional observation probabilities, \
-  $\gamma \in [0,1)$ is the discount factor. \
+  $\gamma \in [0,1)$ is the discount factor.
 
 in this case, 
 
@@ -57,7 +57,7 @@ $$s'=(x',y',t_x,t_y,M,\theta)$$
 
 where
 
-$$(x',y') = (x,y) + a $$
+$$(x',y') = (x,y) \text { or }(x',y') = (x,y) + a $$
 
 The **reward function** $R(s,a,s')$ is defined as follows:
 
