@@ -16,7 +16,7 @@
 # Surgical Robot Lung Exploration Simulation
 
 ## Introduction
-The goal of this project is to simulate a surgical robot that can explore the lung of a patient to find a lesion, moreover the robot is going to navigate through a deformed lung and it should determine the parameters of this tranformation to gain insights about it's location and lung deformation.
+The goal of this project is to simulate a surgical robot that can explore the lung of a patient to find a lesion, moreover the robot is going to navigate through a deformed lung and it should determine the parameters of this tranformation to gain insights about it's location.
 \
 The following is an abstract simulation of the robot in action.
 
@@ -77,7 +77,7 @@ The **observation space** $\Omega$ is a set of observations, in this case, the o
 The **conditional observation probabilities** $O(o|s,a)$ are also deterministic.
 
 
-$$O(o|s,a) = 
+$$O(o|s,a)= O(o|s) = 
 \begin{cases}
     1 &   \text{if } (x,y) \text{ adjacent cells for map } f_\theta(M) \text{are compatible with } o \\
     0 &   \text{otherwise} \\
@@ -90,12 +90,14 @@ Where $f$ is the deformation function that acts on the original maze map M with 
 
 Because the agent does not directly observe the environment's state, the agent must make decisions under uncertainty of the true environment state. The belief function is a probability distribution over the states of the environment.
 
-$$b : S \rightarrow [0,1]$$
+$$b : S \rightarrow [0,1] \text{ and } \sum_s b(s) = 1  $$
 
 By interacting with the environment and receiving observations, the agent may update its belief in the true state by updating the probability distribution of the current state
 
 $$ b'(s')=\eta O(o\mid s',a)\sum _{s\in S}T(s'\mid s,a)b(s)$$
 
+where $η = \frac{1}{Pr ( o ∣ b , a )}$ is a normalizing constant with 
+$$Pr ( o ∣ b , a ) = \sum_{s'\in S} O ( o ∣ s' , a ) \sum_{s \in S}( s'∣s,a)b(s)$$
 
 ## Simulation
 
