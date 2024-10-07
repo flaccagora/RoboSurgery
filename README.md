@@ -16,7 +16,8 @@
 # Surgical Robot Lung Exploration Simulation
 
 ## Introduction
-The goal of this project is to simulate a surgical robot that can explore the lung of a patient to find a tumor.
+The goal of this project is to simulate a surgical robot that can explore the lung of a patient to find a lesion, moreover the robot is going to navigate through a deformed lung and it should determine the parameters of this tranformation to gain insights about it's location and lung deformation.
+\
 The following is an abstract simulation of the robot in action.
 
 
