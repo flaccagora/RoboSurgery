@@ -1,4 +1,0 @@
-gumnasium
-gymnasium-robotics
-stable-baselines3[extra]
-ipywidgets
