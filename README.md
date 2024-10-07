@@ -6,6 +6,8 @@
     - [State structure](#state-structure)
     - [Action Space](#action-space)
     - [Reward Function](#reward-function)
+  - [POMDP](#pomdp)
+    - [Belief State](#belief-state)
   - [Agent and Training](#agent-and-training)
 - [Run](#run)
 - [TODO](#todo)
@@ -22,7 +24,7 @@ The environment is a high level simulation of the real phenomena. The robot is a
 
 ### State structure
 
-The observation consists of a dictionary with information about the robot's position and goal. The dictionary consists of the following 4 keys:
+A state is completely specified by the following dictionary:
 
 * `robot`: its value is an `ndarray` of shape `(2,)`. The elements of the array correspond to the following:
 
@@ -62,7 +64,29 @@ The action space is a `Box(-1.0, 1.0, (2,), float32)`. An action represents the 
 
 ### Reward Function
 
+The reward function is defined as follows:
 
+$$r(s, a, s') = $$
+
+## POMDP
+
+Since The environment is partially observable, the problem is framed as a POMDP.
+
+* The observation consists of information about the cells in the robot's proximity. The dictionary consists of the following:
+
+    | Num | Observation                     | is_Wall     |  
+    | --- | --------------------------------|-------------|
+    | 0   | relative cell + (0,-1)          | bool        |
+    | 1   | relative cell + (1,0)           | bool        |
+    | 2   | relative cell + (0,1)           | bool        |
+    | 3   | relative cell + (-1,0)          | bool        |
+
+* Model of the environment
+### Belief State
+As a probability over the states, the belief state 
+
+
+$$b(s) = p_1(x,y)\cdot p_2(\underbar{$\theta$})\cdot p_3(t_x,t_y)$$
 
 
 ## Agent and Training
@@ -87,7 +111,6 @@ pip install -e .
 open and run jupyter notebook [test.ipynb](./test.ipynb)
 
 # TODO
-- [ ] Multimodal Architecture ?? 
 - [ ] add observation of the maze in robot proximity
 - [ ] Maze deformation
 - [ ] POMDP
