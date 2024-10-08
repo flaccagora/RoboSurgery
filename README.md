@@ -57,7 +57,7 @@ $$s'=(x',y',t_x,t_y,M,\theta)$$
 
 where
 
-$$(x',y') = (x,y) \text { or }(x',y') = (x,y) + a $$
+$$(x',y') = (x,y) + a $$
 
 The **reward function** $R(s,a,s')$ is defined as follows:
 
