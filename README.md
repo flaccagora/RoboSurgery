@@ -2,10 +2,8 @@
 - [Table of Contents](#table-of-contents)
 - [Surgical Robot Lung Exploration Simulation](#surgical-robot-lung-exploration-simulation)
   - [Introduction](#introduction)
-  - [POMDP framework (only theta)](#pomdp-framework-only-theta)
-    - [Belief State](#belief-state)
   - [POMDP framework](#pomdp-framework)
-    - [Belief State](#belief-state-1)
+    - [Belief State](#belief-state)
   - [Simulation](#simulation)
     - [State structure](#state-structure)
     - [Action Space](#action-space)
@@ -22,78 +20,6 @@ The goal of this project is to simulate a surgical robot that can explore the lu
 \
 The following is an abstract simulation of the robot in action.
 
-## POMDP framework (only theta)
-
-Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where
-
-  $S$ is a set of states, \
-  $A$ is a set of actions, \
-  $T$ is a set of conditional transition probabilities between states, \
-  $R: S\times A \rightarrow \mathbb{R}$  is the reward function. \
-  $\Omega$ is a set of observations, \
-  $O$ is a set of conditional observation probabilities, \
-  $\gamma \in [0,1)$ is the discount factor.
-
-in this case, 
-
-A **state** $s$ is $(f_\theta)$ where: \
-    * $f_\theta:M \rightarrow M$ where $\theta$ is the parameter for the deformation function 
-      from the space of maze maps to the space of maze maps.
-  
-Each **action** $a$ is a 2-tuple $(\Delta x, \Delta y)$ where $(\Delta x, \Delta y)$ is the movement of the robot in the x and y axis respectively. there are 4 possible actions: \
-    * $(0,-1)$ move up \
-    * $(1,0)$ move right \
-    * $(0,1)$ move down \
-    * $(-1,0)$ move left
-
-The **conditional transition probabilities** $T(s' | s, a)$ are deterministic, the robot moves to the new state $s'$ with probability 1. if and only if 
-
-$$T(s' | s, a) = (s = s') = (\theta = \theta')$$
-
-The **reward function** $R(s,a,s')$ is defined as follows:
-
-
- $$R(s,a,s') = 
-    \begin{cases}
-    \frac{-0.1}{mapsize} &   s' \neq s_{goal} \wedge \text{moved} \\ 
-    \frac{-0.2}{mapsize} &   s' \neq s_{goal}  \wedge \text{hit wall}\\
-    1 &   s' = s_{goal} \\
-    \end{cases}    
-$$
-
-The **observation space** $\Omega$ is a set of observations, in this case, the observation is a 5-tuple $(o_0,o_1,o_2,o_3,0_4)$ where $o_i$ is a boolean value that represents if there is a wall in the relative adjacent cell
-  
-  ```
-  [[o1,o2,o3],
-  [o1,0,o4],
-  [0,0,0]]
-  ```
-based on the orientation of the robot.
-
-
-The **conditional observation probabilities** $O(o|s,a)$ are also deterministic.
-
-
-$$O(o|s,a)= O(o|s) = p(o \text{ in } f_\theta(M)) $$
-
-Where $f$ is the deformation function that acts on the original maze map M with parameter $\theta$.
-
-### Belief State
-
-Because the agent does not directly observe the environment's state, the agent must make decisions under uncertainty of the true environment state. The belief function is a probability distribution over the states of the environment.
-
-$$b : S \rightarrow [0,1] \text{ and } \sum_s b(s) = 1  $$
-
-By interacting with the environment and receiving observations, the agent may update its belief in the true state by updating the probability distribution of the current state
-
-$$ b'(s')=\eta O(o\mid s',a)\sum _{s\in S}T(s'\mid s,a)b(s) = \eta O(o\mid s',a)b(s') $$
-
-where $η = \frac{1}{Pr ( o ∣ b , a )}$ is a normalizing constant with 
-$$Pr ( o ∣ b , a ) = \sum_{s'\in S} O ( o ∣ s' , a ) \sum_{s \in S}T( s'∣s,a)b(s)$$
-
-$$Pr ( o ∣ b , a ) = \sum_{s'}O(o|s')b(s')$$
-
-
 ## POMDP framework
 
 Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where
@@ -108,29 +34,26 @@ Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where
 
 in this case, 
 
-A **state** $s$ is a 6-tuple $(x,y,t_x,t_y,M,\theta)$ where: \
+A **state** $s$ is a 6-tuple $(x,y,\phi,\theta)$ where: \
     * $(x,y)$ is the robot position \
-    * $(t_x,t_y)$ is the target position \
-    * $M$ is the maze map \
+    * $\phi$ is the robot orientation \
     * $\theta$ is the parameter for the deformation function $f_{\theta}$
   
 Each **action** $a$ is a 2-tuple $(\Delta x, \Delta y)$ where $(\Delta x, \Delta y)$ is the movement of the robot in the x and y axis respectively. there are 4 possible actions: \
-    * $(0,-1)$ move up \
-    * $(1,0)$ move right \
-    * $(0,1)$ move down \
-    * $(-1,0)$ move left
+    * 0 move forward \
+    * 1 turn right \
+    * 2 move back \
+    * 3 turn left
 
 The **conditional transition probabilities** $T(s' | s, a)$ are deterministic, the robot moves to the new state $s'$ with probability 1. if and only if 
 
-$$s = (x,y,t_x,t_y,M,\theta)$$ 
-
-and 
-
-$$s'=(x',y',t_x,t_y,M,\theta)$$ 
+$s = (x,y,\phi,\theta)$ and $s'=(x',y',\phi,\theta)$
 
 where
 
-$$(x',y') = (x,y) + a $$
+$(x',y') = (x,y) + a$ and $\phi' = \phi + a \mod 4$ and $\theta' = \theta$
+
+Note that the robot can visit any cell in the maze, even if it is a wall.
 
 The **reward function** $R(s,a,s')$ is defined as follows:
 
