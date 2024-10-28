@@ -45,7 +45,7 @@ class DQNAgent(object):
                  replay_memory_size=500000,
                  replay_memory_init_size=100,
                  update_target_estimator_every=10000,
-                 discount_factor=1,
+                 discount_factor=.95,
                  epsilon_start=0.5,
                  epsilon_end=0.1,
                  epsilon_decay_steps=100,
