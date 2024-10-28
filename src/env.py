@@ -98,10 +98,10 @@ class GridEnvDeform(gym.Env):
             reward =  10            
         elif np.all((x_,y_) == (x,y)):
             # if the agent has not moved (only at the boundary of the maze)
-            reward =  -100/(self.max_shape[0]*self.max_shape[1])
+            reward =  -50/(self.max_shape[0]*self.max_shape[1])
         elif self.maze[x_, y_] == 1:
             # if the agent has entered a wall
-            reward =  -100/(self.max_shape[0]*self.max_shape[1])
+            reward =  -50/(self.max_shape[0]*self.max_shape[1])
         elif self.maze[x_, y_] == 0:
             # if the agent has moved to a free cell
             reward =  -1/(self.max_shape[0]*self.max_shape[1])
@@ -116,12 +116,16 @@ class GridEnvDeform(gym.Env):
         
         return s_, reward, terminated, truncated, info, 
     
-    def get_observation(self, s):
+    def get_observation(self, s=None):
 
-        self.set_deformed_maze(s[1])
+        if s is None:
+            agent_pos = self.agent_pos
+            agent_orientation = self.agent_orientation
+        else: 
+            self.set_deformed_maze(s[1])
+            agent_pos = s[0][:2]
+            agent_orientation = s[0][2]
 
-        agent_pos = s[0][:2]
-        agent_orientation = s[0][2]
         ind = [agent_pos + a for a in [np.array([0,-1]),
                                             np.array([-1,-1]),
                                             np.array([-1,0]),

@@ -1,4 +1,8 @@
 import torch
+import itertools
+
+obs_dict = {obs:i for i, obs in enumerate(list(itertools.product([0,1], repeat=5)))}
+
 
 def belief_entropy(probabilities):
     
@@ -8,7 +12,7 @@ def belief_entropy(probabilities):
     return entropy.item()  # .item() to get a standard Python float
 
 
-def update_belief(self, belief, action, observation, T, O):
+def update_belief(belief, action, observation, T, O):
     """
     Perform a Bayesian belief update in a POMDP with action-dependent transition and observation models.
 
@@ -26,7 +30,7 @@ def update_belief(self, belief, action, observation, T, O):
     predicted_belief = torch.matmul(belief, T[:, action])
 
     # Update Step: Multiply by observation likelihood
-    observation_likelihood = O[:, action, self.obs_dict[tuple(observation.tolist())]]
+    observation_likelihood = O[:, action, obs_dict[tuple(observation.tolist())]]
     new_belief = predicted_belief * observation_likelihood
 
     # Normalize the updated belief to ensure it's a valid probability distribution
