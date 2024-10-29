@@ -103,3 +103,78 @@ class DoubleDQNAgent:
         self.q_network.load_state_dict(torch.load(path))
         self.target_network.load_state_dict(self.q_network.state_dict())
 
+def evaluate_agent(env_name, agent, num_episodes=10):
+    env = gym.make(env_name)
+    total_rewards = []
+
+    for episode in range(num_episodes):
+        state, _ = env.reset()
+        episode_reward = 0
+        done = False
+
+        while not done:
+            # Render the environment
+            # env.render()
+
+            # Agent takes an action using a greedy policy (without exploration)
+            action = agent.choose_action(state)
+            next_state, reward, done, _, _ = env.step(action)
+
+            state = next_state
+            episode_reward += reward
+
+            if done:
+                total_rewards.append(episode_reward)
+                print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward}")
+
+    env.close()
+    avg_reward = np.mean(total_rewards)
+    print(f"Average Reward over {num_episodes} episodes: {avg_reward}")
+    return avg_reward
+
+# Training loop
+def train_agent(env_name, num_episodes=500):
+    env = gym.make(env_name)
+    state_dim = env.observation_space.shape[0]
+    action_dim = env.action_space.n
+
+    agent = DoubleDQNAgent(state_dim, action_dim)
+    rewards = []
+    evalrewards = []
+
+    for episode in range(num_episodes):
+        state, _ = env.reset()
+        episode_reward = 0
+        done = False
+
+        while not done:
+            action = agent.choose_action(state)
+            next_state, reward, done, _, _ = env.step(action)
+            agent.store_transition(state, action, reward, next_state, done)
+
+            agent.train()
+            state = next_state
+            episode_reward += reward
+
+            if done:
+                agent.update_epsilon()
+                rewards.append(episode_reward)
+                print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward}, Epsilon: {agent.epsilon:.2f}")
+
+        if episode != 0 and episode % 20 == 0:
+            avg_reward = evaluate_agent(env_name, agent)
+            evalrewards.append(avg_reward)
+            print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
+
+    env.close()
+    print("Training complete.")
+    print("evalrewards: ", evalrewards)
+
+    # save agent
+    agent.save("chat_dqn.pth")
+    
+    return rewards
+
+# Run the training
+if __name__ == "__main__":
+    rewards = train_agent("CartPole-v1", num_episodes=500)

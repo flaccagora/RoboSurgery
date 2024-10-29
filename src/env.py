@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import itertools
 import torch
-from dqn import DQNAgent
+from old.dqn_old import DQNAgent # for typing only
 
 class GridEnvDeform(gym.Env):
     def __init__(self, maze, l0,h0,l1,h1):
@@ -100,16 +100,16 @@ class GridEnvDeform(gym.Env):
 
         if np.all((x_,y_) == self.goal_pos):
             # if the agent is in the goal position
-            reward =  10            
+            reward =  1            
         elif np.all((x_,y_) == (x,y)):
             # if the agent has not moved (only at the boundary of the maze)
-            reward =  -50/(self.max_shape[0]*self.max_shape[1])
+            reward =  -1 # -50/(self.max_shape[0]*self.max_shape[1])
         elif self.maze[x_, y_] == 1:
             # if the agent has entered a wall
-            reward =  -50/(self.max_shape[0]*self.max_shape[1])
+            reward =  -2 # -50/(self.max_shape[0]*self.max_shape[1])
         elif self.maze[x_, y_] == 0:
             # if the agent has moved to a free cell
-            reward =  -1/(self.max_shape[0]*self.max_shape[1])
+            reward =  -0.5 # -1/(self.max_shape[0]*self.max_shape[1])
 
         info = {}
         truncated = False 
@@ -256,7 +256,7 @@ class POMDPWrapper_v0():
         # done = True if np.all(self.states[s_prime.item()][0][:2] == self.env.goal_pos) else False
         done = True if r.item() == 10 else False
         
-        return obs.item(), r.item(), done , info 
+        return obs.item(), r.item(), done , info
     
     def run(self, num_trajectories):
         """ 
@@ -266,7 +266,7 @@ class POMDPWrapper_v0():
         repeat
         
         Initialize belief if new episode
-        for all actions compute b,a,b',r and store in replay buffer
+        for all actions compute b,a,b',r and store
         execute the best action in the environment
         get new belief 
         
@@ -292,10 +292,11 @@ class POMDPWrapper_v0():
                 # state['raw_legal_actions'] = actions
                 # state['legal_actions'] = actions
                 la =  {i:i for i in range(4)}
-                # POMDP
+                # POMDP feed the agent with the belief state
                 #state = {'obs':b, 'raw_legal_actions':la, 'legal_actions':la}
                 #next_state = {'obs':b_prime, 'raw_legal_actions':la, 'legal_actions':la}
-                # FULLY OBSERVABLE
+                
+                # FULLY OBSERVABLE FOR TESTING ONLY feed the agent with the actual state
                 state = {'obs':[s], 'raw_legal_actions':la, 'legal_actions':la}
                 next_state = {'obs':[info['actual_state']], 'raw_legal_actions':la, 'legal_actions':la}
 
@@ -316,7 +317,8 @@ class POMDPWrapper_v0():
         
         return trajectories
 
-   
+    def reset(self):
+        return np.random.randint(0,len(self.states)), {}
 
     def update_belief(self, belief, action, observation):
         """
