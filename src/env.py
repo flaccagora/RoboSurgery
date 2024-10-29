@@ -61,7 +61,9 @@ class GridEnvDeform(gym.Env):
     
     def step(self, a, s=None, execute=False):
 
-        """take action a from state s (if given) or from actual state of the maze """
+        """take action a from state s (if given) or from actual state of the maze 
+        
+        return the next state, the reward, if the episode is terminated, if the episode is truncated, info"""
         
         if s is not None:
             self.set_deformed_maze(s[1])
@@ -219,7 +221,7 @@ class GridEnvDeform(gym.Env):
         self.goal_pos = self.original_maze.shape * np.array([randomdeformation[1],randomdeformation[0]])
         self.theta = randomdeformation
         self.timestep = 0
-        return (self.agent_pos[0],self.agent_pos[1], self.agent_orientation), (self.maze.shape[0], self.maze.shape[1])
+        return ((self.agent_pos[0],self.agent_pos[1], self.agent_orientation), self.theta), {}
         
     def is_done(self):
         return np.all(self.agent_pos == self.goal_pos)
