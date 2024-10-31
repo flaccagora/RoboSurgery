@@ -21,7 +21,7 @@ class QNetwork(nn.Module):
 
 # Define the Double DQN agent
 class DoubleDQNAgent:
-    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10):
+    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10, q_network=None):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -32,19 +32,31 @@ class DoubleDQNAgent:
         self.step_count = 0
 
         # Q-network and target network
-        self.q_network = QNetwork(state_dim, action_dim)
+        if q_network is None:
+            self.q_network = QNetwork(state_dim, action_dim)
+        else:
+            self.q_network = q_network
+            
         self.target_network = QNetwork(state_dim, action_dim)
         self.target_network.load_state_dict(self.q_network.state_dict())
         self.target_network.eval()
 
         # Optimizer
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=lr)
+        # self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=5, gamma=0.1)
+
         self.loss_fn = nn.MSELoss()
 
         # Exploration parameters
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
+    
+    def choose_deterministic_action(self, state):
+        state = torch.FloatTensor(state).unsqueeze(0)
+        with torch.no_grad():
+            q_values = self.q_network(state)
+        return torch.argmax(q_values).item()
 
     def choose_action(self, state):
         if np.random.rand() < self.epsilon:
@@ -70,10 +82,10 @@ class DoubleDQNAgent:
         batch = random.sample(self.memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
 
-        states = torch.FloatTensor(states)
+        states = torch.stack(states)
         actions = torch.LongTensor(actions).unsqueeze(1)
         rewards = torch.FloatTensor(rewards).unsqueeze(1)
-        next_states = torch.FloatTensor(next_states)
+        next_states = torch.stack(next_states)
         dones = torch.FloatTensor(dones).unsqueeze(1)
 
         # Compute Q(s, a) using the main Q-network
@@ -95,6 +107,7 @@ class DoubleDQNAgent:
         self.step_count += 1
         if self.step_count % self.target_update_freq == 0:
             self.target_network.load_state_dict(self.q_network.state_dict())
+
 
     def save(self, path):
         torch.save(self.q_network.state_dict(), path)

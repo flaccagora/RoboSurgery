@@ -62,7 +62,8 @@ def train_agent(env_name, num_episodes=500):
                       mlp_layers=[128, 128], num_actions=action_dim,
                       learning_rate=0.001, discount_factor=0.99,
                       update_target_estimator_every=10,
-                      replay_memory_size=10000)
+                      replay_memory_size=10000,
+                      epsilon_start=1.0, epsilon_end=0.01,epsilon_decay_steps=500,)
     rewards = []
     evalrewards = []
 

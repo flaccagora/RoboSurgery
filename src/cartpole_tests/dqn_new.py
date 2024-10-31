@@ -138,7 +138,7 @@ def train_agent(env_name, num_episodes=500):
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
 
-    agent = DoubleDQNAgent(state_dim, action_dim)
+    agent = DoubleDQNAgent(state_dim, action_dim, batch_size=2)
     rewards = []
     evalrewards = []
 
@@ -177,4 +177,4 @@ def train_agent(env_name, num_episodes=500):
 
 # Run the training
 if __name__ == "__main__":
-    rewards = train_agent("CartPole-v1", num_episodes=500)
+    rewards = train_agent("CartPole-v1", num_episodes=2)
