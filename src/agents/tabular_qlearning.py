@@ -17,7 +17,7 @@ def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100):
             # env.render()
 
             # Agent takes an action using a greedy policy (without exploration)
-            action = torch.argmax(Q[state])
+            action = np.argmax(Q[state])
             next_state, reward, done, _, info = env.step(action.item(),s)
             state = state_dict[next_state]
 
