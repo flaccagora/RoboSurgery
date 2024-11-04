@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import itertools
 import torch
-from old.dqn_old import DQNAgent # for typing only
+from agents.dqn import DoubleDQNAgent # for typing only
 
 class GridEnvDeform(gym.Env):
     def __init__(self, maze, l0,h0,l1,h1):
@@ -232,9 +232,8 @@ class GridEnvDeform(gym.Env):
 class POMDPWrapper_v0():
     """This is a wrapper for the GridEnvDeform class that makes the environment partially observable."""
 
-    def __init__(self, env: GridEnvDeform, agent : DQNAgent, T,O,R,*args, **kwargs):
+    def __init__(self, env: GridEnvDeform, agent : DoubleDQNAgent, T,R,O,*args, **kwargs):
 
-        self.env = env
         self.agent = agent
         self.states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(env.l0,env.h0) for j in range(env.l1,env.h1)] 
         self.actions = [0,1,2,3]
@@ -249,15 +248,15 @@ class POMDPWrapper_v0():
         self.O = O
         self.R = R
     
-    def step(self, s,a):
+    def step(self,s,a):
         s_prime = torch.argmax(self.T[s,a,:])
-        r = self.R[s,a,s_prime]
+        r = self.R[s,a,s_prime.item()]
         obs = torch.argmax(self.O[s_prime,0,:])
         info = {"actual_state": s_prime.item()}
 
         # done = True if np.all(self.states[s_prime.item()][0][:2] == self.env.goal_pos) else False
         done = True if r.item() == 10 else False
-        
+
         return obs.item(), r.item(), done , info
     
     def run(self, num_trajectories):
@@ -285,31 +284,20 @@ class POMDPWrapper_v0():
         s = np.random.randint(0,len(self.states))
 
         while len(trajectories) < num_trajectories:
-            for a in self.env.actions:
+            for a in self.actions:
                 next_obs, reward, done, info = self.step(s, a)
                 b_prime = self.update_belief(b, a, next_obs)
 
-                # format state as dqn agent expects
-                # state['obs'] = b (percieved state)
-                # state['raw_legal_actions'] = actions
-                # state['legal_actions'] = actions
-                la =  {i:i for i in range(4)}
                 # POMDP feed the agent with the belief state
                 #state = {'obs':b, 'raw_legal_actions':la, 'legal_actions':la}
                 #next_state = {'obs':b_prime, 'raw_legal_actions':la, 'legal_actions':la}
                 
-                # FULLY OBSERVABLE FOR TESTING ONLY feed the agent with the actual state
-                state = {'obs':[s], 'raw_legal_actions':la, 'legal_actions':la}
-                next_state = {'obs':[info['actual_state']], 'raw_legal_actions':la, 'legal_actions':la}
-
-
-
                 # Store trajectory
                 # trajectories.append(({'obs':b}, a, reward, {'obs':b_prime}, done))
-                trajectories.append((state, a, reward, next_state, done))
+                trajectories.append((b, a, reward, b_prime, done))
 
             # step in the environment
-            best_action = self.agent.step(state)    
+            best_action = self.agent.step(b)    
             next_obs, _, done, info = self.step(s,best_action)
             b = self.update_belief(b, best_action, next_obs)
             s = info['actual_state']
@@ -320,7 +308,13 @@ class POMDPWrapper_v0():
         return trajectories
 
     def reset(self):
-        return np.random.randint(0,len(self.states)), {}
+        # set random state
+        s = np.random.randint(0,len(self.states))
+
+        # get observation
+        obs = torch.argmax(self.O[s,0])
+        info = {"actual_state": s}
+        return obs, info
 
     def update_belief(self, belief, action, observation):
         """

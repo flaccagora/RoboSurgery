@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from env import GridEnvDeform
+from environment.env import GridEnvDeform
 
 def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100, max_episode_steps=100):
     total_rewards = []

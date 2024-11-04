@@ -30,7 +30,9 @@ def update_belief(belief, action, observation, T, O):
     predicted_belief = torch.matmul(belief, T[:, action])
 
     # Update Step: Multiply by observation likelihood
-    observation_likelihood = O[:, action, obs_dict[tuple(observation.tolist())]]
+    # observation_likelihood = O[:, action, obs_dict[tuple(observation.tolist())]]
+    observation_likelihood = O[:, action, observation]
+
     new_belief = predicted_belief * observation_likelihood
 
     # Normalize the updated belief to ensure it's a valid probability distribution
