@@ -2,7 +2,7 @@ import numpy as np
 import random
 from env import GridEnvDeform
 
-def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100):
+def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100, max_episode_steps=100):
     total_rewards = []
 
     for episode in range(num_episodes):
@@ -11,7 +11,7 @@ def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100):
 
         episode_reward = 0
         done = False
-        c = 25
+        c = max_episode_steps
         while c > 0:
             # Render the environment
             # env.render()
@@ -34,7 +34,7 @@ def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100):
     return avg_reward
 
 
-def q_learning(env : GridEnvDeform, num_episodes=1000, alpha=0.1, gamma=0.99, epsilon=0.1, states_dict=None, evaluate_every=100):
+def q_learning(env : GridEnvDeform, num_episodes=1000, max_episode_steps=100, alpha=0.1, gamma=0.99, epsilon=0.1, states_dict=None, evaluate_every=100):
     """
     Perform Q-learning on an environment.
     
@@ -57,7 +57,7 @@ def q_learning(env : GridEnvDeform, num_episodes=1000, alpha=0.1, gamma=0.99, ep
         done = False
         step = 0
 
-        while not done and step < 100:
+        while not done and step < max_episode_steps:
             # Epsilon-greedy action selection
             if random.uniform(0, 1) < epsilon:
                 action = np.random.randint(4)  # Explore
@@ -65,7 +65,7 @@ def q_learning(env : GridEnvDeform, num_episodes=1000, alpha=0.1, gamma=0.99, ep
                 action = np.argmax(Q[state])  # Exploit
             
             # Take action and observe outcome
-            next_state, reward, done, _, _ = env.step(action)
+            next_state, reward, done, _, _ = env.step(action, execute=True)
             next_state = states_dict[next_state]
             # Q-learning update
             best_next_action = np.argmax(Q[next_state])

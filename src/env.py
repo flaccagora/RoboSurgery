@@ -66,7 +66,7 @@ class GridEnvDeform(gym.Env):
         return the next state, the reward, if the episode is terminated, if the episode is truncated, info"""
         
         if s is not None:
-            self.set_deformed_maze(s[1])
+            self.set_state(s)
             x, y, phi = s[0][:3]
             x_, y_, phi_ = x, y, phi
         else:
