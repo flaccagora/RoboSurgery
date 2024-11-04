@@ -165,3 +165,4 @@ personal.txt
 logs/
 *.pt
 old/
+.vscode
