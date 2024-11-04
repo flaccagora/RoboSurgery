@@ -349,6 +349,67 @@ class POMDPWrapper_v0():
              
         return new_belief        
  
+class POMDPWrapper_v1():
+    """This is a wrapper for the GridEnvDeform class that makes the environment partially observable."""
+
+    def __init__(self, env: GridEnvDeform, T,O,R,*args, **kwargs):
+
+        self.env = env
+        self.states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(env.l0,env.h0) for j in range(env.l1,env.h1)] 
+        self.actions = [0,1,2,3]
+        self.observations = list(itertools.product([0,1], repeat=5))
+        self.thetas = env.deformations
+
+        self.obs_dict = {obs : i for i, obs in enumerate(self.observations)}
+        self.state_dict = {state : i for i, state in enumerate(self.states)}
+        
+        # Transition, Observation and Reward model T(S,A,S'), O(S,A,O), R(S,A,S')
+        self.T = T
+        self.O = O
+        self.R = R
+    
+    def step(self, s,a):
+        s_prime = torch.argmax(self.T[s,a,:])
+        r = self.R[s,a,s_prime]
+        obs = torch.argmax(self.O[s_prime,0,:])
+        info = {"actual_state": s_prime.item()}
+
+        # done = True if np.all(self.states[s_prime.item()][0][:2] == self.env.goal_pos) else False
+        done = True if r.item() == 10 else False
+        
+        return obs.item(), r.item(), done , info
+    
+    def reset(self):
+        return np.random.randint(0,len(self.states)), {}
+
+    def update_belief(self, belief, action, observation):
+        """
+        Perform a Bayesian belief update in a POMDP with action-dependent transition and observation models.
+
+        Parameters:
+            belief (torch.Tensor): Initial belief distribution over states, shape (num_states,)
+            T (torch.Tensor): Transition probabilities, shape (num_states, num_actions, num_states)
+            O (torch.Tensor): Observation probabilities, shape (num_states, num_actions, num_observations)
+            action (int): The action taken (index of action)
+            observation (int): The observation received (index of observation)
+
+        Returns:
+            torch.Tensor: The updated belief over states, shape (num_states,)
+        """
+        # Prediction Step: Compute predicted belief over next states
+        predicted_belief = torch.matmul(belief, self.T[:, action])
+
+        # Update Step: Multiply by observation likelihood
+        observation_likelihood = self.O[:, action, observation]
+        new_belief = predicted_belief * observation_likelihood
+
+        # Normalize the updated belief to ensure it's a valid probability distribution
+        if new_belief.sum() > 0:
+            new_belief /= new_belief.sum() 
+             
+        return new_belief        
+
+
 def create_maze(dim):
     maze = np.ones((dim*2+1, dim*2+1))
     x, y = (0, 0)
