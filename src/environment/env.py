@@ -105,7 +105,7 @@ class GridEnvDeform(gym.Env):
             reward =  1            
         elif np.all((x_,y_) == (x,y)):
             # if the agent has not moved (only at the boundary of the maze)
-            reward =  -1 # -50/(self.max_shape[0]*self.max_shape[1])
+            reward =  -2 # -50/(self.max_shape[0]*self.max_shape[1])
         elif self.maze[x_, y_] == 1:
             # if the agent has entered a wall
             reward =  -2 # -50/(self.max_shape[0]*self.max_shape[1])
@@ -123,12 +123,48 @@ class GridEnvDeform(gym.Env):
         
         return s_, reward, terminated, truncated, info, 
     
+    def next_state(self, a, s, execute=False):
+
+        """take action a from state s = x,y,phi 
+        
+        return the next state,
+        """
+    
+        x, y, phi = s  
+        x_, y_, phi_ = x, y, phi      
+
+        actual_action = (a + phi) % 4
+        
+        if actual_action == 0:  # Move up
+            new_pos = [x - 1, y]
+        elif actual_action == 2:  # Move down
+            new_pos = [x + 1, y]
+        elif actual_action == 3:  # Move left
+            new_pos = [x, y - 1]
+        elif actual_action == 1:  # Move right
+            new_pos = [x, y + 1]
+        else:
+            raise ValueError("Invalid Action")
+        
+        # Check if the new position is valid (inside the maze and not a wall)
+        if 0 < new_pos[0] < self.max_shape[0]-1 and 0 < new_pos[1] < self.max_shape[1]-1:
+            x_, y_ = new_pos
+
+        phi_ = (phi + a) % 4
+        
+        s_ = (x_, y_, phi_)
+        
+        
+        return s_ 
+
+
     def get_observation(self, s=None):
 
         if s is None:
             agent_pos = self.agent_pos
             agent_orientation = self.agent_orientation
-        else: 
+        else:
+            prior_state = self.get_state()
             self.set_deformed_maze(s[1])
             agent_pos = s[0][:2]
             agent_orientation = s[0][2]
@@ -144,6 +180,9 @@ class GridEnvDeform(gym.Env):
 
         agent_obs = np.array([self.maze[tuple(ind[i%8])] 
                                                 for i in range(2*agent_orientation, 2*agent_orientation+5)])
+        
+        if s is not None:
+            self.set_state(prior_state)
 
         
         return agent_obs

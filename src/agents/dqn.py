@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import random
 from collections import deque
+import wandb
 
 # Define the neural network architecture for the Q-network
 class QNetwork(nn.Module):
@@ -21,7 +22,7 @@ class QNetwork(nn.Module):
 
 # Define the Double DQN agent
 class DoubleDQNAgent:
-    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10, q_network=None):
+    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10, q_network=None,wandb=False):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -30,6 +31,8 @@ class DoubleDQNAgent:
         self.memory = deque(maxlen=memory_size)
         self.target_update_freq = target_update_freq
         self.step_count = 0
+        self.train_running_loss = 0
+        self.log_every = 10
 
         # Q-network and target network
         if q_network is None:
@@ -51,6 +54,12 @@ class DoubleDQNAgent:
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
+        if wandb:
+            self.wandbinit()
+    def wandbinit(self):
+        import wandb
+        wandb.init(project="dqn")
+
     
     def choose_deterministic_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)
@@ -99,14 +108,24 @@ class DoubleDQNAgent:
 
         # Compute the loss and update the main Q-network
         loss = self.loss_fn(q_values, q_targets)
+        # for log purposes
+        self.train_running_loss += loss.item()
+        
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-
         # Update the target network periodically
         self.step_count += 1
         if self.step_count % self.target_update_freq == 0:
             self.target_network.load_state_dict(self.q_network.state_dict())
+
+        if self.step_count % self.log_every:
+            wandb.log({"loss":self.train_running_loss/(self.batch_size*self.log_every),
+                       "epsilon":self.epsilon,
+                       "step_count":self.step_count,
+                       })
+
+            self.train_running_loss = 0
 
 
     def save(self, path):

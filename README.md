@@ -12,6 +12,7 @@
 - [Run](#run)
 - [TODO](#todo)
 - [Ideas](#ideas)
+- [performance test](#performance-test)
 
 # Surgical Robot Lung Exploration Simulation
 
@@ -184,3 +185,7 @@ open and run jupyter notebook [test.ipynb](./test.ipynb)
 - https://isaac-sim.github.io/IsaacLab/source/overview/reinforcement-learning/rl_frameworks.html
 - https://github.com/Denys88/rl_games
 - https://deepmind.google/discover/blog/rt-2-new-model-translates-vision-and-language-into-action/
+
+# performance test
+
+- studio sulle value function ranking e comparazione delle V 
