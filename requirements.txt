@@ -1,0 +1,7 @@
+absl-py==2.1.0
+ale-py==0.8.1
+altair==5.4.1
+gymnasium==0.29.1
+torch==2.4.1
+tqdm==4.66.5
+wandb==0.18.6
