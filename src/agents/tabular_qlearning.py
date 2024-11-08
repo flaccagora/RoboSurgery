@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from environment.env import GridEnvDeform
+from tqdm import tqdm
 
 def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100, max_episode_steps=100):
     total_rewards = []
@@ -49,7 +50,10 @@ def q_learning(env : GridEnvDeform, num_episodes=1000, max_episode_steps=100, al
         Q-table after training.
     """
     # Initialize Q-table with zeros
-    Q = np.zeros((len(env.states), len(env.actions)))
+    Q = -np.ones((len(env.states), len(env.actions)))
+
+    progress_bar = tqdm(range(num_episodes), desc="Q-Learning")
+    progress_bar.set_description_str("Q-Learning")
     
     for episode in range(num_episodes):
         state, _ = env.reset()
@@ -77,12 +81,18 @@ def q_learning(env : GridEnvDeform, num_episodes=1000, max_episode_steps=100, al
             step += 1
         if episode % evaluate_every == 0:
             avg_reward = eval_tabular(env, Q, states_dict)
-            print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
-            
+            # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
+            logs = {
+                "average_reward": avg_reward,
+            }
+            progress_bar.set_postfix(**logs)
+        
+        progress_bar.update(1)
+
     epsilon *= 0.99
     if epsilon < 0.1:
         epsilon = 0.1  # Decay epsilon
-    
+    progress_bar.close()
     return Q
 
 

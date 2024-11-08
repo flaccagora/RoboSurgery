@@ -439,7 +439,7 @@ class IDS():
         R_t_a = torch.zeros(len(self.env.deformations),len(self.env.actions))
         for t, theta in enumerate(self.env.deformations):
             for a, action in enumerate(self.env.actions):
-                R_t_a[t][a] = env.R((pos,theta),a)
+                R_t_a[t][a] = self.env.R((pos,theta),a)
         
         E_R = torch.einsum('ta,t->a',R_t_a,b)
 

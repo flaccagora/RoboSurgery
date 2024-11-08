@@ -5,6 +5,7 @@ import random
 import itertools
 import torch
 from agents.dqn import DoubleDQNAgent # for typing only
+import pygame
 
 class GridEnvDeform(gym.Env):
     def __init__(self, maze, l0,h0,l1,h1):
@@ -35,6 +36,8 @@ class GridEnvDeform(gym.Env):
 
         self.goal_pos = self.original_maze.shape - np.array([2,2])
         
+        self.set_rendering()
+
         self.reset()
         
     def T(self, s, a, s_):
@@ -157,7 +160,6 @@ class GridEnvDeform(gym.Env):
         
         return s_ 
 
-
     def get_observation(self, s=None):
 
         if s is None:
@@ -251,6 +253,39 @@ class GridEnvDeform(gym.Env):
         maze_render[tuple(self.goal_pos)] = 4  # Show goal position
         plt.imshow(maze_render, cmap='binary', origin='upper')
         plt.show()
+
+    def set_rendering(self):
+        self.screen_width = 800
+        self.screen_height = 600
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        pygame.display.set_caption("Maze Environment")            
+
+    def render_bis(self, s=None):
+        if s is not None:
+            self.set_state(s)
+
+        # Clear the screen
+        self.screen.fill((255, 255, 255))
+
+        # Draw the maze
+        cell_size = min(self.screen_width, self.screen_height) // max(self.max_shape)
+        for x in range(self.max_shape[0]):
+            for y in range(self.max_shape[1]):
+                if (x, y) == tuple(self.agent_pos):
+                    color = (255, 0, 0)  # Red for agent
+                elif (x, y) == tuple(self.goal_pos):
+                    color = (0, 255, 0)  # Green for goal
+                elif self.maze[x, y] == 1:
+                    color = (0, 0, 0)  # Black for walls
+                else:
+                    color = (255, 255, 255)  # White for free space
+                pygame.draw.rect(self.screen, color, (y * cell_size, x * cell_size, cell_size, cell_size))
+
+        # Update the display
+        pygame.display.flip()
+   
+    def close_render(self):
+        pygame.quit()
 
     def reset(self, seed=42):
         randomdeformation = random.choice(self.deformations)

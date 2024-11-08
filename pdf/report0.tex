@@ -1,0 +1,103 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}    % Unicode support
+\usepackage{amsmath,amsfonts}  % Math symbols
+\usepackage{graphicx}          % Images
+\usepackage{hyperref}          % Hyperlinks
+\usepackage{geometry}          % Page layout
+\usepackage{caption}           % Captions for figures/tables
+\usepackage{cite}              % Citations
+
+
+% Page layout settings
+\geometry{
+    top=1in,
+    bottom=1in,
+    left=1in,
+    right=1in
+}
+
+% Title information
+\title{RoboSurgery}
+\author{Matteo Nunziante\thanks{matteo.nunziante@studenti.units.it}}
+\date{\today}
+
+\begin{document}
+
+% Title
+\maketitle
+
+% Abstract
+\begin{abstract}
+
+\end{abstract}
+
+% Keywords
+\textbf{Keywords:} keyword1, keyword2, keyword3
+\newpage
+
+
+% Table of contents
+\tableofcontents 
+\newpage
+
+% Introduction
+\section{Introduction}
+The goal of this project is to simulate a surgical robot for exploring lungs of patients.
+% Related Work
+\section{Related Work}
+
+% Methodology
+\section{Probkem Statement}
+
+
+% POMDP
+\section{POMDP}
+Formal description of Partially Observable Markov Decision Process as in \cite{Spaan2012}
+
+Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where: \\
+  $S$ is a set of states, \\
+  $A$ is a set of actions, \\
+  $T$ is a set of conditional transition probabilities between states, \\
+  $R: S\times A \rightarrow \mathbb{R}$  is the reward function. \\
+  $\Omega$ is a set of observations, \\
+  $O$ is a set of conditional observation probabilities, \\
+  $\gamma \in [0,1)$ is the discount factor.
+
+\newpage
+\section{Mathematical Formulation}
+\subsection{State Space}
+From now on we're going to indicate as \textbf{State} the fully observable state of the 
+system, which is the position of the robot, the deformation of the object and the
+
+$$s = (\underbar{pos},\theta)$$
+
+where $\underbar{pos} = (x,y,\phi)$ is the position of the robot in the 2D space
+and $\theta$ represents the deformation parameters of the object.
+
+\subsection{Action Space}
+The action space is the set of all possible actions that the robot can take, 
+Forwards, Backwards, Left, Right.
+\subsection{Observation Space}
+The observation space is the set of all possible observations that the robot can make,
+which is the presence of an obstacle in its field of view.
+% Conclusion
+\newpage
+\section{Results}
+\subsection{QMDP}
+\subsection{Thompson Sampling}
+\subsection{Infotaxis}
+\subsection{Information Directed Sampling}
+\cite{russo2017learningoptimizeinformationdirectedsampling}
+
+
+
+
+% References
+\newpage
+\bibliographystyle{plain}
+\bibliography{ref}
+
+
+\end{document}

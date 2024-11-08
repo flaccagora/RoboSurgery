@@ -166,3 +166,14 @@ logs/
 *.pt
 old/
 .vscode
+
+# Latex files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.fls
+*.bib
