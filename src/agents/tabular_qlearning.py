@@ -2,6 +2,112 @@ import numpy as np
 import random
 from environment.env import GridEnvDeform
 from tqdm import tqdm
+import torch
+
+class Q_agent():
+    def __init__(self, Q,env):
+        self.Q = Q
+        self.env = env
+
+    def get_entropy(self, belief):
+        return -torch.sum(belief * torch.log(belief + 1e-10))
+
+    def get_action(self, belief,pos):
+        theta = self.env.deformations[torch.argmax(belief)]
+        argmaxstate = self.env.state_dict[(pos,theta)]
+
+        # Agent takes an action using a greedy policy (without exploration)
+        action = np.argmax(self.Q[argmaxstate])
+        return action
+    
+    def update_belief(self, belief, pos, observation):
+        """"
+        perform update over theta
+        
+        $$b'_{x,a,o}(theta) = \eta \cdot p(o|x,theta) \cdot b(theta)$$
+        
+        """
+
+        new_belief = torch.zeros_like(belief)
+
+        for t, theta in enumerate(self.env.deformations):
+            P_o_s_theta = np.all(self.env.get_observation(s = (pos,theta)) == observation) # 0 or 1 
+
+            new_belief[t] = P_o_s_theta * belief[t]
+        
+        new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
+
+        return new_belief
+
+class Q_agent_MDP():
+    def __init__(self, Q,env):
+        self.Q = Q
+        self.env = env
+
+    def get_action(self, s):
+
+        argmaxstate = self.env.state_dict[s]
+
+        # Agent takes an action using a greedy policy (without exploration)
+        action = np.argmax(self.Q[argmaxstate])
+        return action
+    
+    def update_belief(self, belief, pos, observation):
+        """"
+        perform update over theta
+        
+        $$b'_{x,a,o}(theta) = \eta \cdot p(o|x,theta) \cdot b(theta)$$
+        
+        """
+
+        new_belief = torch.zeros_like(belief)
+
+        for t, theta in enumerate(self.env.deformations):
+            P_o_s_theta = np.all(self.env.get_observation(s = (pos,theta)) == observation) # 0 or 1 
+
+            new_belief[t] = P_o_s_theta * belief[t]
+        
+        new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
+
+        return new_belief
+
+
+class Thompson_agent():
+    def __init__(self, Q,env):
+        self.Q = Q
+        self.env = env
+
+    def get_entropy(self, belief):
+        return -torch.sum(belief * torch.log(belief + 1e-10))
+
+    def get_action(self, belief,pos):
+        theta = self.env.deformations[torch.multinomial(belief, 1).item()]
+
+        sampledstate = self.env.state_dict[(pos,theta)]
+
+        # Agent takes an action using a greedy policy (without exploration)
+        action = np.argmax(self.Q[sampledstate])
+        return action
+    
+    def update_belief(self, belief, pos, observation):
+        """"
+        perform update over theta
+        
+        $$b'_{x,a,o}(theta) = \eta \cdot p(o|x,theta) \cdot b(theta)$$
+        
+        """
+
+        new_belief = torch.zeros_like(belief)
+
+        for t, theta in enumerate(self.env.deformations):
+            P_o_s_theta = np.all(self.env.get_observation(s = (pos,theta)) == observation) # 0 or 1 
+
+            new_belief[t] = P_o_s_theta * belief[t]
+        
+        new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
+
+        return new_belief
+
 
 def eval_tabular(env : GridEnvDeform, Q,state_dict, num_episodes=100, max_episode_steps=100):
     total_rewards = []

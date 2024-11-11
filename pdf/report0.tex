@@ -68,28 +68,48 @@ Formally, a POMDP is a 7-tuple $(S,A,T,R,\Omega,O,\gamma)$, where: \\
 \newpage
 \section{Mathematical Formulation}
 \subsection{State Space}
-From now on we're going to indicate as \textbf{State} the fully observable state of the 
-system, which is the position of the robot, the deformation of the object and the
+We are interested in the estimation of the deformaition parameters of an object in a 2D space.
+$$s = (\theta)$$
 
-$$s = (\underbar{pos},\theta)$$
-
-where $\underbar{pos} = (x,y,\phi)$ is the position of the robot in the 2D space
-and $\theta$ represents the deformation parameters of the object.
+$\theta$ represents the deformation tensor.
 
 \subsection{Action Space}
 The action space is the set of all possible actions that the robot can take, 
 Forwards, Backwards, Left, Right.
 \subsection{Observation Space}
 The observation space is the set of all possible observations that the robot can make,
-which is the presence of an obstacle in its field of view.
+i.e. the presence or absence of an obstacle in its field of view.
+\subsection{Bayesian estimation}
+
+rendere il belief indipendente dalla posizione e orientazione del robot, dipenderò unicamente dalla deformazione
+
+$$b(s) = b(theta) * \delta(xyphi = real(xyphi))$$
+
+real(xyphi) = x*
+from now on x = xyphi
+
+
+
+$$b'_{a,o}(x',\theta') = \eta \cdot \delta(x'=x^*+a) \cdot p(o|x',\theta') \cdot \sum_{x,\theta}p(x',\theta'|x,\theta,a)b(x,\theta)$$
+$$ = \eta \cdot \delta(x'=x^*+a) \cdot p(o|x',\theta') \cdot b(x'-a,\theta') $$
+$$ = \eta \cdot \delta(x'=x^*+a) \cdot p(o|x',\theta') \cdot \delta (x'-a = x^* )b(\theta') $$
+$$ = \eta \cdot \delta(x'=x^*+a) \cdot p(o|x',\theta') \cdot b(\theta') $$
+$$ = \eta \cdot \delta(x'=x^*+a) \cdot b'_{a,o}(\theta')$$
+
+dunque a seconda della azione scelta i non zero saranno i 4 x raggiungibili con a
+
+$$p(o|b,a) = \sum_{x,\theta}p(o|x,\theta)b(x.\theta)$$
+$$ = \sum_{\theta}p(o|x^*,\theta)b(\theta)$$
 % Conclusion
 \newpage
 \section{Results}
+\subsection{MDP Solution}
 \subsection{QMDP}
 \subsection{Thompson Sampling}
 \subsection{Infotaxis}
 \subsection{Information Directed Sampling}
 \cite{russo2017learningoptimizeinformationdirectedsampling}
+\subsection{DQN}
 
 
 

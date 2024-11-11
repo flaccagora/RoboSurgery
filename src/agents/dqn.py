@@ -56,18 +56,18 @@ class DoubleDQNAgent:
         self.epsilon_decay = 0.995
         if wandb:
             self.wandbinit()
+   
     def wandbinit(self):
         import wandb
         wandb.init(project="dqn")
-
-    
+ 
     def choose_deterministic_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)
         with torch.no_grad():
             q_values = self.q_network(state)
         return torch.argmax(q_values).item()
 
-    def choose_action(self, state):
+    def get_action(self, state):
         if np.random.rand() < self.epsilon:
             return np.random.randint(self.action_dim)
         else:
@@ -126,7 +126,6 @@ class DoubleDQNAgent:
                        })
 
             self.train_running_loss = 0
-
 
     def save(self, path):
         torch.save(self.q_network.state_dict(), path)

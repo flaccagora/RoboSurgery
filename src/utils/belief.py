@@ -1,5 +1,6 @@
 import torch
 import itertools
+import numpy as np
 
 obs_dict = {obs:i for i, obs in enumerate(list(itertools.product([0,1], repeat=5)))}
 
@@ -10,6 +11,25 @@ def belief_entropy(probabilities):
     entropy = -torch.sum(probabilities * torch.log2(probabilities + (probabilities == 0).float()))
     
     return entropy.item()  # .item() to get a standard Python float
+
+def b_theta_update(env, belief,pos,observation):
+    """
+    perform update over theta
+    
+    $$b'_{x,a,o}(theta) = \eta \cdot p(o|x,theta) \cdot b(theta)$$
+    
+    """
+
+    new_belief = torch.zeros_like(belief)
+
+    for t, theta in enumerate(env.deformations):
+        P_o_s_theta = np.all(env.get_observation((pos,theta)) == observation) # 0 or 1 
+
+        new_belief[t] = P_o_s_theta * belief[t]
+    
+    new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
+
+    return new_belief
 
 
 def update_belief(belief, action, observation, T, O):

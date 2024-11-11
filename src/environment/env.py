@@ -24,11 +24,14 @@ class GridEnvDeform(gym.Env):
         self.obs = list(itertools.product([0,1], repeat=5))
         # list of possible deformations
         self.deformations = [(i,j) for i in range(l0,h0) for j in range(l1,h1)]
+
         
         # space in which every maze lives (is a 2d matrix)
         self.max_shape = self.original_maze.shape * np.array([h1-1,h0-1]) + np.array([2,2])
         # list of states
         self.states = [((x,y,phi),(i,j)) for x in range(1,self.max_shape[0]-1) for y in range(1,self.max_shape[1]-1) for phi in range(4) for i in range(l0,h0) for j in range(l1,h1)] 
+        self.state_dict = {state : i for i, state in enumerate(self.states)}
+        
         self.l0 = l0
         self.h0 = h0
         self.l1 = l1
@@ -36,8 +39,6 @@ class GridEnvDeform(gym.Env):
 
         self.goal_pos = self.original_maze.shape - np.array([2,2])
         
-        self.set_rendering()
-
         self.reset()
         
     def T(self, s, a, s_):
@@ -123,9 +124,35 @@ class GridEnvDeform(gym.Env):
         
         if execute:
             self.timestep += 1
+            self.episode.append(s_)
+
         
-        return s_, reward, terminated, truncated, info, 
+        return s_, reward, terminated, truncated, info
+        
+    def backward(self):
+        """go back to previous state"""
+
+        if self.timestep == 0:
+            return "No previous state"
+        
+        s = self.episode[self.timestep]
+        self.timestep -= 1
+        self.set_state(s)
+
+        return s
     
+    def forward(self):
+        """go forward to next state"""
+
+        if self.timestep == len(self.episode):
+            return "No next state"
+        
+        s = self.episode[self.timestep]
+        self.timestep += 1
+        self.set_state(s)  
+        
+        return s
+         
     def next_state(self, a, s, execute=False):
 
         """take action a from state s = x,y,phi 
@@ -258,7 +285,47 @@ class GridEnvDeform(gym.Env):
         self.screen_width = 800
         self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        pygame.display.set_caption("Maze Environment")            
+        pygame.display.set_caption("Maze Environment")
+            # Add text for controls
+        
+    def set_rendering(self):
+        self.screen_width = 800
+        self.screen_height = 600
+        pygame.init()  # Initialize all pygame modules
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        pygame.display.set_caption("Maze Environment")
+        
+        # Handle key events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                # Press 'r' to reset environment
+                if event.key == pygame.K_r:
+                    self.reset()
+                # Press 'q' to quit
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    return
+                # Press 's' to save current state
+                elif event.key == pygame.K_s:
+                    self.save_state()
+                # Press space to pause/resume
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                # Press arrow keys for manual control
+                elif event.key == pygame.K_LEFT:
+                    self.step(3)  # Left action
+                elif event.key == pygame.K_RIGHT:
+                    self.step(1)  # Right action
+                elif event.key == pygame.K_UP:
+                    self.step(0)  # Up action
+                elif event.key == pygame.K_DOWN:
+                    self.step(2)  # Down action
+
+        # Update display
+        pygame.display.flip()
 
     def render_bis(self, s=None):
         if s is not None:
@@ -281,6 +348,43 @@ class GridEnvDeform(gym.Env):
                     color = (255, 255, 255)  # White for free space
                 pygame.draw.rect(self.screen, color, (y * cell_size, x * cell_size, cell_size, cell_size))
 
+        # Add text for controls
+        font = pygame.font.Font(None, 36)
+        controls = [
+            "Controls:",
+            "R - Reset",
+            "Q - Quit",
+            "Space - Pause/Resume",
+            "Arrows - Move agent"
+        ]
+        
+        for i, text in enumerate(controls):
+            text_surface = font.render(text, True, (0, 0, 0))
+            self.screen.blit(text_surface, (self.screen_width - 200, 20 + i * 30))
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.reset()
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    return
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                elif event.key == pygame.K_LEFT:
+                    self.step(3,execute=True)
+                elif event.key == pygame.K_RIGHT:
+                    self.step(1,execute=True)
+                elif event.key == pygame.K_UP:
+                    self.step(0,execute=True)
+                elif event.key == pygame.K_DOWN:
+                    self.step(2,execute=True)
+                
+
         # Update the display
         pygame.display.flip()
    
@@ -295,6 +399,7 @@ class GridEnvDeform(gym.Env):
         self.goal_pos = self.original_maze.shape * np.array([randomdeformation[1],randomdeformation[0]])
         self.theta = randomdeformation
         self.timestep = 0
+        self.episode = [(self.get_state())]
         return ((self.agent_pos[0],self.agent_pos[1], self.agent_orientation), self.theta), {}
         
     def is_done(self):
