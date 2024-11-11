@@ -6,6 +6,7 @@ import itertools
 import torch
 from agents.dqn import DoubleDQNAgent # for typing only
 import pygame
+import imageio
 
 class GridEnvDeform(gym.Env):
     def __init__(self, maze, l0,h0,l1,h1):
@@ -39,6 +40,7 @@ class GridEnvDeform(gym.Env):
 
         self.goal_pos = self.original_maze.shape - np.array([2,2])
         
+        self.frames = []
         self.reset()
         
     def T(self, s, a, s_):
@@ -387,7 +389,18 @@ class GridEnvDeform(gym.Env):
 
         # Update the display
         pygame.display.flip()
-   
+
+        # Capture the current frame and add it to the list of frames
+        frame = pygame.surfarray.array3d(self.screen)
+        self.frames.append(frame)
+    
+    def save_gif(self):
+        """
+        Save the captured frames as a GIF file.
+        """
+        imageio.mimsave("gif.gif", self.frames, duration=0.1)
+        print(f"GIF saved as gif")
+
     def close_render(self):
         pygame.quit()
 

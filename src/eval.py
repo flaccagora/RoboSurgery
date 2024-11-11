@@ -225,7 +225,7 @@ def eval_agent(observability,agent,env,num_episodes=100,max_episode_steps=10,ren
     return "Invalid agent type"
     
 
-def all_data(transitions, beliefs):
+def all_data(transitions, beliefs, path=None):
     # stats on transitions
     completed_episodes = 0
     for i in range(len(transitions)):
@@ -250,4 +250,8 @@ def all_data(transitions, beliefs):
     plt.xlabel("Step")
     plt.ylabel("Entropy")
     plt.legend([f"Episode {i}" for i in range(len(belief_entropy))])
+
+    if path:
+        plt.savefig(path + f"entropy_{completed_episodes}out{len(transitions)}.png")
+    
     plt.show()
