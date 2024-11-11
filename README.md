@@ -1,3 +1,7 @@
+
+
+![](https://github.com/flaccagora/RoboSurgery/blob/main/gif.gif)
+
 # Table of Contents
 - [Table of Contents](#table-of-contents)
 - [Surgical Robot Lung Exploration Simulation](#surgical-robot-lung-exploration-simulation)
