@@ -5,7 +5,7 @@ from tqdm import tqdm
 import torch
 
 class Q_agent():
-    def __init__(self, Q,env):
+    def __init__(self, Q,env:GridEnvDeform):
         self.Q = Q
         self.env = env
 
