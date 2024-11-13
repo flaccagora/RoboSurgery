@@ -177,3 +177,6 @@ old/
 *.toc
 *.fls
 *.bib
+wandb/
+*.zip
+runs/

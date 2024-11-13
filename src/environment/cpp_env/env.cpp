@@ -1,6 +1,4 @@
-#include <iostream>
-#include <Eigen/Dense>
-
+# pragma once
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -9,41 +7,9 @@
 #include <Eigen/Dense>
 #include <algorithm>
 #include <tuple>
-#include <state.cpp>
-
+#include "env.h"
 
 // g++ env.cpp -o env -I /usr/local/include/eigen3
-
-class GridEnvDeform {
-public:
-    GridEnvDeform(const Eigen::MatrixXi& maze, int l0, int h0, int l1, int h1);
-
-    std::tuple<std::tuple<int, int, int>, std::tuple<int, int>> reset();
-    std::tuple<std::tuple<int, int, int>, int, bool, bool, std::string> step(int action);
-    void render();
-    bool is_done();
-    std::vector<int> get_observation();
-    std::tuple<std::tuple<int,int>> get_goal_pos();
-    // Helper functions
-    Eigen::MatrixXi stretch_maze(const std::tuple<int, int>& thetas);
-    void set_deformed_maze(const std::tuple<int, int>& thetas);
-    void set_state(const std::tuple<int, int, int>& state, const std::tuple<int, int>& thetas);
-    std::tuple<int, int> agent_pos;
-    int agent_orientation;
-    int max_shape[2];
-
-    
-private:
-    Eigen::MatrixXi original_maze;
-    Eigen::MatrixXi maze;
-    std::vector<int> actions = {0, 1, 2, 3}; // up, right, down, left
-    std::vector<int> orientations = {0, 1, 2, 3};
-    std::vector<std::tuple<int, int>> deformations;
-    Eigen::Vector2i goal_pos;
-    int l0, h0, l1, h1;
-    int timestep;
-
-};
 
 
 GridEnvDeform::GridEnvDeform(const Eigen::MatrixXi& maze, int l0, int h0, int l1, int h1)
@@ -58,7 +24,8 @@ GridEnvDeform::GridEnvDeform(const Eigen::MatrixXi& maze, int l0, int h0, int l1
 
     goal_pos = Eigen::Vector2i(maze.rows() - 2, maze.cols() - 2);
     max_shape[0] = original_maze.rows() * (h1-1) + 2;
-    max_shape[1] = original_maze.cols() * (h0-1) + 2 ;
+    max_shape[1] = original_maze.cols() * (h0-1) + 2;
+
 
 }
 
@@ -83,7 +50,16 @@ Eigen::MatrixXi GridEnvDeform::stretch_maze(const std::tuple<int, int>& thetas) 
 
 void GridEnvDeform::set_deformed_maze(const std::tuple<int, int>& thetas) {
     maze = stretch_maze(thetas);
-    goal_pos = Eigen::Vector2i(original_maze.rows() * std::get<1>(thetas)-2, original_maze.cols() * std::get<0>(thetas)-2);
+    
+    // Create a larger canvas to fit the stretched maze
+    Eigen::MatrixXi canva1 = Eigen::MatrixXi::Ones(max_shape[0], max_shape[1]);
+    
+    // Place the stretched maze in the top-left corner of the canvas
+    canva1.block(1, 1, maze.rows(), maze.cols()) = maze;
+    maze = canva1;
+
+    // Update the goal position based on the new maze dimensions
+    goal_pos = Eigen::Vector2i((original_maze.rows()) * std::get<1>(thetas), (original_maze.cols()) * std::get<0>(thetas));
     std::cout << "Goal position: " << goal_pos << std::endl;
 }
 
@@ -198,15 +174,15 @@ void GridEnvDeform::render() {
 
 int main() {
     // Initialize a simple maze for testing
-    Eigen::MatrixXi maze(5, 5);
-    maze << 1, 1, 1, 1, 1,
-            1, 0, 1, 0, 1,
-            1, 0, 1, 0, 1,
-            1, 0, 0, 0, 1,
-            1, 1, 1, 1, 1;
+    Eigen::MatrixXi maze(3, 3);
+    maze << 
+             0, 1, 0,
+             0, 1, 0,
+             0, 0, 0;
+            
 
-    int l0 = 1, h0 = 3;
-    int l1 = 1, h1 = 2;
+    int l0 = 1, h0 = 10;
+    int l1 = 1, h1 = 10;
 
     // Create GridEnvDeform object
     GridEnvDeform env(maze, l0, h0, l1, h1);
@@ -247,6 +223,20 @@ int main() {
 
     // Generate actions
     std::vector<int> actions = {0, 1, 2, 3};
+
+    // test step function
+    while (true)
+    {
+        // input action from command line
+        int action;
+        std::cout << "Enter action: ";
+        std::cin >> action;
+
+        auto [new_state, reward, terminated, _, _] = env.step(action);
+        // std::cout << new_state << " " << reward << " " << terminated << std::endl;
+        env.render();
+    }
+    
 
 
     return 0;
