@@ -1,3 +1,7 @@
+
+import sys
+print(sys.path)
+
 from stable_baselines3 import PPO
 import numpy as np
 from environment.env import FULLGYMGridEnvDeform
