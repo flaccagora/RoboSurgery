@@ -34,6 +34,7 @@ def train_ppo(args):
     total_timesteps = args.total_timesteps
     batch_size = args.batch_size
     n_steps = args.n_steps
+    lr = args.learning_rate
 
     config = {
         "policy_type": "MultiInputPolicy",
@@ -82,7 +83,7 @@ def train_ppo(args):
     env = DummyVecEnv([make_env])
 
 
-    model = PPO("MultiInputPolicy",env,n_steps=n_steps,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu")
+    model = PPO("MultiInputPolicy",env,n_steps=n_steps,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks)
     model.save(f"models/PPO_{run.id}")
     env.close()
