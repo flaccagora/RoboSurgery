@@ -54,7 +54,8 @@ class DoubleDQNAgent:
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
-        if wandb:
+        self.wandb = wandb
+        if self.wandb:
             self.wandbinit()
    
     def wandbinit(self):
@@ -119,7 +120,7 @@ class DoubleDQNAgent:
         if self.step_count % self.target_update_freq == 0:
             self.target_network.load_state_dict(self.q_network.state_dict())
 
-        if self.step_count % self.log_every:
+        if self.step_count % self.log_every and self.wandb:
             wandb.log({"loss":self.train_running_loss/(self.batch_size*self.log_every),
                        "epsilon":self.epsilon,
                        "step_count":self.step_count,
