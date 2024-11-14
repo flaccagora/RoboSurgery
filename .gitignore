@@ -176,6 +176,5 @@ old/
 *.fls
 *.bib
 wandb/
-*.zip
 runs/
 .rob
