@@ -13,19 +13,7 @@ h1 = 10
 def train_dqn(args):
     from stable_baselines3.common.callbacks import BaseCallback
     from wandb.integration.sb3 import WandbCallback
-    import wandb
-
-    class My_callback(BaseCallback):
-        def __init__(self, verbose=0):
-            super(My_callback, self).__init__(verbose)
-        def _on_step(self) -> bool:
-            if self.num_timesteps % 500 == 0:
-                self.training_env.reset()
-            return True
-        # def _on_rollout_end(self) -> None:
-        #     print(f"Rollout end: {self.num_timesteps}")
-        #     return True
-        
+    import wandb        
 
     total_timesteps = args.total_timesteps
     batch_size = args.batch_size

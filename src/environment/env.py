@@ -707,9 +707,9 @@ class POMDPGYMGridEnvDeform(gym.Env):
         self.belief = new_beleif
 
         obs = OrderedDict({
-                            "x": np.int64(x_),              # Values from 0 to 10
-                            "y": np.int64(y_),              # Values from 0 to 10
-                            "phi": np.int64(phi_),             # Values from 0 to 4
+                            "x": torch.tensor([x_],dtype=torch.int32),              # Values from 0 to 10
+                            "y": torch.tensor([y_],dtype=torch.int32),              # Values from 0 to 10
+                            "phi": torch.tensor([phi_],dtype=torch.int32),             # Values from 0 to 4
                             "belief": self.belief , # Probability vector
                         })
 
@@ -801,7 +801,7 @@ class POMDPGYMGridEnvDeform(gym.Env):
         
         """
 
-        new_belief = np.zeros_like(self.belief)
+        new_belief = torch.zeros_like(self.belief)
         observation = self.get_observation()
         pos = (self.agent_pos[0],self.agent_pos[1],self.agent_orientation)
 
@@ -810,7 +810,7 @@ class POMDPGYMGridEnvDeform(gym.Env):
 
             new_belief[t] = P_o_s_theta * self.belief[t]
         
-        new_belief = new_belief / (np.sum(new_belief) + 1e-10)
+        new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
 
         return new_belief
 
@@ -918,7 +918,7 @@ class POMDPGYMGridEnvDeform(gym.Env):
         self.theta = randomdeformation
         self.timestep = 0
         
-        self.belief = np.ones(len(self.deformations)) / len(self.deformations)
+        self.belief = torch.ones(len(self.deformations)) / len(self.deformations)
         obs = OrderedDict({
                             "x": np.int64(self.agent_pos[0]),              # Values from 0 to 10
                             "y": np.int64(self.agent_pos[1]),              # Values from 0 to 10

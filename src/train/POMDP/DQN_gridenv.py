@@ -91,7 +91,6 @@ def train_dqn(args):
         progress_bar.set_description(f"episode {episode}")
 
         s, _ = env.reset()
-        state = torch.tensor([item for sublist in s for item in sublist], dtype=torch.float32)
 
         obs = env.get_observation()
 
@@ -102,25 +101,25 @@ def train_dqn(args):
         done = False
         steps = 0
         while not done and steps < max_episode_steps:
-            action = agent.get_action(b)
             
-            s_ , reward, done , _, _ = env.step(action,state, execute=True)
-            next_state = torch.tensor([item for sublist in s_ for item in sublist], dtype=torch.float32)
-            next_obs = env.get_observation(next_state)
+            action = agent.get_action(torch.cat((torch.tensor(s[0]),b)))
             
-            state = next_state
-            
-            b_prime = b_theta_update(env,b,s[0], next_obs)
-            b = b_prime
+            s_ , reward, done , _, _ = env.step(action,s, execute=True)
+            next_obs = env.get_observation(s_)
+                        
+            b_prime = b_theta_update(env,b,s_[0], next_obs)
             
             # state is now pos + beliefoverthetas
-            feedstate = torch.cat((s[0],b))
-            nextfeedstate = torch.cat((s[0],b_prime))
+            feedstate = torch.cat((torch.tensor(s[0]),b))
+            nextfeedstate = torch.cat((torch.tensor(s_[0]),b_prime))
 
             agent.store_transition(feedstate, action, reward, nextfeedstate, done)
 
             agent.train()
-            state = next_state
+          
+            s = s_
+            b = b_prime
+          
             episode_reward += reward
             steps += 1      
         
