@@ -1,13 +1,8 @@
 import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
 import itertools
-from tqdm import tqdm, trange
 
-from agents.dqn import DoubleDQNAgent, QNetwork
 from environment.env import GridEnvDeform
-from agents.tabular_qlearning import q_learning
+from src.agents.Tabular_Q_agent import q_learning
 
 
 # maze size

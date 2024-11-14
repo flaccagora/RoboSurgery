@@ -1,13 +1,10 @@
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.optim as optim
 import itertools
 from tqdm import tqdm
 
-from agents.dqn import DoubleDQNAgent, QNetwork
-from environment.env import GridEnvDeform, POMDPWrapper_v0, create_maze
-import matplotlib.pyplot as plt
+from agents.DQN_agent import DoubleDQNAgent
+from environment.env import GridEnvDeform
 
 # maze size
 N = 2

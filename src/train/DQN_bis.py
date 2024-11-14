@@ -1,4 +1,4 @@
-from stable_baselines3 import PPO
+from stable_baselines3 import DQN
 import numpy as np
 from environment.env import FULLGYMGridEnvDeform
 import numpy as np
@@ -10,7 +10,7 @@ h0 = 10
 l1 = 1
 h1 = 10
 
-def train_ppo(args):
+def train_dqn(args):
     from stable_baselines3.common.callbacks import BaseCallback
     from wandb.integration.sb3 import WandbCallback
     import wandb
@@ -42,7 +42,7 @@ def train_ppo(args):
     }
 
     run = wandb.init(
-        project="PPO",
+        project="DQN",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=True,  # auto-upload the videos of agents playing the game
@@ -79,7 +79,7 @@ def train_ppo(args):
     env = DummyVecEnv([make_env])
 
 
-    model = PPO("MultiInputPolicy",env,n_steps=n_steps,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
+    model = DQN("MultiInputPolicy",env,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks)
     model.save(f"models/PPO_{run.id}")
     env.close()
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    train_ppo(args)
+    train_dqn(args)

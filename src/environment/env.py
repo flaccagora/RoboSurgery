@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import itertools
 import torch
-from agents.dqn import DoubleDQNAgent # for typing only
+from agents.DQN_agent import DoubleDQNAgent # for typing only
 import pygame
 import imageio
 from gymnasium.spaces import Dict, Discrete, Box
@@ -1274,9 +1274,7 @@ class FULLGYMGridEnvDeform(gym.Env):
                             "theta": np.array(self.theta) , # Probability vector
                         })
 
-        return obs, {}
-    
-        
+        return obs, {}           
 
 def create_maze(dim):
     maze = np.ones((dim*2+1, dim*2+1))

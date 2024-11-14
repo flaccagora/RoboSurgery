@@ -1,4 +1,4 @@
-from agents.dqn import DoubleDQNAgent
+from agents.DQN_agent import DoubleDQNAgent
 import numpy as np
 from environment.env import GridEnvDeform
 import torch
@@ -7,9 +7,58 @@ from tqdm import trange
 import matplotlib.pyplot as plt
 
 def eval_dqn_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
-    pass
+    if render:
+        env.set_rendering()
+
+    
+    total_rewards = []
+
+    for episode in range(num_episodes):
+        s, _ = env.reset()
+        
+        obs = env.get_observation()
+
+        episode_reward = 0
+        done = False
+        c = max_episode_steps
+        while not done and c > 0:            
+            
+            state = (s[0][0],s[0][1],s[0][2],s[1][0],s[1][1])
+            # Agent takes an action using a greedy policy (without exploration)
+            action = agent.choose_deterministic_action(state)
+            next_state, reward, done, _, info = env.step(action,s,execute=render)
+
+            s = next_state
+
+            if render:
+                print("State: ", s)
+                print("Chosen action: ", action)
+                print("Next state: ", next_state)
+                print("argmaxstate", state)
+            
+                env.render_bis()
+
+            episode_reward += reward
+            
+            if done or c == 1:
+                total_rewards.append(episode_reward)
+                # print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward}")
+
+            c -= 1
+    avg_reward = np.mean(total_rewards)
+    # print(f"Average Reward over {num_episodes} episodes: {avg_reward}")
+
+    if render:
+        env.close_render()
+        
+    return avg_reward
+
 
 def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
+    if render:
+        env.set_rendering()
+
+    
     total_rewards = []
 
     for episode in range(num_episodes):
@@ -19,16 +68,12 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
         obs = env.get_observation()
 
         b_0 = torch.ones(len(env.deformations)) / len(env.deformations)   
-        b = b_theta_update(b_0,s[0], obs)
+        b = b_theta_update(env,b_0,s[0], obs)
     
         episode_reward = 0
         done = False
-        c = 25
-        while not done and c > 0:
-            # Render the environment
-            if render:
-                env.render()                                
-            
+        c = max_episode_steps
+        while not done and c > 0:            
             
             pos = s[0]
             theta = env.deformations[torch.argmax(b)]
@@ -42,7 +87,7 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
             next_obs = env.get_observation(next_state)
             s = next_state
 
-            b_prime = b_theta_update(b,s[0], next_obs)
+            b_prime = b_theta_update(env,b,s[0], next_obs)
             b = b_prime
 
             if render:
@@ -51,7 +96,9 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
                 print("Next state: ", next_state)
                 print("argmaxstate", argmaxstate)
                 print("argmax and max Belief: ", env.deformations[torch.argmax(b_prime)], torch.max(b_prime))
-                
+            
+                env.render_bis()
+
             episode_reward += reward
             
             if done or c == 1:
@@ -61,6 +108,10 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
             c -= 1
     avg_reward = np.mean(total_rewards)
     # print(f"Average Reward over {num_episodes} episodes: {avg_reward}")
+
+    if render:
+        env.close_render()
+        
     return avg_reward
 
 def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
@@ -171,7 +222,6 @@ def eval_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,rende
 
     return transitions
 
-
 def eval_tabular_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
     
     state_dict = env.state_dict
@@ -213,13 +263,16 @@ def eval_tabular_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_ste
 def eval_agent(observability,agent,env,num_episodes=100,max_episode_steps=10,render=False):
     if isinstance(agent,DoubleDQNAgent):
         if observability == "MDP":
+            print("MDP - DQN")
             return eval_dqn_agent_mdp(agent,env,num_episodes,max_episode_steps,render)
         elif observability == "POMDP":
+            print("POMDP - DQN")
             return eval_dqn_agent_pomdp(agent,env,num_episodes,max_episode_steps,render)
     else: # assuming infotaxis agent, tabularqwrapper
         if observability == "MDP":
             return eval_agent_mdp(agent,env,num_episodes,max_episode_steps,render)
         elif observability == "POMDP":
+            print("POMDP")
             return eval_agent_pomdp(agent,env,num_episodes,max_episode_steps,render)
 
     return "Invalid agent type"
