@@ -31,7 +31,7 @@ def train_dqn(args):
     }
 
     run = wandb.init(
-        project="DQN",
+        project="DQN - MDP",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=True,  # auto-upload the videos of agents playing the game

@@ -42,7 +42,7 @@ def train_ppo(args):
     }
 
     run = wandb.init(
-        project="PPO",
+        project="PPO - MDP",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=True,  # auto-upload the videos of agents playing the game

@@ -79,7 +79,7 @@ def train_dqn(args):
     lr = args.learning_rate
     batch_size = args.batch_size
 
-    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True)
+    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - MDP")
     
 
     rewards = []
