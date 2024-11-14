@@ -1,6 +1,6 @@
 from stable_baselines3 import DQN
 import numpy as np
-from environment.env import MDPFULLGYMGridEnvDeform
+from environment.env import MDPGYMGridEnvDeform
 import numpy as np
 
 
@@ -34,7 +34,7 @@ def train_dqn(args):
 
     config = {
         "policy_type": "MultiInputPolicy",
-        "env_name": "MDPFULLGYMGridEnvDeform",
+        "env_name": "MDPGYMGridEnvDeform",
         "defo_range": (l0,h0,l1,h1),
         "total_timesteps": total_timesteps,
         "learning_rate": lr,
@@ -73,7 +73,7 @@ def train_dqn(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = MDPFULLGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
+        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
 
         env = Monitor(env)  # record stats such as returns
         return env
