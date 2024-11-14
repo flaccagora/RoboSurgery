@@ -172,7 +172,6 @@ old/
 *.bbl
 *.blg
 *.log
-*.out
 *.synctex.gz
 *.toc
 *.fls

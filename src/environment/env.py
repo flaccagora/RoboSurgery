@@ -806,8 +806,11 @@ class POMDPGYMGridEnvDeform(gym.Env):
         pos = (self.agent_pos[0],self.agent_pos[1],self.agent_orientation)
 
         for t, theta in enumerate(self.deformations):
+            if self.belief[t] == 0:
+                new_belief[t] = 0
+                continue
+            
             P_o_s_theta = np.all(self.get_observation(s = (pos,theta)) == observation) # 0 or 1 
-
             new_belief[t] = P_o_s_theta * self.belief[t]
         
         new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
