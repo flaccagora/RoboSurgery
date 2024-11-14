@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 from agents.DQN_agent import DoubleDQNAgent
 from environment.env import GridEnvDeform
+from utils.belief import b_theta_update
 
 # maze size
 N = 2
@@ -71,7 +72,7 @@ def evaluate_agent_training(env : GridEnvDeform, agent : DoubleDQNAgent, num_epi
 
 def train_dqn(args):
 
-    state_dim = 5
+    state_dim = len(env.deformations) + 3 # pos + belief over thetas
     action_dim = 4
 
     num_episodes = args.total_timesteps
@@ -92,18 +93,31 @@ def train_dqn(args):
         s, _ = env.reset()
         state = torch.tensor([item for sublist in s for item in sublist], dtype=torch.float32)
 
+        obs = env.get_observation()
+
+        b_0 = torch.ones(len(env.deformations)) / len(env.deformations)   
+        b = b_theta_update(env,b_0,s[0], obs)
+
         episode_reward = 0
         done = False
-        
         steps = 0
         while not done and steps < max_episode_steps:
-            action = agent.get_action(state)
+            action = agent.get_action(b)
             
-            s_ , reward, done , _, _ = env.step(action,s, execute=True)
+            s_ , reward, done , _, _ = env.step(action,state, execute=True)
             next_state = torch.tensor([item for sublist in s_ for item in sublist], dtype=torch.float32)
-            s = s_
+            next_obs = env.get_observation(next_state)
+            
+            state = next_state
+            
+            b_prime = b_theta_update(env,b,s[0], next_obs)
+            b = b_prime
+            
+            # state is now pos + beliefoverthetas
+            feedstate = torch.cat((s[0],b))
+            nextfeedstate = torch.cat((s[0],b_prime))
 
-            agent.store_transition(state, action, reward, next_state, done)
+            agent.store_transition(feedstate, action, reward, nextfeedstate, done)
 
             agent.train()
             state = next_state
