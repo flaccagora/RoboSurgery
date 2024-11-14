@@ -1,0 +1,8 @@
+Thu Nov 14 12:47:25 CET 2024
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.18.6
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+Using cpu device
+Logging to runs/y2697bls/DQN_1
+slurmstepd: error: *** JOB 9315644 ON lrdn3985 CANCELLED AT 2024-11-14T13:07:23 ***
