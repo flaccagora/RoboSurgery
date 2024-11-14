@@ -5,8 +5,8 @@
 #SBATCH -N 1                # 1 node
 #SBATCH --ntasks-per-node=4 # 4 tasks out of 112
 #SBATCH --mem=64000          # memory per node out of 494000MB (481GB)
-#SBATCH --job-name=DQN_POMDP
-#SBATCH --output=DQN_POMDP.out 
+#SBATCH --job-name=DQN_POMDPsb3
+#SBATCH --output=DQN_POMDPsb3.out 
 
 date
 
