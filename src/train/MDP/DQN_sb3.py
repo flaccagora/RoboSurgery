@@ -15,18 +15,6 @@ def train_dqn(args):
     from wandb.integration.sb3 import WandbCallback
     import wandb
 
-    class My_callback(BaseCallback):
-        def __init__(self, verbose=0):
-            super(My_callback, self).__init__(verbose)
-        def _on_step(self) -> bool:
-            if self.num_timesteps % 200 == 0:
-                self.training_env.reset()
-            return True
-        def _on_rollout_end(self) -> None:
-            print(f"Rollout end: {self.num_timesteps}")
-            return True
-        
-
     total_timesteps = args.total_timesteps
     batch_size = args.batch_size
     n_steps = args.n_steps
@@ -50,8 +38,7 @@ def train_dqn(args):
         save_code=True,  # optional
     )
 
-    callbacks = [My_callback(0), 
-                WandbCallback(gradient_save_freq=100,
+    callbacks = [ WandbCallback(gradient_save_freq=100,
                                 model_save_path=f"agents/pretrained/{run.id}",
                                 verbose=2,
                                 model_save_freq = total_timesteps//10
