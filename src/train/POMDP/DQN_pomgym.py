@@ -87,11 +87,12 @@ def train_dqn(args):
         progress_bar.update(1)
 
 
-        if episode != 0 and episode % 500 == 0:
+        if episode != 0 and episode % num_episodes//10 == 0:
             # avg_reward = evaluate_agent_training(env, agent)
             # evalrewards.append(avg_reward)
             # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
-            pass
+            agent.save("agents/pretrained/POMDP/double_dqn.pt")
+
     print("Training complete.")
     agent.save("agents/pretrained/POMDP/double_dqn.pt")
     print("evalrewards: ", evalrewards)

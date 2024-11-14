@@ -53,6 +53,7 @@ def train_ppo(args):
                 WandbCallback(gradient_save_freq=100,
                                 model_save_path=f"agents/pretrained/{run.id}",
                                 verbose=2,
+                                model_save_freq = total_timesteps//10
                                 ),
                 ]
 
