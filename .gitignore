@@ -163,7 +163,6 @@ cython_debug/
 
 personal.txt
 logs/
-*.pt
 old/
 .vscode
 
