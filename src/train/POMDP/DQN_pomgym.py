@@ -93,7 +93,7 @@ def train_dqn(args):
             # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
             pass
     print("Training complete.")
-    agent.save("agents/double_dqn.pt")
+    agent.save("agents/pretrained/POMDP/double_dqn.pt")
     print("evalrewards: ", evalrewards)
 
 if __name__ == "__main__":
