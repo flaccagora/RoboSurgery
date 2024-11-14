@@ -1,6 +1,6 @@
 from stable_baselines3 import PPO
 import numpy as np
-from environment.env import FULLGYMGridEnvDeform
+from environment.env import MDPFULLGYMGridEnvDeform
 import numpy as np
 
 
@@ -34,7 +34,7 @@ def train_ppo(args):
 
     config = {
         "policy_type": "MultiInputPolicy",
-        "env_name": "FULLGYMGridEnvDeform",
+        "env_name": "MDPFULLGYMGridEnvDeform",
         "defo_range": (l0,h0,l1,h1),
         "total_timesteps": total_timesteps,
         "Batch_Size": batch_size,
@@ -71,7 +71,7 @@ def train_ppo(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = FULLGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
+        env = MDPFULLGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
 
         env = Monitor(env)  # record stats such as returns
         return env

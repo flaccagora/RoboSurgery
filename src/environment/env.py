@@ -598,7 +598,7 @@ class POMDPWrapper_v1():
              
         return new_belief        
 
-class GYMGridEnvDeform(gym.Env):
+class POMDPGYMGridEnvDeform(gym.Env):
     
     def __init__(self, maze, l0,h0,l1,h1,render_mode = None):
 
@@ -900,14 +900,6 @@ class GYMGridEnvDeform(gym.Env):
                     return
                 elif event.key == pygame.K_SPACE:
                     self.pause()
-                elif event.key == pygame.K_LEFT:
-                    self.step(3,execute=True)
-                elif event.key == pygame.K_RIGHT:
-                    self.step(1,execute=True)
-                elif event.key == pygame.K_UP:
-                    self.step(0,execute=True)
-                elif event.key == pygame.K_DOWN:
-                    self.step(2,execute=True)
                 
 
         # Update the display
@@ -936,7 +928,7 @@ class GYMGridEnvDeform(gym.Env):
 
         return obs, {}
     
-class FULLGYMGridEnvDeform(gym.Env):
+class MDPGYMGridEnvDeform(gym.Env):
     
     def __init__(self, maze, l0,h0,l1,h1,render_mode = None):
 
