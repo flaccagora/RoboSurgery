@@ -920,11 +920,12 @@ class POMDPGYMGridEnvDeform(gym.Env):
         
         self.belief = torch.ones(len(self.deformations)) / len(self.deformations)
         obs = OrderedDict({
-                            "x": np.int64(self.agent_pos[0]),              # Values from 0 to 10
-                            "y": np.int64(self.agent_pos[1]),              # Values from 0 to 10
-                            "phi": np.int64(self.agent_orientation),             # Values from 0 to 4
+                            "x": torch.tensor([self.agent_pos[0]],dtype=torch.int32),              # Values from 0 to 10
+                            "y": torch.tensor([self.agent_pos[1]],dtype=torch.int32),              # Values from 0 to 10
+                            "phi": torch.tensor([self.agent_orientation],dtype=torch.int32),             # Values from 0 to 4
                             "belief": self.belief , # Probability vector
                         })
+
 
         return obs, {}
     

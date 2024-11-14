@@ -56,13 +56,13 @@ def train_dqn(args):
         progress_bar.set_description(f"episode {episode}")
 
         s, _ = env.reset()
+        feedstate = torch.cat([ob for ob in s.values()])
 
         episode_reward = 0
         done = False
         steps = 0
         while not done and steps < max_episode_steps:
             
-            feedstate = torch.cat([ob for ob in s.values()])
 
             action = agent.get_action(feedstate)
             
@@ -76,6 +76,7 @@ def train_dqn(args):
             agent.train()
           
             s = s_
+            feedstate = nextfeedstate
           
             episode_reward += reward
             steps += 1      
