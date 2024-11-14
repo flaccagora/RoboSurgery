@@ -18,6 +18,6 @@ cd ./src
 export PYTHONPATH=$(pwd)
 export WANDB_MODE=offline
 
-python3 train/MDP/DQN.py
+python3 train/MDP/DQN_sb3.py
 
 date

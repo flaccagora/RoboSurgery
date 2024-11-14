@@ -37,8 +37,9 @@ def train_dqn(args):
         "env_name": "MDPFULLGYMGridEnvDeform",
         "defo_range": (l0,h0,l1,h1),
         "total_timesteps": total_timesteps,
+        "learning_rate": lr,
         "Batch_Size": batch_size,
-        "PPO n_steps": n_steps
+    
     }
 
     run = wandb.init(
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.0003)
     parser.add_argument("--batch_size", type=int, default=2000)
     parser.add_argument("--n_steps", type=int, default=2000)
-    parser.add_argument("--total_timesteps", type=int, default=100000)
+    parser.add_argument("--total_timesteps", type=int, default=50000)
     
     args = parser.parse_args()
 
