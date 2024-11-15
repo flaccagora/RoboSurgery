@@ -31,7 +31,7 @@ def train_dqn(args):
     }
 
     run = wandb.init(
-        project="DQN - MDP",
+        project="DQNsb3 - MDP",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=True,  # auto-upload the videos of agents playing the game
@@ -39,7 +39,7 @@ def train_dqn(args):
     )
 
     callbacks = [ WandbCallback(gradient_save_freq=100,
-                                model_save_path=f"agents/pretrained/MDP/{run.id}",
+                                model_save_path=f"agents/pretrained/MDP/DQNsb3_{run.id}",
                                 verbose=2,
                                 model_save_freq = total_timesteps//10
                                 ),

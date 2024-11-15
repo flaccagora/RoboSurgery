@@ -30,7 +30,7 @@ def train_dqn(args):
     }
 
     run = wandb.init(
-        project="DQN - POMDP",
+        project="DQNsb3 - POMDP",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=True,  # auto-upload the videos of agents playing the game
@@ -39,7 +39,7 @@ def train_dqn(args):
 
     callbacks = [
                 WandbCallback(gradient_save_freq=100,
-                                model_save_path=f"agents/pretrained/POMDP/{run.id}",
+                                model_save_path=f"agents/pretrained/POMDP/DQNsb3_{run.id}",
                                 verbose=2,
                                 model_save_freq=total_timesteps//10,
                                 ),
@@ -70,7 +70,7 @@ def train_dqn(args):
 
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks)
-    model.save(f"agents/pretrained/POMDP/DQN_{run.id}")
+    model.save(f"agents/pretrained/POMDP/DQNsb3_{run.id}")
     env.close()
     run.finish()
 

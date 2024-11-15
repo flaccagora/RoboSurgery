@@ -1240,13 +1240,13 @@ class MDPGYMGridEnvDeform(gym.Env):
                 elif event.key == pygame.K_SPACE:
                     self.pause()
                 elif event.key == pygame.K_LEFT:
-                    self.step(3,execute=True)
+                    self.step(3)
                 elif event.key == pygame.K_RIGHT:
-                    self.step(1,execute=True)
+                    self.step(1)
                 elif event.key == pygame.K_UP:
-                    self.step(0,execute=True)
+                    self.step(0)
                 elif event.key == pygame.K_DOWN:
-                    self.step(2,execute=True)
+                    self.step(2)
                 
 
         # Update the display
@@ -1274,8 +1274,12 @@ class MDPGYMGridEnvDeform(gym.Env):
                     "theta": torch.tensor(self.theta) , # Probability vector
                 })
 
+        if self.render_mode == "human":
+            self.render()
 
         return obs, {}           
+
+
 
 def create_maze(dim):
     maze = np.ones((dim*2+1, dim*2+1))
