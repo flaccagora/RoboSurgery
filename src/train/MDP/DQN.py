@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 from agents.DQN_agent import DoubleDQNAgent
 from environment.env import GridEnvDeform
+import wandb
 
 # maze size
 N = 2
@@ -79,7 +80,17 @@ def train_dqn(args):
     lr = args.learning_rate
     batch_size = args.batch_size
 
+    config = {
+        "num_episodes": num_episodes,
+        "max_episode_steps": max_episode_steps,
+        "lr": lr,
+        "batch_size": batch_size,
+        "target_update_freq": 100,
+    }
+
     agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - MDP")
+
+    wandb.config.update(config)
     
 
     rewards = []

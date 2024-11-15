@@ -6,6 +6,7 @@ from tqdm import tqdm
 from agents.DQN_agent import DoubleDQNAgent
 from environment.env import POMDPGYMGridEnvDeform
 from stable_baselines3.common.preprocessing import preprocess_obs
+import wandb
 
 # maze size
 N = 2
@@ -45,8 +46,18 @@ def train_dqn(args):
     lr = args.learning_rate
     batch_size = args.batch_size
 
+    config = {
+        "num_episodes": num_episodes,
+        "max_episode_steps": max_episode_steps,
+        "lr": lr,
+        "batch_size": batch_size,
+        "target_update_freq": 100,
+    }
+
+
     agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - POMDP")
     
+    wandb.config.update(config)
 
     rewards = []
     evalrewards = []
@@ -87,7 +98,7 @@ def train_dqn(args):
         progress_bar.update(1)
 
 
-        if episode != 0 and episode % num_episodes//10 == 0:
+        if episode != 0 and episode % 500 == 0:
             # avg_reward = evaluate_agent_training(env, agent)
             # evalrewards.append(avg_reward)
             # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
@@ -104,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.0003)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_steps", type=int, default=200)
-    parser.add_argument("--total_timesteps", type=int, default=50000)
+    parser.add_argument("--total_timesteps", type=int, default=5000)
         
     args = parser.parse_args()
     
