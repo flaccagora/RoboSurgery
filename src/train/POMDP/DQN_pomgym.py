@@ -112,10 +112,10 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser() 
 
-    parser.add_argument("--learning_rate", type=float, default=0.0003)
+    parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_steps", type=int, default=200)
-    parser.add_argument("--total_timesteps", type=int, default=5000)
+    parser.add_argument("--total_timesteps", type=int, default=50000)
         
     args = parser.parse_args()
     
