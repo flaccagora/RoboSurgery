@@ -17,7 +17,6 @@ def train_dqn(args):
 
     total_timesteps = args.total_timesteps
     batch_size = args.batch_size
-    n_steps = args.n_steps
     lr = args.learning_rate
     target_update = args.target_update
     gamma = args.gamma
@@ -49,8 +48,7 @@ def train_dqn(args):
                                 ),
                 ]
 
-    # n_steps (int) – The number of steps to run for each environment per update 
-    # (i.e. rollout buffer size is n_steps * n_envs
+
     from stable_baselines3.common.monitor import Monitor
     from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 
@@ -83,9 +81,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--learning_rate", type=float, default=0.0003)
-    parser.add_argument("--batch_size", type=int, default=50000)
-    parser.add_argument("--n_steps", type=int, default=2000)
-    parser.add_argument("--total_timesteps", type=int, default=50000)
+    parser.add_argument("--batch_size", type=int, default=256)
+    parser.add_argument("--total_timesteps", type=int, default=1000000) # env steps
     parser.add_argument("--target_update", type=int, default=10)
     args = parser.parse_args()
 
