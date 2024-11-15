@@ -19,6 +19,8 @@ def train_dqn(args):
     batch_size = args.batch_size
     n_steps = args.n_steps
     lr = args.learning_rate
+    target_update = args.target_update
+    gamma = args.gamma
 
     config = {
         "policy_type": "MultiInputPolicy",
@@ -26,6 +28,8 @@ def train_dqn(args):
         "defo_range": (l0,h0,l1,h1),
         "total_timesteps": total_timesteps,
         "learning_rate": lr,
+        "gamma": args.gamma,
+        "target_update": target_update,
         "Batch_Size": batch_size,
     
     }
@@ -68,7 +72,7 @@ def train_dqn(args):
     env = DummyVecEnv([make_env])
 
 
-    model = DQN("MultiInputPolicy",env,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
+    model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, target_update_interval=target_update,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks)
     model.save(f"agents/pretrained/MDP/DQNsb3_{run.id}")
     env.close()
@@ -79,10 +83,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--learning_rate", type=float, default=0.0003)
-    parser.add_argument("--batch_size", type=int, default=2000)
+    parser.add_argument("--batch_size", type=int, default=50000)
     parser.add_argument("--n_steps", type=int, default=2000)
     parser.add_argument("--total_timesteps", type=int, default=50000)
-    
+    parser.add_argument("--target_update", type=int, default=10)
     args = parser.parse_args()
 
     train_dqn(args)

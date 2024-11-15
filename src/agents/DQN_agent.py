@@ -123,7 +123,7 @@ class DoubleDQNAgent:
         if self.step_count % self.log_every and self.wandb:
             wandb.log({"loss":self.train_running_loss/(self.batch_size*self.log_every),
                        "epsilon":self.epsilon,
-                       "step_count":self.step_count,
+                       "step_count (train called #)":self.step_count,
                        })
 
             self.train_running_loss = 0

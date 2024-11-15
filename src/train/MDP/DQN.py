@@ -75,20 +75,25 @@ def train_dqn(args):
     state_dim = 5
     action_dim = 4
 
-    num_episodes = args.total_timesteps
+    num_episodes = args.num_episodes
     max_episode_steps = args.n_steps
     lr = args.learning_rate
     batch_size = args.batch_size
+    gamma = args.gamma
+    target_update = args.target_update
 
     config = {
         "num_episodes": num_episodes,
         "max_episode_steps": max_episode_steps,
         "lr": lr,
+        "gamma": args.gamma,
         "batch_size": batch_size,
-        "target_update_freq": 100,
+        "target_update_freq": target_update,
     }
 
-    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - MDP")
+    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr,gamma=gamma, 
+                           batch_size=batch_size,target_update_freq=target_update,
+                             wandb=True, project_name="DQN - MDP")
 
     wandb.config.update(config)
     
@@ -96,7 +101,8 @@ def train_dqn(args):
     rewards = []
     evalrewards = []
     progress_bar = tqdm(total=num_episodes)
-
+    total_steps = 0
+    agent_trained = 0
     for episode in range(num_episodes):
         progress_bar.set_description(f"episode {episode}")
 
@@ -116,10 +122,16 @@ def train_dqn(args):
 
             agent.store_transition(state, action, reward, next_state, done)
 
+            
             agent.train()
+            agent_trained += 1
+            if agent_trained % 10 == 0:
+                wandb.log({"env_steps":total_steps})
+
             state = next_state
             episode_reward += reward
-            steps += 1      
+            steps += 1    
+            total_steps += 1  
         
         agent.update_epsilon()
         rewards.append(episode_reward)
@@ -134,6 +146,7 @@ def train_dqn(args):
             agent.save("agents/pretrained/MDP/double_dqn.pt")
 
     print("Training complete.")
+    print("env stepped: ", total_steps)
     agent.save("agents/pretrained/MDP/double_dqn.pt")
     print("evalrewards: ", evalrewards)
 
@@ -144,8 +157,10 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.0003)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--n_steps", type=int, default=200)
-    parser.add_argument("--total_timesteps", type=int, default=50000)
-        
+    parser.add_argument("--num_episodes", type=int, default=50000)
+    parser.add_argument("--gamma", type=float, default=0.99)
+    parser.add_argument("--target_update", type=int, default=10)
+
     args = parser.parse_args()
     
     train_dqn(args)
