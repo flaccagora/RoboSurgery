@@ -39,7 +39,7 @@ def train_dqn(args):
     )
 
     callbacks = [ WandbCallback(gradient_save_freq=100,
-                                model_save_path=f"agents/pretrained/{run.id}",
+                                model_save_path=f"agents/pretrained/MDP/{run.id}",
                                 verbose=2,
                                 model_save_freq = total_timesteps//10
                                 ),
@@ -70,7 +70,7 @@ def train_dqn(args):
 
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,verbose=1,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks)
-    model.save(f"models/PPO_{run.id}")
+    model.save(f"agents/pretrained/MDP/DQNsb3_{run.id}")
     env.close()
     run.finish()
 

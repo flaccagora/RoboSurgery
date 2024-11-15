@@ -55,10 +55,12 @@ def eval_dqn_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,r
 
 
 def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
+    print("QMDP")
+    
     if render:
         env.set_rendering()
 
-    
+
     total_rewards = []
 
     for episode in range(num_episodes):
@@ -119,6 +121,7 @@ def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,ren
         - episode_transition: list of list of tuples (s,a,r,s',done), t[i] is the ith episode
         - beliefs: list of beliefs at each time step 
     """
+    print("eval_agent_pomdp")
     if render:
         env.set_rendering()
 
@@ -224,6 +227,8 @@ def eval_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,rende
 
 def eval_tabular_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
     
+    if render:
+        env.set_rendering()
     state_dict = env.state_dict
 
     total_rewards = []
@@ -237,7 +242,7 @@ def eval_tabular_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_ste
         c = max_episode_steps
         while not done and c > 0:
             if render:
-                env.render()
+                env.render_bis()
 
             # Agent takes an action using a greedy policy (without exploration)
             action = np.argmax(agent[state])
@@ -256,6 +261,8 @@ def eval_tabular_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_ste
             c -= 1
 
     avg_reward = np.mean(total_rewards)
+    if render:
+        env.close_render()
 
     return total_rewards, avg_reward
 
@@ -268,6 +275,8 @@ def eval_agent(observability,agent,env,num_episodes=100,max_episode_steps=10,ren
         elif observability == "POMDP":
             print("POMDP - DQN")
             return eval_dqn_agent_pomdp(agent,env,num_episodes,max_episode_steps,render)
+    elif isinstance(agent,np.ndarray):
+        return eval_tabular_agent_mdp(agent,env,num_episodes,max_episode_steps,render=render)
     else: # assuming infotaxis agent, tabularqwrapper
         if observability == "MDP":
             return eval_agent_mdp(agent,env,num_episodes,max_episode_steps,render)

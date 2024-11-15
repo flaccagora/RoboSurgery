@@ -120,10 +120,10 @@ def train_dqn(args):
             avg_reward = evaluate_agent_training(env, agent)
             evalrewards.append(avg_reward)
             # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
-            agent.save("agents/double_dqn.pt")
+            agent.save("agents/pretrained/MDP/double_dqn.pt")
 
     print("Training complete.")
-    agent.save("agents/double_dqn.pt")
+    agent.save("agents/pretrained/MDP/double_dqn.pt")
     print("evalrewards: ", evalrewards)
 
 if __name__ == "__main__":
