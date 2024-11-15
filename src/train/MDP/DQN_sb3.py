@@ -84,6 +84,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--total_timesteps", type=int, default=1000000) # env steps
     parser.add_argument("--target_update", type=int, default=10)
+    parser.add_argument("--gamma", type=float, default=0.99)
+    
     args = parser.parse_args()
 
     train_dqn(args)
