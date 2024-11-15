@@ -159,7 +159,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_steps", type=int, default=200) # steps per episode --> num steps total = n_steps * num_episodes = 10000000 * 200
     parser.add_argument("--num_episodes", type=int, default=50000) 
     parser.add_argument("--gamma", type=float, default=0.99)
-    parser.add_argument("--target_update", type=int, default=10)
+    parser.add_argument("--target_update", type=int, default=100)
 
     args = parser.parse_args()
     
