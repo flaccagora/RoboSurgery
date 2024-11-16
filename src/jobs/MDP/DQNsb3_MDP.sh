@@ -18,6 +18,6 @@ cd ./src
 export PYTHONPATH=$(pwd)
 export WANDB_MODE=offline
 
-python3 train/MDP/DQN_sb3.py --learning_rate=0.001 --target_update=100
+python3 train/MDP/DQN_sb3.py --learning_rate=0.001
 
 date
