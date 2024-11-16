@@ -44,7 +44,7 @@ def train_dqn(args):
     callbacks = [ WandbCallback(
                                 model_save_path=f"agents/pretrained/MDP/DQNsb3_{run.id}",
                                 verbose=2,
-                                model_save_freq = total_timesteps/10,
+                                model_save_freq = 10000,
                                 log="parameters",
                                 ),
                 ]
@@ -63,7 +63,7 @@ def train_dqn(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="human")
+        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rdb_array")
 
         env = Monitor(env)  # record stats such as returns
         return env
@@ -74,7 +74,7 @@ def train_dqn(args):
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
                 target_update_interval=target_update,verbose=2,
                 tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
-                train_freq=(1,"episode"), gradient_steps=1)
+                train_freq=(1,"step"), gradient_steps=1)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=1)
     model.save(f"agents/pretrained/MDP/DQNsb3_{run.id}")
     env.close()
@@ -85,9 +85,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--learning_rate", type=float, default=0.001)
-    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--total_timesteps", type=int, default=1000000) # env steps
-    parser.add_argument("--target_update", type=int, default=1000) # in env steps
+    parser.add_argument("--target_update", type=int, default=200) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
 
     args = parser.parse_args()
