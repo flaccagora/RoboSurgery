@@ -55,10 +55,8 @@ def train_dqn(args):
     }
 
 
-    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - POMDP")
+    agent = DoubleDQNAgent(state_dim, action_dim, lr = lr, batch_size=batch_size,target_update_freq=100, wandb=True, project_name="DQN - POMDP",config=config)
     
-    wandb.config.update(config)
-
     rewards = []
     evalrewards = []
     progress_bar = tqdm(total=num_episodes)

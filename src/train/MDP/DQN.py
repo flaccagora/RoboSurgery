@@ -17,7 +17,7 @@ l1 = 1
 h1 = 10
 
 maze = np.load(f"maze/maze_{N}.npy")
-env = GridEnvDeform(maze,l0,h0,l1,h1)
+env = GridEnvDeform(maze,l0,h0,l1,h1, render_mode="human")
 
 states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(l0,h0) for j in range(l1,h1)] 
 actions = [0,1,2,3]
@@ -93,9 +93,8 @@ def train_dqn(args):
 
     agent = DoubleDQNAgent(state_dim, action_dim, lr = lr,gamma=gamma, 
                            batch_size=batch_size,target_update_freq=target_update,
-                             wandb=True, project_name="DQN - MDP")
+                             wandb=True, project_name="DQN - MDP", config=config)
 
-    wandb.config.update(config)
     
 
     rewards = []
@@ -139,11 +138,12 @@ def train_dqn(args):
         progress_bar.update(1)
 
 
-        if episode != 0 and episode % 500 == 0:
-            avg_reward = evaluate_agent_training(env, agent)
-            evalrewards.append(avg_reward)
-            # print(f"Episode {episode + 1}/{num_episodes}, Average Reward: {avg_reward}")
+        if episode != 0 and episode % 10 == 0:
+            # avg_reward = evaluate_agent_training(env, agent)
+            # evalrewards.append(avg_reward)
+            print(f"Episode {episode}, saving checkpoint")
             agent.save(f"agents/pretrained/MDP/double_dqn_{episode}.pt")
+            print("-- Saved\n")
 
     print("Training complete.")
     print("env stepped: ", total_steps)

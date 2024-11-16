@@ -22,7 +22,7 @@ class QNetwork(nn.Module):
 
 # Define the Double DQN agent
 class DoubleDQNAgent:
-    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10, q_network=None,wandb=False,project_name=None):
+    def __init__(self, state_dim, action_dim, gamma=0.99, lr=0.001, batch_size=64, memory_size=10000, target_update_freq=10, q_network=None,wandb=False,project_name=None,config=None):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.gamma = gamma
@@ -56,11 +56,11 @@ class DoubleDQNAgent:
         self.epsilon_decay = 0.995
         self.wandb = wandb
         if self.wandb:
-            self.wandbinit(project_name)
+            self.wandbinit(project_name, config)
    
-    def wandbinit(self,project_name):
+    def wandbinit(self,project_name, config):
         import wandb
-        wandb.init(project=project_name)
+        wandb.init(project=project_name, config=config)
  
     def choose_deterministic_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)

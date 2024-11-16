@@ -41,10 +41,11 @@ def train_dqn(args):
         save_code=True,  # optional
     )
 
-    callbacks = [ WandbCallback(gradient_save_freq=100,
+    callbacks = [ WandbCallback(
                                 model_save_path=f"agents/pretrained/MDP/DQNsb3_{run.id}",
                                 verbose=2,
-                                model_save_freq = total_timesteps//10
+                                model_save_freq = total_timesteps/10,
+                                log="parameters",
                                 ),
                 ]
 
@@ -62,7 +63,7 @@ def train_dqn(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
+        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="human")
 
         env = Monitor(env)  # record stats such as returns
         return env
@@ -70,8 +71,11 @@ def train_dqn(args):
     env = DummyVecEnv([make_env])
 
 
-    model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, target_update_interval=target_update,verbose=2,tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr)
-    model.learn(total_timesteps,progress_bar=True, callback=callbacks)
+    model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
+                target_update_interval=target_update,verbose=2,
+                tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
+                train_freq=(1,"episode"), gradient_steps=10)
+    model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=1)
     model.save(f"agents/pretrained/MDP/DQNsb3_{run.id}")
     env.close()
     run.finish()
@@ -80,10 +84,10 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("--learning_rate", type=float, default=0.0003)
-    parser.add_argument("--batch_size", type=int, default=256)
-    parser.add_argument("--total_timesteps", type=int, default=1000000) # env steps
-    parser.add_argument("--target_update", type=int, default=100) # in env steps
+    parser.add_argument("--learning_rate", type=float, default=0.001)
+    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--total_timesteps", type=int, default=10000) # env steps
+    parser.add_argument("--target_update", type=int, default=1000) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
 
     args = parser.parse_args()

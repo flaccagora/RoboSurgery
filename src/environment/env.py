@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 
 class GridEnvDeform(gym.Env):
-    def __init__(self, maze, l0,h0,l1,h1):
+    def __init__(self, maze, l0,h0,l1,h1, render_mode=None):
 
         self.original_maze = maze
         self.original_maze_shape = maze.shape
@@ -44,6 +44,9 @@ class GridEnvDeform(gym.Env):
         self.goal_pos = self.original_maze.shape - np.array([2,2])
         
         self.frames = []
+        self.render_mode = render_mode
+        if self.render_mode == "human":
+            self.set_rendering()
         self.reset()
         
     def T(self, s, a, s_):
@@ -130,6 +133,9 @@ class GridEnvDeform(gym.Env):
         if execute:
             self.timestep += 1
             self.episode.append(s_)
+
+        if self.render_mode == "human":
+            self.render_bis()
 
         
         return s_, reward, terminated, truncated, info
@@ -285,13 +291,6 @@ class GridEnvDeform(gym.Env):
         maze_render[tuple(self.goal_pos)] = 4  # Show goal position
         plt.imshow(maze_render, cmap='binary', origin='upper')
         plt.show()
-
-    def set_rendering(self):
-        self.screen_width = 800
-        self.screen_height = 600
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        pygame.display.set_caption("Maze Environment")
-            # Add text for controls
         
     def set_rendering(self):
         self.screen_width = 800
@@ -416,6 +415,10 @@ class GridEnvDeform(gym.Env):
         self.theta = randomdeformation
         self.timestep = 0
         self.episode = [(self.get_state())]
+
+        if self.render_mode == "human":
+            self.render_bis()
+
         return ((self.agent_pos[0],self.agent_pos[1], self.agent_orientation), self.theta), {}
         
     def is_done(self):
@@ -423,180 +426,6 @@ class GridEnvDeform(gym.Env):
     
     def is_new(self):
         return self.timestep == 0
-
-class POMDPWrapper_v0():
-    """This is a wrapper for the GridEnvDeform class that makes the environment partially observable."""
-
-    def __init__(self, env: GridEnvDeform, agent : DoubleDQNAgent, T,R,O,*args, **kwargs):
-
-        self.agent = agent
-        self.states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(env.l0,env.h0) for j in range(env.l1,env.h1)] 
-        self.actions = [0,1,2,3]
-        self.observations = list(itertools.product([0,1], repeat=5))
-        self.thetas = env.deformations
-
-        self.obs_dict = {obs : i for i, obs in enumerate(self.observations)}
-        self.state_dict = {state : i for i, state in enumerate(self.states)}
-        
-        # Transition, Observation and Reward model T(S,A,S'), O(S,A,O), R(S,A,S')
-        self.T = T
-        self.O = O
-        self.R = R
-    
-    def step(self,s,a):
-        s_prime = torch.argmax(self.T[s,a,:])
-        r = self.R[s,a,s_prime.item()]
-        obs = torch.argmax(self.O[s_prime,0,:])
-        info = {"actual_state": s_prime.item()}
-
-        # done = True if np.all(self.states[s_prime.item()][0][:2] == self.env.goal_pos) else False
-        done = True if r.item() == 10 else False
-
-        return obs.item(), r.item(), done , info
-    
-    def run(self, num_trajectories):
-        """ 
-        The idea is to run the environment to populate the replay buffer with some data
-        transition for the POMDP should be like (belief, action, reward, next_belief, done)
-        
-        repeat
-        
-        Initialize belief if new episode
-        for all actions compute b,a,b',r and store
-        execute the best action in the environment
-        get new belief 
-        
-        until populated replay buffer
-        
-        """
-
-
-        # create a list of trajectories
-        trajectories = []
-
-        # Initialize belief (uniform distribution for now, probably need to change this)
-        b = (torch.ones(len(self.states)) / len(self.states))
-        s = np.random.randint(0,len(self.states))
-
-        while len(trajectories) < num_trajectories:
-            for a in self.actions:
-                next_obs, reward, done, info = self.step(s, a)
-                b_prime = self.update_belief(b, a, next_obs)
-
-                # POMDP feed the agent with the belief state
-                #state = {'obs':b, 'raw_legal_actions':la, 'legal_actions':la}
-                #next_state = {'obs':b_prime, 'raw_legal_actions':la, 'legal_actions':la}
-                
-                # Store trajectory
-                # trajectories.append(({'obs':b}, a, reward, {'obs':b_prime}, done))
-                trajectories.append((b, a, reward, b_prime, done))
-
-            # step in the environment
-            best_action = self.agent.step(b)    
-            next_obs, _, done, info = self.step(s,best_action)
-            b = self.update_belief(b, best_action, next_obs)
-            s = info['actual_state']
-            # if done:
-            #     s = np.random.randint(0,len(self.states))
-            #     b = (torch.ones(len(self.states)) / len(self.states))
-        
-        return trajectories
-
-    def reset(self):
-        # set random state
-        s = np.random.randint(0,len(self.states))
-
-        # get observation
-        obs = torch.argmax(self.O[s,0])
-        info = {"actual_state": s}
-        return obs, info
-
-    def update_belief(self, belief, action, observation):
-        """
-        Perform a Bayesian belief update in a POMDP with action-dependent transition and observation models.
-
-        Parameters:
-            belief (torch.Tensor): Initial belief distribution over states, shape (num_states,)
-            T (torch.Tensor): Transition probabilities, shape (num_states, num_actions, num_states)
-            O (torch.Tensor): Observation probabilities, shape (num_states, num_actions, num_observations)
-            action (int): The action taken (index of action)
-            observation (int): The observation received (index of observation)
-
-        Returns:
-            torch.Tensor: The updated belief over states, shape (num_states,)
-        """
-        # Prediction Step: Compute predicted belief over next states
-        predicted_belief = torch.matmul(belief, self.T[:, action])
-
-        # Update Step: Multiply by observation likelihood
-        observation_likelihood = self.O[:, action, observation]
-        new_belief = predicted_belief * observation_likelihood
-
-        # Normalize the updated belief to ensure it's a valid probability distribution
-        if new_belief.sum() > 0:
-            new_belief /= new_belief.sum() 
-             
-        return new_belief        
- 
-class POMDPWrapper_v1():
-    """This is a wrapper for the GridEnvDeform class that makes the environment partially observable."""
-
-    def __init__(self, env: GridEnvDeform, T,O,R,*args, **kwargs):
-
-        self.env = env
-        self.states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(env.l0,env.h0) for j in range(env.l1,env.h1)] 
-        self.actions = [0,1,2,3]
-        self.observations = list(itertools.product([0,1], repeat=5))
-        self.thetas = env.deformations
-
-        self.obs_dict = {obs : i for i, obs in enumerate(self.observations)}
-        self.state_dict = {state : i for i, state in enumerate(self.states)}
-        
-        # Transition, Observation and Reward model T(S,A,S'), O(S,A,O), R(S,A,S')
-        self.T = T
-        self.O = O
-        self.R = R
-    
-    def step(self, s,a):
-        s_prime = torch.argmax(self.T[s,a,:])
-        r = self.R[s,a,s_prime]
-        obs = torch.argmax(self.O[s_prime,0,:])
-        info = {"actual_state": s_prime.item()}
-
-        # done = True if np.all(self.states[s_prime.item()][0][:2] == self.env.goal_pos) else False
-        done = True if r.item() == 10 else False
-        
-        return obs.item(), r.item(), done , info
-    
-    def reset(self):
-        return np.random.randint(0,len(self.states)), {}
-
-    def update_belief(self, belief, action, observation):
-        """
-        Perform a Bayesian belief update in a POMDP with action-dependent transition and observation models.
-
-        Parameters:
-            belief (torch.Tensor): Initial belief distribution over states, shape (num_states,)
-            T (torch.Tensor): Transition probabilities, shape (num_states, num_actions, num_states)
-            O (torch.Tensor): Observation probabilities, shape (num_states, num_actions, num_observations)
-            action (int): The action taken (index of action)
-            observation (int): The observation received (index of observation)
-
-        Returns:
-            torch.Tensor: The updated belief over states, shape (num_states,)
-        """
-        # Prediction Step: Compute predicted belief over next states
-        predicted_belief = torch.matmul(belief, self.T[:, action])
-
-        # Update Step: Multiply by observation likelihood
-        observation_likelihood = self.O[:, action, observation]
-        new_belief = predicted_belief * observation_likelihood
-
-        # Normalize the updated belief to ensure it's a valid probability distribution
-        if new_belief.sum() > 0:
-            new_belief /= new_belief.sum() 
-             
-        return new_belief        
 
 class POMDPGYMGridEnvDeform(gym.Env):
     
@@ -1030,9 +859,9 @@ class MDPGYMGridEnvDeform(gym.Env):
             reward =  -0.5 # -1/(self.max_shape[0]*self.max_shape[1])
 
         info = {}
-        truncated = False 
                 
         self.timestep += 1
+        truncated = self.timestep >= 100 
 
         if self.render_mode == "human":
             self.render()
