@@ -63,7 +63,7 @@ def train_dqn(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rdb_array")
+        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
 
         env = Monitor(env)  # record stats such as returns
         return env

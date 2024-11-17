@@ -17,7 +17,6 @@ source .rob/bin/activate
 cd ./src
 
 export PYTHONPATH=$(pwd)
-export WANDB_MODE=offline
 
 python3 train/MDP/DQN_sb3.py --learning_rate=0.001
 
