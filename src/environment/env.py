@@ -866,10 +866,6 @@ class MDPGYMGridEnvDeform(gym.Env):
         if self.render_mode == "human":
             self.render()
 
-        new_beleif = self.update_belief()
-
-        self.belief = new_beleif
-
         obs = OrderedDict({
                             "x": torch.tensor([x_],dtype=torch.int32),              # Values from 0 to 10
                             "y": torch.tensor([y_],dtype=torch.int32),              # Values from 0 to 10
@@ -957,30 +953,6 @@ class MDPGYMGridEnvDeform(gym.Env):
 
         return stretched_maze
     
-    def update_belief(self):
-        """"
-        perform update over theta
-        
-        $$b'_{x,a,o}(theta) = \eta \cdot p(o|x,theta) \cdot b(theta)$$
-        
-        """
-
-        new_belief = torch.zeros_like(self.belief)
-        observation = self.get_observation()
-        pos = (self.agent_pos[0],self.agent_pos[1],self.agent_orientation)
-
-        for t, theta in enumerate(self.deformations):
-            if self.belief[t] == 0:
-                new_belief[t] = 0
-                continue
-            
-            P_o_s_theta = np.all(self.get_observation(s = (pos,theta)) == observation) # 0 or 1 
-            new_belief[t] = P_o_s_theta * self.belief[t]
-        
-        new_belief = new_belief / (torch.sum(new_belief) + 1e-10)
-
-        return new_belief
-
     def set_rendering(self):
         self.screen_width = 800
         self.screen_height = 600
