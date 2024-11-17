@@ -49,7 +49,7 @@ def train_ppo(args):
         save_code=True,  # optional
     )
 
-    callbacks = [My_callback(0), 
+    callbacks = [
                 WandbCallback(gradient_save_freq=100,
                                 model_save_path=f"agents/pretrained/MDP/PPO_{run.id}",
                                 verbose=2,
