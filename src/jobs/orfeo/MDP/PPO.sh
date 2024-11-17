@@ -4,8 +4,8 @@
 #SBATCH --time 02:00:00     # format: HH:MM:SS
 #SBATCH -N 1                # 1 node
 #SBATCH --ntasks-per-node=4 # 4 tasks out of 112
-#SBATCH --job-name=DQNsb3_MDP
-#SBATCH --output=DQNsb3_MDP.out 
+#SBATCH --job-name=PPO_MDP
+#SBATCH --output=PPO_MDP.out 
 
 date
 
