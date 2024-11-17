@@ -11,7 +11,7 @@ l1 = 1
 h1 = 10
 
 def train_ppo(args):
-    from stable_baselines3.common.callbacks import BaseCallback
+    from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback
     from wandb.integration.sb3 import WandbCallback
     import wandb
 
@@ -49,12 +49,23 @@ def train_ppo(args):
         save_code=True,  # optional
     )
 
+    # Save a checkpoint every 1000 steps
+    checkpoint_callback = CheckpointCallback(
+                            save_freq=10000,
+                            save_path=f"agents/pretrained/MDP/PPO_{run.id}",
+                            name_prefix="rl_model",
+                            save_replay_buffer=False,
+                            save_vecnormalize=True,
+                        )
+
+
     callbacks = [
                 WandbCallback(gradient_save_freq=100,
                                 model_save_path=f"agents/pretrained/MDP/PPO_{run.id}",
                                 verbose=2,
                                 model_save_freq = total_timesteps//10
                                 ),
+                checkpoint_callback,
                 ]
 
     # n_steps (int) – The number of steps to run for each environment per update 
