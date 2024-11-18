@@ -452,6 +452,7 @@ class POMDPGYMGridEnvDeform(gym.Env):
         # list of states
         self.states = [((x,y,phi),(i,j)) for x in range(1,self.max_shape[0]-1) for y in range(1,self.max_shape[1]-1) for phi in range(4) for i in range(l0,h0) for j in range(l1,h1)] 
         self.state_dict = {state : i for i, state in enumerate(self.states)}
+        self.positions = [(x,y,phi) for x in range(1,self.max_shape[0]-1) for y in range(1,self.max_shape[1]-1) for phi in range(4)]
         
         self.l0 = l0
         self.h0 = h0
@@ -787,6 +788,7 @@ class MDPGYMGridEnvDeform(gym.Env):
         # list of states
         self.states = [((x,y,phi),(i,j)) for x in range(1,self.max_shape[0]-1) for y in range(1,self.max_shape[1]-1) for phi in range(4) for i in range(l0,h0) for j in range(l1,h1)] 
         self.state_dict = {state : i for i, state in enumerate(self.states)}
+        self.positions = [(x,y,phi) for x in range(1,self.max_shape[0]-1) for y in range(1,self.max_shape[1]-1) for phi in range(4)]
         
         self.l0 = l0
         self.h0 = h0
