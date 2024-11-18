@@ -51,8 +51,8 @@ def train_ppo(args):
 
     # Save a checkpoint every 1000 steps
     checkpoint_callback = CheckpointCallback(
-                            save_freq=10000,
-                            save_path=f"agents/pretrained/MDP/PPO_{run.id}",
+                            save_freq=500000,
+                            save_path=f"agents/pretrained/POMDP/PPO_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,
                             save_vecnormalize=True,
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.0003)
     parser.add_argument("--batch_size", type=int, default=2000)
     parser.add_argument("--n_steps", type=int, default=2000)
-    parser.add_argument("--total_timesteps", type=int, default=1000000)
+    parser.add_argument("--total_timesteps", type=int, default=10000000)
     
     args = parser.parse_args()
 
