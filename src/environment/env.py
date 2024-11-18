@@ -801,7 +801,7 @@ class MDPGYMGridEnvDeform(gym.Env):
         self.reset()
 
         self.render_mode = render_mode
-        if self.render_mode == "human":
+        if self.render_mode == "rgb_array":
             self.set_rendering()
 
         # gym attributes
@@ -866,7 +866,7 @@ class MDPGYMGridEnvDeform(gym.Env):
         self.timestep += 1
         truncated = self.timestep >= 100 
 
-        if self.render_mode == "human":
+        if self.render_mode == "rgb_array":
             self.render()
 
         obs = OrderedDict({
@@ -1078,7 +1078,7 @@ class MDPGYMGridEnvDeform(gym.Env):
                     "theta": torch.tensor(self.theta) , # Probability vector
                 })
 
-        if self.render_mode == "human":
+        if self.render_mode == "rgb_array":
             self.render()
 
         return obs, {}           
