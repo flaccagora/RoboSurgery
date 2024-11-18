@@ -524,9 +524,10 @@ class POMDPGYMGridEnvDeform(gym.Env):
             reward =  -0.5 # -1/(self.max_shape[0]*self.max_shape[1])
 
         info = {}
-        truncated = False 
-                
+        
         self.timestep += 1
+        truncated = self.timestep >= 100 
+                
 
         if self.render_mode == "human":
             self.render()

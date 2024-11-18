@@ -30,8 +30,7 @@ def train_dqn(args):
         "gamma": args.gamma,
         "target_update": target_update,
         "Batch_Size": batch_size,
-    
-    }
+        }
 
     run = wandb.init(
         project="DQNsb3 - MDP",
@@ -42,7 +41,7 @@ def train_dqn(args):
     )
 
 
-    # Save a checkpoint every 1000 steps
+    # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
                             save_freq=10000,
                             save_path=f"agents/pretrained/MDP/DQNsb3_{run.id}",
