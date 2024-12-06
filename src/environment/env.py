@@ -1060,13 +1060,34 @@ class MDPGYMGridEnvDeform(gym.Env):
         frame = pygame.surfarray.array3d(self.screen)
         self.frames.append(frame)
 
-    def reset(self, seed=42):
-        randomdeformation = random.choice(self.deformations)
-        self.agent_pos = [np.random.randint(1, self.max_shape[0]-1), np.random.randint(1, self.max_shape[1]-1)]
-        self.agent_orientation = random.choice(self.orientations)
-        self.set_deformed_maze(randomdeformation)
-        self.goal_pos = self.original_maze.shape * np.array([randomdeformation[1],randomdeformation[0]])
-        self.theta = randomdeformation
+    def reset(self,seed=42,state=None): 
+        """
+        Reset the environment to the initial state.
+        optional: set the state to a specific state 
+            s = (x,y,phi,theta) or s = (x,y,phi) or s = (theta)
+        """
+
+        if isinstance(state, tuple) and isinstance(state[0], tuple): # pos and theta
+            self.set_state(state)
+        elif isinstance(state, tuple) and isinstance(state[0], int) and len(state) == 3: # pos
+            raise NotImplementedError("passing only state x y phi not implemented yet")
+        elif isinstance(state, tuple) and isinstance(state[0], int) and len(state) == 2: # theta
+            #raise NotImplementedError("passing only state theta not implemented yet")
+            randomdeformation = state
+            self.agent_pos = [np.random.randint(1, self.max_shape[0]-1), np.random.randint(1, self.max_shape[1]-1)]
+            self.agent_orientation = random.choice(self.orientations)
+            self.set_deformed_maze(randomdeformation)
+            self.goal_pos = self.original_maze.shape * np.array([randomdeformation[1],randomdeformation[0]])
+            self.theta = randomdeformation
+
+        elif state is None:
+            randomdeformation = random.choice(self.deformations)
+            self.agent_pos = [np.random.randint(1, self.max_shape[0]-1), np.random.randint(1, self.max_shape[1]-1)]
+            self.agent_orientation = random.choice(self.orientations)
+            self.set_deformed_maze(randomdeformation)
+            self.goal_pos = self.original_maze.shape * np.array([randomdeformation[1],randomdeformation[0]])
+            self.theta = randomdeformation
+        
         self.timestep = 0
         
         self.belief = torch.ones(len(self.deformations)) / len(self.deformations)
