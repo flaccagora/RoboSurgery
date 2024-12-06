@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import random
 import itertools
 import torch
-from agents.DQN_agent import DoubleDQNAgent # for typing only
 import pygame
 import imageio
 from gymnasium.spaces import Dict, Discrete, Box
