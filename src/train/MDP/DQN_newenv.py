@@ -86,7 +86,7 @@ def train_dqn(args):
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
                 target_update_interval=target_update, policy_kwargs=dict(net_arch=net_arch), verbose=1,
                 tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
-                train_freq=(1,"episode"), gradient_steps=1)
+                train_freq=(20,"step"), gradient_steps=1)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=55)
     model.save(f"agents/pretrained/MDP/DQN_continous_{run.id}")
     env.close()
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--total_timesteps", type=int, default=1000000) # env steps
-    parser.add_argument("--target_update", type=int, default=555) # in env steps
+    parser.add_argument("--target_update", type=int, default=200) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
 
     args = parser.parse_args()
