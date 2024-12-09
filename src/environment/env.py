@@ -8,7 +8,7 @@ import pygame
 import imageio
 from gymnasium.spaces import Dict, Discrete, Box
 from collections import OrderedDict
-from utils.point_in import is_point_in_parallelogram
+from utils.point_in import is_point_in_parallelogram, sample_in_parallelogram
 
 
 class GridEnvDeform(gym.Env):
@@ -1156,16 +1156,17 @@ class ObservableDeformedGridworld(gym.Env):
         ]
         self.transformed_corners = [self.transform(corner) for corner in self.corners]
         
-    def reset(self,seed=55):
+    def reset(self,seed=None):
         """
         Reset the environment to the initial state.
         :return: Initial state and observation.
         """
         np.random.seed(seed)
         self.set_deformation(self.sample(2,self.stretch_range), self.sample(2,self.shear_range))  # Reset deformation to random
-        self.state = np.array([0.1, 0.1])  # Start at the origin
+        # self.state = np.array([0.1, 0.1])  # Start at the origin
         #self.state = np.random.rand(2) * self.transform(self.grid_size) # Random start position in the deformable grid
-        
+        self.state = sample_in_parallelogram(self.transformed_corners)
+
         self.transformed_corners = [self.transform(corner) for corner in self.corners]
 
         state = OrderedDict({
@@ -1381,7 +1382,7 @@ class ObservableDeformedGridworld(gym.Env):
     
         self.state = next_state
         self.timestep += 1
-        truncated = self.timestep >= 200 
+        truncated = self.timestep > 200 
 
         if self.render_mode == "human":
             self.render()

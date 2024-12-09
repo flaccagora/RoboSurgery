@@ -53,7 +53,7 @@ def train_dqn(args):
     # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
                             save_freq=10000,
-                            save_path=f"DQNsb3_{run.id}",
+                            save_path=f"DQN_continous_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,
                             save_vecnormalize=True,
@@ -74,6 +74,7 @@ def train_dqn(args):
         env = ObservableDeformedGridworld(
             grid_size=(1.0, 1.0),
             obstacles=obstacles,
+            render_mode='human',
         )
 
         env = Monitor(env)  # record stats such as returns
@@ -88,7 +89,7 @@ def train_dqn(args):
                 tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
                 train_freq=(1,"episode"), gradient_steps=1)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=55)
-    model.save(f"agents/pretrained/MDP/DQNsb3_{run.id}")
+    model.save(f"agents/pretrained/MDP/DQN_continous_{run.id}")
     env.close()
     run.finish()
 
