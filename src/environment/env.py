@@ -8,6 +8,7 @@ import pygame
 import imageio
 from gymnasium.spaces import Dict, Discrete, Box
 from collections import OrderedDict
+from utils.point_in import is_point_in_parallelogram
 
 
 class GridEnvDeform(gym.Env):
@@ -1366,11 +1367,11 @@ class ObservableDeformedGridworld(gym.Env):
             info = {"collision": True}
             terminated = False
         # Check if the is inside the deformed grid boundaries
-        # elif not is_point_inside_quad(next_state, self.transformed_corners):
-        #     reward = -2.0
-        #     info = {"out": True}
-        #     next_state = self.state
-        #     terminated = True
+        elif not is_point_in_parallelogram(next_state, self.transformed_corners):
+            reward = -2.0
+            info = {"out": True}
+            next_state = self.state
+            terminated = True
         else:   
             transformed_goal = self.transform(self.goal)
             transformed_state = self.transform(self.state)
