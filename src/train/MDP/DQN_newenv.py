@@ -74,7 +74,6 @@ def train_dqn(args):
         env = ObservableDeformedGridworld(
             grid_size=(1.0, 1.0),
             obstacles=obstacles,
-            render_mode='human',
         )
 
         env = Monitor(env)  # record stats such as returns
