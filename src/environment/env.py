@@ -1103,6 +1103,574 @@ class MDPGYMGridEnvDeform(gym.Env):
 
         return obs, {}           
 
+class ObservableDeformedGridworld(gym.Env):
+
+    def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), 
+                 obstacles=None, stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, render_mode=None):
+        """
+        Initialize the observable deformed continuous gridworld.
+        :param grid_size: Size of the grid (width, height).
+        :param step_size: Step size for the agent's movement.
+        :param goal: Coordinates of the goal position.
+        :param obstacles: List of obstacles as rectangles [(x_min, y_min), (x_max, y_max)].
+        :param stretch: Tuple (s_x, s_y) for stretching the grid in x and y directions.
+        :param shear: Tuple (sh_x, sh_y) for shearing the grid.
+        :param observation_radius: Radius within which the agent can observe its surroundings.
+        """
+        self.grid_size = np.array(grid_size)
+        self.step_size = step_size
+        self.goal = np.array(goal)
+        self.state = np.array([0.1, 0.1])  # Start at the origin
+        self.obstacles = obstacles if obstacles else []
+        self.observation_radius = observation_radius
+
+        # Transformation matrix
+        self.transformation_matrix = np.array([
+            [stretch[0], shear[0]],
+            [shear[1], stretch[1]]
+        ])
+        self.inverse_transformation_matrix = np.linalg.inv(self.transformation_matrix)
+
+        # Rendering mode
+        self.render_mode = render_mode
+
+        # gymnasium compatibility
+        self.action_space = gym.spaces.Discrete(4)
+        self.observation_space =  Dict({
+            "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
+            "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
+            "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
+        })
+
+        self.stretch_range = np.array([0.4, 1])
+        self.shear_range = np.array([-0.2, 0.2])
+
+        self.timestep = 0
+
+        self.corners = [
+            np.array([0, 0]),
+            np.array([self.grid_size[0], 0]),
+            self.grid_size,
+            np.array([0, self.grid_size[1]]),
+        ]
+        self.transformed_corners = [self.transform(corner) for corner in self.corners]
+        
+    def reset(self,seed=55):
+        """
+        Reset the environment to the initial state.
+        :return: Initial state and observation.
+        """
+        np.random.seed(seed)
+        self.set_deformation(self.sample(2,self.stretch_range), self.sample(2,self.shear_range))  # Reset deformation to random
+        self.state = np.array([0.1, 0.1])  # Start at the origin
+        #self.state = np.random.rand(2) * self.transform(self.grid_size) # Random start position in the deformable grid
+        
+        self.transformed_corners = [self.transform(corner) for corner in self.corners]
+
+        state = OrderedDict({
+            "pos": self.state,
+            "theta": self.transformation_matrix.flatten(),
+            "obs": self.observe_obstacle()
+        }) 
+        
+        self.timestep = 0
+
+        # print(f"Initial agent position: {self.state}",
+        #       f"Initial goal position: {self.goal}",
+        #       f"Initial deformation: {self.transformation_matrix}",
+        #       f"Initial observation: {self.observe_obstacle()}",
+        #       sep="\n")
+        
+        return state, {}
+    
+    def set_deformation(self, stretch, shear):
+        """
+        Set the deformation transformation matrix based on stretch and shear parameters.
+        
+        This function creates a transformation matrix to apply grid deformations, including 
+        stretching and shearing, to the grid coordinates. It also computes the inverse of 
+        this transformation for reversing the deformation.
+
+        :param stretch: A tuple (s_x, s_y) for stretching the grid in the x and y directions.
+        :param shear: A tuple (sh_x, sh_y) for shearing the grid in the x and y directions.
+        """
+        # Create the transformation matrix based on stretch and shear
+        self.transformation_matrix = np.array([
+            [stretch[0], shear[0]],  # First row: stretch in x and shear in x direction
+            [shear[1], stretch[1]]   # Second row: shear in y and stretch in y direction
+        ])
+
+        # Calculate the inverse transformation matrix for reversing the deformation
+        self.inverse_transformation_matrix = np.linalg.inv(self.transformation_matrix)
+
+        # Optionally, print the transformation matrices for debugging
+        # print(f"Transformation Matrix:\n{self.transformation_matrix}")
+        # print(f"Inverse Transformation Matrix:\n{self.inverse_transformation_matrix}")
+
+    def set_pos(self, pos):
+        """
+        Set the agent's state to a new position.
+        
+        This function directly updates the agent's position (state) to the provided coordinates.
+
+        :param pos: A tuple or array representing the new position of the agent in the grid.
+        """
+        # Update the state (agent's position)
+        self.state = np.array(pos)
+
+        # Optionally, print the new state for debugging
+        # print(f"New agent position: {self.state}")
+
+    def transform(self, position):
+        """
+        Apply the grid deformation to a given position.
+        :param position: (x, y) in original space.
+        :return: Transformed position in the deformed grid.
+        """
+        return np.dot(self.transformation_matrix, position)
+
+    def inverse_transform(self, position):
+        """
+        Map a position from the deformed grid back to the original space.
+        :param position: (x, y) in the deformed grid.
+        :return: Original position.
+        """
+        return np.dot(self.inverse_transformation_matrix, position)
+
+    def is_in_obstacle(self, position):
+        """
+        Check if a given position is inside any obstacle.
+        :param position: The (x, y) coordinates to check in the original space.
+        :return: True if the position is inside an obstacle, False otherwise.
+        """
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            x_min_transformed, y_min_transformed = self.transform([x_min, y_min])
+            x_max_transformed, y_max_transformed = self.transform([x_max, y_max])
+            if x_min_transformed <= position[0] <= x_max_transformed and y_min_transformed <= position[1] <= y_max_transformed:
+                return True
+        return False
+
+    def observe_single_obstacle(self):
+        """
+        Check if any part of an obstacle is within the observation radius of the agent.
+        :return: True if any part of an obstacle is within the observation radius, False otherwise.
+        """
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            
+            # Clamp the agent's position to the obstacle's boundaries to find the closest point
+            closest_x = np.clip(self.state[0], x_min, x_max)
+            closest_y = np.clip(self.state[1], y_min, y_max)
+            
+            # Compute the distance from the agent to this closest point
+            closest_point = np.array([closest_x, closest_y])
+            distance_to_obstacle = np.linalg.norm(self.state - closest_point)
+            
+            # Check if this distance is within the observation radius
+            if distance_to_obstacle <= self.observation_radius:
+                return 1
+        
+        return 0
+    
+    def observe_obstacle(self):
+        """
+        Efficiently and precisely check for obstacles in the four cardinal directions (N, E, S, W).
+        Each direction checks for obstacles in a quarter-circle arc within the observation radius.
+        :return: A numpy array of shape (4,), where each entry indicates the presence of obstacles 
+                in the respective direction (North, East, South, West).
+        """
+        directions = ["N", "E", "S", "W"]
+        obstacle_presence = np.zeros(4)  # Default: no obstacles in any direction
+
+        # Precompute direction boundaries in radians
+        direction_ranges = [
+            (315, 45),   # North: [-45°, +45°]
+            (45, 135),   # East: [+45°, +135°]
+            (135, 225),  # South: [+135°, +225°]
+            (225, 315)   # West: [+225°, +315°]
+        ]
+        direction_ranges_rad = [(np.deg2rad(a1), np.deg2rad(a2)) for a1, a2 in direction_ranges]
+
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            x_min, y_min = self.transform([x_min, y_min])
+            x_max, y_max = self.transform([x_max, y_max])
+
+            # Generate sampled points along the edges of the obstacle
+            num_samples = 5  # Increase for more precision
+            edge_points = np.concatenate([
+                np.linspace([x_min, y_min], [x_max, y_min], num_samples),  # Bottom edge
+                np.linspace([x_max, y_min], [x_max, y_max], num_samples),  # Right edge
+                np.linspace([x_max, y_max], [x_min, y_max], num_samples),  # Top edge
+                np.linspace([x_min, y_max], [x_min, y_min], num_samples)   # Left edge
+            ])
+
+            # Compute vectors from agent to sampled points
+            vectors = edge_points - self.state
+            distances = np.linalg.norm(vectors, axis=1)
+
+            # Filter points that are outside the observation radius
+            within_radius = distances <= self.observation_radius
+            if not np.any(within_radius):
+                continue  # Skip obstacles entirely outside the radius
+
+            # Compute angles relative to positive Y-axis
+            angles = np.arctan2(vectors[:, 1], vectors[:, 0])  # Radians
+            angles = (angles + 2 * np.pi) % (2 * np.pi)  # Normalize to [0, 2π)
+
+            # Check which direction each point falls into
+            for i, (angle_min, angle_max) in enumerate(direction_ranges_rad):
+                if obstacle_presence[i] == 1:
+                    continue  # Early exit if the direction is already flagged
+                for angle in angles[within_radius]:
+                    if (angle_min <= angle < angle_max) or (
+                        angle_max < angle_min and (angle >= angle_min or angle < angle_max)
+                    ):
+                        obstacle_presence[i] = 1
+                        break  # No need to check further points for this direction
+
+        return obstacle_presence
+        
+    def step(self, action):
+        """
+        Take a step in the environment, interpreting the action in the deformed space.
+        :param action: One of ['N', 'S', 'E', 'W'].
+        :return: Tuple (next_state, observation, reward, done, info).
+        """
+        # Map actions to movements in the deformed space
+        moves = [np.array([0, self.step_size]),   # Move up in deformed space
+            np.array([0, -self.step_size]),  # Move down in deformed space
+            np.array([self.step_size, 0]),   # Move right in deformed space
+            np.array([-self.step_size, 0])   # Move left in deformed space
+        ]
+
+        # Get the movement vector in the deformed space
+        move = moves[action]
+
+        # Map the movement to the original space using the inverse transformation
+        # move_original = np.dot(self.inverse_transformation_matrix, move)
+
+        # Update state in the original grid space
+        next_state = self.state + move
+
+        num_samples = 50  # Number of points to sample along the path
+        path = np.linspace(self.state, next_state, num_samples)
+
+        # Check for collisions along the path
+        collision = any(self.is_in_obstacle(point) for point in path)
+
+        # Check if the new state is in an obstacle
+        if collision:
+            reward = -1.0  # Penalty for hitting an obstacle
+            info = {"collision": True}
+            terminated = False
+        # Check if the is inside the deformed grid boundaries
+        # elif not is_point_inside_quad(next_state, self.transformed_corners):
+        #     reward = -2.0
+        #     info = {"out": True}
+        #     next_state = self.state
+        #     terminated = True
+        else:   
+            transformed_goal = self.transform(self.goal)
+            transformed_state = self.transform(self.state)
+            terminated = np.linalg.norm(transformed_state - transformed_goal) < self.step_size
+            reward = 1.0 if terminated else -0.01
+            info = {"collision": False, "out": False}
+    
+        self.state = next_state
+        self.timestep += 1
+        truncated = self.timestep >= 200 
+
+        if self.render_mode == "human":
+            self.render()
+
+        state = OrderedDict({
+                    "pos": self.state,
+                    "theta": self.transformation_matrix.flatten(),
+                    "obs": self.observe_obstacle()
+                })
+
+        # Return the transformed state, reward, and terminated truncated flag
+        return state, reward, terminated, truncated, info
+
+    def render_old(self):
+        """
+        Render the deformed gridworld environment using Pygame, ensuring the entire deformed grid fits within the screen.
+        """
+        import pygame  # Ensure Pygame is imported
+
+        # Define colors
+        WHITE = (255, 255, 255)
+        BLUE = (0, 0, 255)
+        GREEN = (0, 255, 0)
+        RED = (255, 0, 0)
+        YELLOW = (255, 255, 0)
+        BLACK = (0, 0, 0)
+
+        # Initialize the screen
+        if not hasattr(self, "screen"):
+            self.screen_width = 800
+            self.screen_height = 600
+            pygame.init()
+            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+            pygame.display.set_caption("Deformed Gridworld Environment")
+
+        # Fill background with white
+        self.screen.fill(WHITE)
+
+        # Compute the bounding box of the deformed grid
+        corners = [
+            self.transform(np.array([0, 0])),
+            self.transform(np.array([self.grid_size[0], 0])),
+            self.transform(self.grid_size),
+            self.transform(np.array([0, self.grid_size[1]])),
+        ]
+        x_coords, y_coords = zip(*corners)
+        min_x, max_x = min(x_coords), max(x_coords)
+        min_y, max_y = min(y_coords), max(y_coords)
+
+        # Define scaling factors to fit the deformed grid within the screen
+        scale_x = self.screen_width / (max_x - min_x)
+        scale_y = self.screen_height / (max_y - min_y)
+        scale = min(scale_x, scale_y)  # Uniform scaling to maintain aspect ratio
+
+        # Transform helper for rendering
+        def to_screen_coords(pos):
+            """
+            Map transformed coordinates to screen coordinates, scaled and shifted to fit the screen.
+            """
+            x, y = pos
+            x_screen = int((x - min_x) * scale)
+            y_screen = int((max_y - y) * scale)  # Flip y-axis for screen rendering
+            return x_screen, y_screen
+
+        # Draw the deformed grid boundaries
+        pygame.draw.polygon(self.screen, BLACK, [to_screen_coords(corner) for corner in corners], width=3)
+
+        # Draw the obstacles
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            bottom_left = self.transform(np.array([x_min, y_min]))
+            bottom_right = self.transform(np.array([x_max, y_min]))
+            top_left = self.transform(np.array([x_min, y_max]))
+            top_right = self.transform(np.array([x_max, y_max]))
+            
+            # Draw each obstacle as a polygon in the deformed space
+            pygame.draw.polygon(self.screen, RED, [
+                to_screen_coords(bottom_left),
+                to_screen_coords(bottom_right),
+                to_screen_coords(top_right),
+                to_screen_coords(top_left)
+            ])
+
+        # Draw the agent
+        agent_position = self.transform(self.state)
+        pygame.draw.circle(self
+        .screen, BLUE, to_screen_coords(agent_position), 10)
+
+        # Draw the goal
+        goal_position = self.transform(self.goal)
+        pygame.draw.circle(self.screen, GREEN, to_screen_coords(goal_position), 12)
+
+        # Draw observation radius as a dashed circle around the agent
+        observation_radius = self.observation_radius * max(self.transformation_matrix.diagonal())
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(agent_position), 
+                        int(observation_radius * scale), 1)
+
+        # Update the display
+        pygame.display.flip()
+
+        # Handle key events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                # Press 'r' to reset environment
+                if event.key == pygame.K_r:
+                    self.reset()
+                # Press 'w' to quit
+                elif event.key == pygame.K_w:
+                    pygame.quit()
+                    return
+                # Press 's' to save current state
+                elif event.key == pygame.K_s:
+                    self.save_state()
+                # Press space to pause/resume
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                # Press arrow keys for manual control
+                elif event.key == pygame.K_LEFT:
+                    return self.step(3)  # Left action
+                elif event.key == pygame.K_RIGHT:
+                    return self.step(2)  # Right action
+                elif event.key == pygame.K_UP:
+                    return self.step(0)  # Up action
+                elif event.key == pygame.K_DOWN:
+                    return self.step(1)  # Down action
+        return None, None, None, None, None
+    
+    def close(self):
+        self.render_mode = None
+        pygame.quit()
+    
+    def sample(self,num,limit):
+        low,high = limit
+        return low + np.random.rand(num)*(high-low)
+    
+    def render(self):
+        """
+        Render the deformed gridworld environment along with the original gridworld.
+        The original gridworld serves as a reference background.
+        """
+        import pygame  # Ensure Pygame is imported
+
+        # Define colors
+        WHITE = (255, 255, 255)
+        LIGHT_GRAY = (200, 200, 200)
+        BLUE = (0, 0, 255)
+        GREEN = (0, 255, 0)
+        RED = (255, 0, 0)
+        PINK = (255, 105, 180)  
+        YELLOW = (255, 255, 0)
+        BLACK = (0, 0, 0)
+
+        # Initialize the screen
+        if not hasattr(self, "screen"):
+            self.screen_width = 1000
+            self.screen_height = 1000
+            pygame.init()
+            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+            pygame.display.set_caption("Deformed and Original Gridworld")
+
+        # Fill background with white
+        self.screen.fill(WHITE)
+
+    # Compute the bounding box of the deformed grid
+        corners = [
+            np.array([0, 0]),
+            np.array([self.grid_size[0], 0]),
+            self.grid_size,
+            np.array([0, self.grid_size[1]]),
+        ]
+        transformed_corners = [self.transform(corner) for corner in corners]
+        x_coords, y_coords = zip(*transformed_corners)
+        min_x, max_x = min(x_coords), max(x_coords)
+        min_y, max_y = min(y_coords), max(y_coords)
+
+        # Define scaling factors to fit the deformed grid within the screen
+        scale_x = self.screen_width / (max_x - min_x)
+        scale_y = self.screen_height / (max_y - min_y)
+        scale = min(scale_x, scale_y)  # Uniform scaling to maintain aspect ratio
+
+        # Add upward translation offset
+        y_translation = max(0, -min_y * scale)
+
+        # Transform helper for rendering
+        def to_screen_coords(pos):
+            """
+            Map transformed coordinates to screen coordinates, scaled and shifted to fit the screen.
+            """
+            x, y = pos
+            x_screen = int((x - min_x) * scale)
+            y_screen = int((max_y - y) * scale + y_translation)  # Flip y-axis and add upward translation
+            return x_screen, y_screen
+        
+        # Draw the un-deformed grid (background)
+        for i in range(int(self.grid_size[0]) + 1):
+            pygame.draw.line(self.screen, LIGHT_GRAY,
+                            to_screen_coords((i, 0)),
+                            to_screen_coords((i, self.grid_size[1])), width=1)
+        for j in range(int(self.grid_size[1]) + 1):
+            pygame.draw.line(self.screen, LIGHT_GRAY,
+                            to_screen_coords((0, j)),
+                            to_screen_coords((self.grid_size[0], j)), width=1)
+
+        # Draw the deformed grid boundaries
+        corners = [
+            np.array([0, 0]),
+            np.array([self.grid_size[0], 0]),
+            self.grid_size,
+            np.array([0, self.grid_size[1]]),
+        ]
+        transformed_corners = [self.transform(corner) for corner in corners]
+        pygame.draw.polygon(self.screen, BLACK, [to_screen_coords(corner) for corner in transformed_corners], width=3)
+
+        # Draw the obstacles in both grids
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            # Original obstacle
+            pygame.draw.rect(self.screen, PINK,
+                            (*to_screen_coords((x_min, y_max)),  # Top-left corner
+                            int((x_max - x_min) * scale),      # Width
+                            int((y_max - y_min) * scale)),    # Height
+                            width=0)
+
+            # Transformed obstacle
+            bottom_left = self.transform(np.array([x_min, y_min]))
+            bottom_right = self.transform(np.array([x_max, y_min]))
+            top_left = self.transform(np.array([x_min, y_max]))
+            top_right = self.transform(np.array([x_max, y_max]))
+            pygame.draw.polygon(self.screen, RED, [
+                to_screen_coords(bottom_left),
+                to_screen_coords(bottom_right),
+                to_screen_coords(top_right),
+                to_screen_coords(top_left)
+            ])
+
+        # Draw the agent in both grids
+        agent_position = self.state
+        transformed_agent_position = agent_position
+        pygame.draw.circle(self.screen, BLUE, to_screen_coords(agent_position), 10)  # Original
+        pygame.draw.circle(self.screen, GREEN, to_screen_coords(transformed_agent_position), 10)  # Transformed
+
+        # Draw the goal in both grids
+        goal_position = self.goal
+        transformed_goal_position = self.transform(goal_position)
+        pygame.draw.circle(self.screen, GREEN, to_screen_coords(goal_position), 12)  # Original
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(transformed_goal_position), 12)  # Transformed
+
+        # Draw observation radius as a dashed circle around the agent
+        observation_radius = self.observation_radius # stays the same in both grids
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(agent_position), 
+                        int(self.observation_radius * scale), 1)  # Original
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(transformed_agent_position), 
+                        int(observation_radius * scale), 1)  # Transformed
+
+        # Update the display
+        pygame.display.flip()
+
+        # Handle key events
+        # Handle key events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                # Press 'r' to reset environment
+                if event.key == pygame.K_r:
+                    self.reset()
+                # Press 'w' to quit
+                elif event.key == pygame.K_w:
+                    pygame.quit()
+                    return
+                # Press 's' to save current state
+                elif event.key == pygame.K_s:
+                    self.save_state()
+                # Press space to pause/resume
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                # Press arrow keys for manual control
+                elif event.key == pygame.K_LEFT:
+                    return self.step(3)  # Left action
+                elif event.key == pygame.K_RIGHT:
+                    return self.step(2)  # Right action
+                elif event.key == pygame.K_UP:
+                    return self.step(0)  # Up action
+                elif event.key == pygame.K_DOWN:
+                    return self.step(1)  # Down action
+        return None, None, None, None, None
 
 
 def create_maze(dim):
