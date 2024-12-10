@@ -1107,7 +1107,7 @@ class MDPGYMGridEnvDeform(gym.Env):
 class ObservableDeformedGridworld(gym.Env):
 
     def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), 
-                 obstacles=None, stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, render_mode=None):
+                 obstacles=None, stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, render_mode=None,shear_range=(-0.2,0.2),stretch_range=(0.4,1)):
         """
         Initialize the observable deformed continuous gridworld.
         :param grid_size: Size of the grid (width, height).
@@ -1140,11 +1140,11 @@ class ObservableDeformedGridworld(gym.Env):
         self.observation_space =  Dict({
             "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
             "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
-            # "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
+            "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
         })
 
-        self.stretch_range = np.array([0.4, 1])
-        self.shear_range = np.array([-0.2, 0.2])
+        self.stretch_range = stretch_range
+        self.shear_range = shear_range
 
         self.timestep = 0
 
@@ -1172,7 +1172,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
             "pos": self.state,
             "theta": self.transformation_matrix.flatten(),
-            # "obs": self.observe_obstacle()
+            "obs": self.observe_obstacle()
         }) 
         
         self.timestep = 0
@@ -1395,7 +1395,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
                     "pos": self.state,
                     "theta": self.transformation_matrix.flatten(),
-                    # "obs": self.observe_obstacle()
+                    "obs": self.observe_obstacle()
                 })
 
         # Return the transformed state, reward, and terminated truncated flag
