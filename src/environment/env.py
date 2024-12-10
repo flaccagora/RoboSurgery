@@ -1163,11 +1163,11 @@ class ObservableDeformedGridworld(gym.Env):
         """
         np.random.seed(seed)
         self.set_deformation(self.sample(2,self.stretch_range), self.sample(2,self.shear_range))  # Reset deformation to random
+        self.transformed_corners = [self.transform(corner) for corner in self.corners]
         # self.state = np.array([0.1, 0.1])  # Start at the origin
         #self.state = np.random.rand(2) * self.transform(self.grid_size) # Random start position in the deformable grid
         self.state = sample_in_parallelogram(self.transformed_corners)
 
-        self.transformed_corners = [self.transform(corner) for corner in self.corners]
 
         state = OrderedDict({
             "pos": self.state,
@@ -1356,7 +1356,7 @@ class ObservableDeformedGridworld(gym.Env):
         # Update state in the original grid space
         next_state = self.state + move
 
-        num_samples = 50  # Number of points to sample along the path
+        num_samples = 10  # Number of points to sample along the path
         path = np.linspace(self.state, next_state, num_samples)
 
         # Check for collisions along the path
@@ -1364,7 +1364,7 @@ class ObservableDeformedGridworld(gym.Env):
 
         # Check if the new state is in an obstacle
         if collision:
-            reward = -1.0  # Penalty for hitting an obstacle
+            reward = -2.0  # Penalty for hitting an obstacle
             info = {"collision": True}
             terminated = False
         # Check if the is inside the deformed grid boundaries
@@ -1372,12 +1372,11 @@ class ObservableDeformedGridworld(gym.Env):
             reward = -2.0
             info = {"out": True}
             next_state = self.state
-            terminated = True
+            terminated = False
         else:   
             transformed_goal = self.transform(self.goal)
-            transformed_state = self.transform(self.state)
-            terminated = np.linalg.norm(transformed_state - transformed_goal) < self.step_size
-            reward = 1.0 if terminated else -0.01
+            terminated = np.linalg.norm(next_state - transformed_goal) < self.step_size
+            reward = 1.0 if terminated else -0.5
             info = {"collision": False, "out": False}
     
         self.state = next_state
@@ -1673,7 +1672,6 @@ class ObservableDeformedGridworld(gym.Env):
                 elif event.key == pygame.K_DOWN:
                     return self.step(1)  # Down action
         return None, None, None, None, None
-
 
 def create_maze(dim):
     maze = np.ones((dim*2+1, dim*2+1))
