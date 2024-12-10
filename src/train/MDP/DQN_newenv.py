@@ -86,7 +86,7 @@ def train_dqn(args):
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
                 target_update_interval=target_update, policy_kwargs=dict(net_arch=net_arch), verbose=1,
                 tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
-                train_freq=(20,"step"), gradient_steps=1)
+                train_freq=(10,"step"), gradient_steps=1)
     model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=55)
     model.save(f"agents/pretrained/MDP/DQN_continous_{run.id}")
     env.close()
