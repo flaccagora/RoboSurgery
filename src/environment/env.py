@@ -1140,7 +1140,6 @@ class ObservableDeformedGridworld(gym.Env):
         self.observation_space =  Dict({
             "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
             "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
-            "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
         })
 
         self.stretch_range = stretch_range
@@ -1172,7 +1171,6 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
             "pos": self.state,
             "theta": self.transformation_matrix.flatten(),
-            "obs": self.observe_obstacle()
         }) 
         
         self.timestep = 0
@@ -1395,7 +1393,6 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
                     "pos": self.state,
                     "theta": self.transformation_matrix.flatten(),
-                    "obs": self.observe_obstacle()
                 })
 
         # Return the transformed state, reward, and terminated truncated flag
