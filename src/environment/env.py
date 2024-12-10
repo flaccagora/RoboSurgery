@@ -1140,7 +1140,7 @@ class ObservableDeformedGridworld(gym.Env):
         self.observation_space =  Dict({
             "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
             "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
-            # "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
+            "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
         })
 
         self.stretch_range = np.array([0.4, 1])
@@ -1172,7 +1172,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
             "pos": self.state,
             "theta": self.transformation_matrix.flatten(),
-            # "obs": self.observe_obstacle()
+            "obs": self.observe_obstacle()
         }) 
         
         self.timestep = 0
@@ -1363,21 +1363,24 @@ class ObservableDeformedGridworld(gym.Env):
         collision = any(self.is_in_obstacle(point) for point in path)
 
         # Check if the new state is in an obstacle
-        if collision:
-            reward = -2.0  # Penalty for hitting an obstacle
-            info = {"collision": True}
-            terminated = False
+        if np.linalg.norm(next_state - self.transform(self.goal)) < self.observation_radius:
+            terminated = True
+            reward = 1.0 
+            info = {"collision": False, "out": False, 'goal': True}
         # Check if the is inside the deformed grid boundaries
         elif not is_point_in_parallelogram(next_state, self.transformed_corners):
             reward = -2.0
             info = {"out": True}
             next_state = self.state
             terminated = False
-        else:   
-            transformed_goal = self.transform(self.goal)
-            terminated = np.linalg.norm(next_state - transformed_goal) < self.step_size
-            reward = 1.0 if terminated else -0.5
-            info = {"collision": False, "out": False}
+        elif collision:   
+            reward = -2.0  # Penalty for hitting an obstacle
+            info = {"collision": True}
+            terminated = False
+        else:
+            terminated = False
+            reward = -0.5
+            info = {"collision": False, "out": False, "goal": False}
     
         self.state = next_state
         self.timestep += 1
@@ -1389,7 +1392,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
                     "pos": self.state,
                     "theta": self.transformation_matrix.flatten(),
-                    # "obs": self.observe_obstacle()
+                    "obs": self.observe_obstacle()
                 })
 
         # Return the transformed state, reward, and terminated truncated flag
