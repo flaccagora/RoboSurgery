@@ -30,6 +30,7 @@ def train_dqn(args):
     lr = args.learning_rate
     target_update = args.target_update
     gamma = args.gamma
+    render_mode = args.render_mode
 
     config = {
         "policy_type": "MultiInputPolicy",
@@ -40,6 +41,8 @@ def train_dqn(args):
         'step_size': 0.1,
         'obstacles':obstacles,
         'observation_radius':0.2,
+        "shear range":None,
+        "stretch range":None
     }
     run = wandb.init(
         project="DQNsb3 - MDP - ObservableDeformedGridworld",
@@ -74,12 +77,18 @@ def train_dqn(args):
         env = ObservableDeformedGridworld(
             grid_size=(1.0, 1.0),
             obstacles=obstacles,
+            render_mode=render_mode,
         )
 
         env = Monitor(env)  # record stats such as returns
         return env
 
     env = DummyVecEnv([make_env])
+
+
+    # update config
+    run.config.update({"shear range":env.envs[0].unwrapped.shear_range,
+                      "stretch range":env.envs[0].unwrapped.stretch_range}, allow_val_change=True)
 
 
     net_arch=[128, 128, 128]
@@ -101,6 +110,7 @@ if __name__ == "__main__":
     parser.add_argument("--total_timesteps", type=int, default=5000000) # env steps
     parser.add_argument("--target_update", type=int, default=200) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
+    parser.add_argument("--render_mode", type=str, default=None)
 
     args = parser.parse_args()
 

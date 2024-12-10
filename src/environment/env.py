@@ -1140,12 +1140,11 @@ class ObservableDeformedGridworld(gym.Env):
         self.observation_space =  Dict({
             "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
             "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
-            "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
+            # "obs": gym.spaces.Box(low=0, high=1, shape=(4,),dtype=int),
         })
 
         self.stretch_range = np.array([0.4, 1])
-        # self.shear_range = np.array([-0.2, 0.2])
-        self.shear_range = np.zeros(2)
+        self.shear_range = np.array([-0.2, 0.2])
 
         self.timestep = 0
 
@@ -1173,7 +1172,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
             "pos": self.state,
             "theta": self.transformation_matrix.flatten(),
-            "obs": self.observe_obstacle()
+            # "obs": self.observe_obstacle()
         }) 
         
         self.timestep = 0
@@ -1239,7 +1238,7 @@ class ObservableDeformedGridworld(gym.Env):
         :return: Original position.
         """
         return np.dot(self.inverse_transformation_matrix, position)
-
+    
     def is_in_obstacle(self, position):
         """
         Check if a given position is inside any obstacle.
@@ -1248,9 +1247,12 @@ class ObservableDeformedGridworld(gym.Env):
         """
         for obs in self.obstacles:
             (x_min, y_min), (x_max, y_max) = obs
-            x_min_transformed, y_min_transformed = self.transform([x_min, y_min])
-            x_max_transformed, y_max_transformed = self.transform([x_max, y_max])
-            if x_min_transformed <= position[0] <= x_max_transformed and y_min_transformed <= position[1] <= y_max_transformed:
+            bottom_left = self.transform(np.array([x_min, y_min]))
+            bottom_right = self.transform(np.array([x_max, y_min]))
+            top_left = self.transform(np.array([x_min, y_max]))
+            top_right = self.transform(np.array([x_max, y_max]))
+            obstacle = [bottom_left, bottom_right, top_right, top_left]
+            if is_point_in_parallelogram(position, obstacle):
                 return True
         return False
 
@@ -1385,7 +1387,7 @@ class ObservableDeformedGridworld(gym.Env):
     
         self.state = next_state
         self.timestep += 1
-        truncated = self.timestep > 200 
+        truncated = self.timestep > 500 
 
         if self.render_mode == "human":
             self.render()
@@ -1393,7 +1395,7 @@ class ObservableDeformedGridworld(gym.Env):
         state = OrderedDict({
                     "pos": self.state,
                     "theta": self.transformation_matrix.flatten(),
-                    "obs": self.observe_obstacle()
+                    # "obs": self.observe_obstacle()
                 })
 
         # Return the transformed state, reward, and terminated truncated flag
