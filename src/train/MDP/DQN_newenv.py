@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import gymnasium as gym
 from environment.env import ObservableDeformedGridworld
 
@@ -50,7 +49,7 @@ def train_dqn(args):
 
     # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
-                            save_freq=500000,
+                            save_freq=250000,
                             save_path=f"DQN_continous_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,
