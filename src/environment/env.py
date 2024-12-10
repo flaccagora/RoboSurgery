@@ -1144,7 +1144,8 @@ class ObservableDeformedGridworld(gym.Env):
         })
 
         self.stretch_range = np.array([0.4, 1])
-        self.shear_range = np.array([-0.2, 0.2])
+        # self.shear_range = np.array([-0.2, 0.2])
+        self.shear_range = np.zeros(2)
 
         self.timestep = 0
 
