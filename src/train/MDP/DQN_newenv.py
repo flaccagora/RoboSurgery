@@ -122,7 +122,7 @@ def train_dqn(args):
 
     net_arch=[128, 128, 128]
     if args.run_id is not None:
-        last_checkpoint = find_last_checkpoint(f"DQN_continous_{args.run_id}")
+        last_checkpoint = find_last_checkpoint(f"agents/pretrained/MDP/DQN_continous_{args.run_id}")
         model = DQN.load(last_checkpoint,env=env,)
     else:
         model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
