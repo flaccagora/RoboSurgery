@@ -146,6 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("--target_update", type=int, default=200) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--render_mode", type=str, default=None)
+    parser.add_argument("--run_id", type=str, default=None)
 
     args = parser.parse_args()
 
