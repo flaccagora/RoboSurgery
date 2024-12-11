@@ -69,8 +69,8 @@ def train_dqn(args):
             sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
             monitor_gym=True,  # auto-upload the videos of agents playing the game
             save_code=True,  # optional
-            run_id=run_id,
-            resume="must"
+            id=run_id,
+            resume="must",
         )
     else:
         run = wandb.init(
