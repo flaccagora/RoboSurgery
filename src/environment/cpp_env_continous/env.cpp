@@ -106,12 +106,12 @@ public:
     std::vector<std::array<Vector2, 2>> obstacles_;
     Vector2 goal_;
     double observation_radius_;
-private:
-    std::array<Vector2, 2> corners_array_ ;
-    double step_size_;
     Vector2 shear_range_;
     Vector2 stretch_range_;
     Matrix2x2 transformation_matrix_;
+private:
+    std::array<Vector2, 2> corners_array_ ;
+    double step_size_;
     Matrix2x2 inverse_transformation_matrix_;
     std::vector<Vector2> corners_;
     std::vector<Vector2> transformed_corners_;
@@ -214,6 +214,9 @@ PYBIND11_MODULE(gridworld, m) {
         .def("reset", &ObservableDeformedGridworld::reset)
         .def("step", &ObservableDeformedGridworld::step)
         .def("transform", &ObservableDeformedGridworld::transform)
+        .def_readonly("transformation_matrix", &ObservableDeformedGridworld::transformation_matrix_)
+        .def_readonly("shear_range", &ObservableDeformedGridworld::shear_range_)
+        .def_readonly("stretch_range", &ObservableDeformedGridworld::stretch_range_)
         .def_readonly("observation_radius", &ObservableDeformedGridworld::observation_radius_)
         .def_readonly("state", &ObservableDeformedGridworld::state_)
         .def_readonly("goal", &ObservableDeformedGridworld::goal_)

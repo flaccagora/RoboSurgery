@@ -9,7 +9,7 @@ import imageio
 from gymnasium.spaces import Dict, Discrete, Box
 from collections import OrderedDict
 from utils.point_in import is_point_in_parallelogram, sample_in_parallelogram
-from cpp_env_continous import gridworld
+from environment.cpp_env_continous import gridworld
 
 
 class GridEnvDeform(gym.Env):
@@ -1139,8 +1139,8 @@ class ObservableDeformedGridworld(gym.Env):
         # gymnasium compatibility
         self.action_space = gym.spaces.Discrete(4)
         self.observation_space =  Dict({
-            "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
-            "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
+            "pos": gym.spaces.Box(low=1.0, high=1.0, shape=(2,),dtype=float),
+            "theta": gym.spaces.Box(low=-1.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
         })
 
         self.stretch_range = stretch_range
@@ -1561,7 +1561,7 @@ class ObservableDeformedGridworld(gym.Env):
         return None, None, None, None, None
 
 
-class Grid(gridworld.ObservableDeformedGridworld):
+class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
    
     def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), obstacles=None,
                   stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, shear_range=(-0.2,0.2), 
@@ -1574,7 +1574,6 @@ class Grid(gridworld.ObservableDeformedGridworld):
             "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
             "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
         })    
-    
     
     def render(self):
         """
@@ -1729,6 +1728,29 @@ class Grid(gridworld.ObservableDeformedGridworld):
                     return self.step(1)  # Down action
         return None, None, None, None, None
     
+    def reset(self, seed=555):
+        """
+        Reset the environment to the initial state.
+        """
+        if seed is not None:
+            super().reset(seed)
+        else:
+            super().reset(555)
+        
+        state = OrderedDict({
+            "pos": np.array(self.state),
+            "theta": np.array(self.transformation_matrix).flatten(),
+        })
+
+        return state, {}
+    
+    def step(self, action):
+        if self.render_mode == "human":
+            self.render()
+
+        return super().step(action)
+   
+        
     def close(self):
         """
         Close the Pygame window.
