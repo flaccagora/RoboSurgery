@@ -1,6 +1,6 @@
 import numpy as np
 import gymnasium as gym
-from environment.env import ObservableDeformedGridworld
+from environment.env import Grid
 import os
 import re
 
@@ -103,7 +103,7 @@ def train_dqn(args):
     from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 
     def make_env():
-        env = ObservableDeformedGridworld(
+        env = Grid(
             grid_size=(1.0, 1.0),
             obstacles=obstacles,
             render_mode=render_mode,

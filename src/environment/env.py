@@ -9,6 +9,7 @@ import imageio
 from gymnasium.spaces import Dict, Discrete, Box
 from collections import OrderedDict
 from utils.point_in import is_point_in_parallelogram, sample_in_parallelogram
+from cpp_env_continous import gridworld
 
 
 class GridEnvDeform(gym.Env):
@@ -1363,7 +1364,6 @@ class ObservableDeformedGridworld(gym.Env):
         # Check for collisions along the path
         collision = any(self.is_in_obstacle(point) for point in path)
 
-        # Check if the new state is in an obstacle
         if np.linalg.norm(next_state - self.transform(self.goal)) < self.observation_radius:
             terminated = True
             reward = 1.0 
@@ -1374,6 +1374,7 @@ class ObservableDeformedGridworld(gym.Env):
             info = {"out": True}
             next_state = self.state
             terminated = False
+        # Check if the new state is in an obstacle
         elif collision:   
             reward = -2.0  # Penalty for hitting an obstacle
             info = {"collision": True}
@@ -1558,6 +1559,183 @@ class ObservableDeformedGridworld(gym.Env):
                 elif event.key == pygame.K_DOWN:
                     return self.step(1)  # Down action
         return None, None, None, None, None
+
+
+class Grid(gridworld.ObservableDeformedGridworld):
+   
+    def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), obstacles=None,
+                  stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, shear_range=(-0.2,0.2), 
+                  stretch_range=(0.4,1), render_mode=None,max_timesteps=500):
+        super().__init__(grid_size, step_size, goal, obstacles, stretch, shear, observation_radius, shear_range, stretch_range)
+        self.render_mode = render_mode
+
+        self.action_space = gym.spaces.Discrete(4)
+        self.observation_space =  gym.spaces.Dict({
+            "pos": gym.spaces.Box(low=.0, high=1.0, shape=(2,),dtype=float),
+            "theta": gym.spaces.Box(low=.0, high=1.0, shape=(4,),dtype=float), # deformation is a 2x2 tensor
+        })    
+    
+    
+    def render(self):
+        """
+        Render the deformed gridworld environment along with the original gridworld.
+        The original gridworld serves as a reference background.
+        """
+        import pygame  # Ensure Pygame is imported
+
+        # Define colors
+        WHITE = (255, 255, 255)
+        LIGHT_GRAY = (200, 200, 200)
+        BLUE = (0, 0, 255)
+        GREEN = (0, 255, 0)
+        RED = (255, 0, 0)
+        PINK = (255, 105, 180)  
+        YELLOW = (255, 255, 0)
+        BLACK = (0, 0, 0)
+
+        # Initialize the screen
+        if not hasattr(self, "screen"):
+            self.screen_width = 1000
+            self.screen_height = 1000
+            pygame.init()
+            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+            pygame.display.set_caption("Deformed and Original Gridworld")
+
+        # Fill background with white
+        self.screen.fill(WHITE)
+
+    # Compute the bounding box of the deformed grid
+        corners = [
+            np.array([0, 0]),
+            np.array([self.grid_size[0], 0]),
+            self.grid_size,
+            np.array([0, self.grid_size[1]]),
+        ]
+        transformed_corners = [self.transform(corner) for corner in corners]
+        x_coords, y_coords = zip(*transformed_corners)
+        min_x, max_x = min(x_coords), max(x_coords)
+        min_y, max_y = min(y_coords), max(y_coords)
+
+        # Define scaling factors to fit the deformed grid within the screen
+        scale_x = self.screen_width / (max_x - min_x)
+        scale_y = self.screen_height / (max_y - min_y)
+        scale = min(scale_x, scale_y)  # Uniform scaling to maintain aspect ratio
+
+        # Add upward translation offset
+        y_translation = max(0, -min_y * scale)
+
+        # Transform helper for rendering
+        def to_screen_coords(pos):
+            """
+            Map transformed coordinates to screen coordinates, scaled and shifted to fit the screen.
+            """
+            x, y = pos
+            x_screen = int((x - min_x) * scale)
+            y_screen = int((max_y - y) * scale + y_translation)  # Flip y-axis and add upward translation
+            return x_screen, y_screen
+        
+        # Draw the un-deformed grid (background)
+        for i in range(int(self.grid_size[0]) + 1):
+            pygame.draw.line(self.screen, LIGHT_GRAY,
+                            to_screen_coords((i, 0)),
+                            to_screen_coords((i, self.grid_size[1])), width=1)
+        for j in range(int(self.grid_size[1]) + 1):
+            pygame.draw.line(self.screen, LIGHT_GRAY,
+                            to_screen_coords((0, j)),
+                            to_screen_coords((self.grid_size[0], j)), width=1)
+
+        # Draw the deformed grid boundaries
+        corners = [
+            np.array([0, 0]),
+            np.array([self.grid_size[0], 0]),
+            self.grid_size,
+            np.array([0, self.grid_size[1]]),
+        ]
+        transformed_corners = [self.transform(corner) for corner in corners]
+        pygame.draw.polygon(self.screen, BLACK, [to_screen_coords(corner) for corner in transformed_corners], width=3)
+
+        # Draw the obstacles in both grids
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            # Original obstacle
+            pygame.draw.rect(self.screen, PINK,
+                            (*to_screen_coords((x_min, y_max)),  # Top-left corner
+                            int((x_max - x_min) * scale),      # Width
+                            int((y_max - y_min) * scale)),    # Height
+                            width=0)
+
+            # Transformed obstacle
+            bottom_left = self.transform(np.array([x_min, y_min]))
+            bottom_right = self.transform(np.array([x_max, y_min]))
+            top_left = self.transform(np.array([x_min, y_max]))
+            top_right = self.transform(np.array([x_max, y_max]))
+            pygame.draw.polygon(self.screen, RED, [
+                to_screen_coords(bottom_left),
+                to_screen_coords(bottom_right),
+                to_screen_coords(top_right),
+                to_screen_coords(top_left)
+            ])
+
+        # Draw the agent in both grids
+        agent_position = self.state
+        transformed_agent_position = agent_position
+        pygame.draw.circle(self.screen, BLUE, to_screen_coords(agent_position), 10)  # Original
+        pygame.draw.circle(self.screen, GREEN, to_screen_coords(transformed_agent_position), 10)  # Transformed
+
+        # Draw the goal in both grids
+        goal_position = self.goal
+        transformed_goal_position = self.transform(goal_position)
+        pygame.draw.circle(self.screen, GREEN, to_screen_coords(goal_position), 12)  # Original
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(transformed_goal_position), 12)  # Transformed
+
+        # Draw observation radius as a dashed circle around the agent
+        observation_radius = self.observation_radius # stays the same in both grids
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(agent_position), 
+                        int(self.observation_radius * scale), 1)  # Original
+        pygame.draw.circle(self.screen, YELLOW, to_screen_coords(transformed_agent_position), 
+                        int(observation_radius * scale), 1)  # Transformed
+
+        # Update the display
+        pygame.display.flip()
+
+        # Handle key events
+        # Handle key events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                # Press 'r' to reset environment
+                if event.key == pygame.K_r:
+                    self.reset()
+                # Press 'w' to quit
+                elif event.key == pygame.K_w:
+                    pygame.quit()
+                    return
+                # Press 's' to save current state
+                elif event.key == pygame.K_s:
+                    self.save_state()
+                # Press space to pause/resume
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                # Press arrow keys for manual control
+                elif event.key == pygame.K_LEFT:
+                    return self.step(3)  # Left action
+                elif event.key == pygame.K_RIGHT:
+                    return self.step(2)  # Right action
+                elif event.key == pygame.K_UP:
+                    return self.step(0)  # Up action
+                elif event.key == pygame.K_DOWN:
+                    return self.step(1)  # Down action
+        return None, None, None, None, None
+    
+    def close(self):
+        """
+        Close the Pygame window.
+        """
+        pygame.quit()
+
+
 
 def create_maze(dim):
     maze = np.ones((dim*2+1, dim*2+1))
