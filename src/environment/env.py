@@ -1732,10 +1732,7 @@ class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
         """
         Reset the environment to the initial state.
         """
-        if seed is not None:
-            super().reset(seed)
-        else:
-            super().reset(555)
+        super().reset(42)
         
         state = OrderedDict({
             "pos": np.array(self.state),

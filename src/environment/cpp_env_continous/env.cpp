@@ -37,10 +37,13 @@ public:
                     grid_size_};
 
         transformed_corners_ = transform_corners(corners_);
+
+        std::mt19937 rng(42);
+
     }
+    std::mt19937 rng;
 
     void reset(unsigned int seed = 0) {
-        std::mt19937 rng(seed);
         auto stretch = sample(rng, stretch_range_);
         auto shear = sample(rng, shear_range_);
         set_deformation(stretch, shear);

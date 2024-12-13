@@ -107,8 +107,8 @@ def train_dqn(args):
             grid_size=(1.0, 1.0),
             obstacles=obstacles,
             render_mode=render_mode,
-            shear_range=(0.,0.),
-            stretch_range=(1,1)
+            shear_range=(-.2,.2),
+            stretch_range=(.4,1)
         )
 
         env = Monitor(env)  # record stats such as returns
