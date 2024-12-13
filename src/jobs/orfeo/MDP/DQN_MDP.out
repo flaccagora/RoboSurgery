@@ -1,0 +1,12 @@
+Fri Dec 13 16:13:36 CET 2024
+usage: conda [-h] [-v] [--no-plugins] [-V] COMMAND ...
+conda: error: argument COMMAND: invalid choice: 'deactivate' (choose from 'clean', 'compare', 'config', 'create', 'info', 'init', 'install', 'list', 'notices', 'package', 'remove', 'uninstall', 'rename', 'run', 'search', 'update', 'upgrade', 'doctor', 'repoquery', 'env', 'content-trust')
+/usr/lib64/libstdc++.so.6:/usr/local/cuda-12.2/targets/x86_64-linux/lib:/usr/local/cuda-12.2/targets/x86_64-linux/lib:
+/u/dssc/mnunzi00/RoboSurgery/src
+Traceback (most recent call last):
+  File "/orfeo/cephfs/home/dssc/mnunzi00/RoboSurgery/src/train/MDP/DQN_newenv.py", line 3, in <module>
+    from environment.env import Grid
+  File "/u/dssc/mnunzi00/RoboSurgery/src/environment/env.py", line 7, in <module>
+    import pygame
+ModuleNotFoundError: No module named 'pygame'
+Fri Dec 13 16:13:43 CET 2024
