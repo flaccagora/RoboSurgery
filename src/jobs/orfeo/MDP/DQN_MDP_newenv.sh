@@ -18,6 +18,6 @@ cd ./src
 
 export PYTHONPATH=$(pwd)
 
-python3 train/MDP/DQN_newenv.py --learning_rate=0.001
+python3 train/MDP/DQN_newenv.py --learning_rate=0.001 --run_id="erwcxb9y"
 
 date
