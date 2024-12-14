@@ -63,28 +63,32 @@ public:
 
     auto move = moves[action];
     Vector2 next_state = {state_[0] + move[0], state_[1] + move[1]};
+    std::unordered_map<std::string, bool> info;
+    float reward;
+    bool terminated;
 
     if (distance(next_state, transform(goal_)) < observation_radius_) {
-        state_ = next_state;
-        std::unordered_map<std::string, bool> info = {{"goal", true}};
-        return make_step_response(next_state, 1.0, true, info);
-    }
-    
-    if (is_collision(next_state)) {
-        state_ = next_state;
-        std::unordered_map<std::string, bool> info = {{"collision", true}};
-        return make_step_response(state_, -2.0, false, info);
-    }
-
-    if (!is_point_in_parallelogram(next_state, corners_array_)) {
-        std::unordered_map<std::string, bool> info = {{"out", true}};
-        return make_step_response(state_, -2.0, false, info);
+        info = {{"goal", true}};
+        reward = 1.0;
+        terminated = false;
+    }else if (is_collision(next_state)) {
+        info = {{"collision", true}};
+        reward = -2.0;
+        terminated = false;
+    }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
+        info = {{"out", true}};
+        reward = -2;
+        terminated = false;
+        next_state = state_;
+    }else {
+        info = {};
+        reward = -0.5;
+        terminated = false;
     }
 
     state_ = next_state;
     timestep_++;
-    std::unordered_map<std::string, bool> info;
-    return make_step_response(state_, -0.5, timestep_ > 500, info);
+    return make_step_response(state_, reward,terminated, timestep_ > 500, info);
 }
 
     void set_deformation(Vector2 stretch, Vector2 shear) {
@@ -191,14 +195,14 @@ private:
     bool,
     std::unordered_map<std::string, bool>
     > make_step_response(
-    const Vector2& state, double reward, bool terminated, 
+    const Vector2& state, double reward, bool terminated, bool truncated,
     const std::unordered_map<std::string, bool>& info) {
     return std::make_tuple(
         std::unordered_map<std::string, std::vector<double>>{
             {"pos", {state[0], state[1]}},
             {"theta", flatten(transformation_matrix_)}
         },
-        reward, terminated, timestep_ > 500, info
+        reward, terminated, truncated, info
     );
 }
 
