@@ -71,15 +71,15 @@ public:
         info = {{"goal", true}};
         reward = 1.0;
         terminated = false;
+    }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
+        info = {{"out", true}};
+        reward = -2.0;
+        terminated = false;
+        next_state = state_;
     }else if (is_collision(next_state)) {
         info = {{"collision", true}};
         reward = -2.0;
         terminated = false;
-    }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
-        info = {{"out", true}};
-        reward = -2;
-        terminated = false;
-        next_state = state_;
     }else {
         info = {};
         reward = -0.5;
@@ -88,7 +88,7 @@ public:
 
     state_ = next_state;
     timestep_++;
-    return make_step_response(state_, reward,terminated, timestep_ > 500, info);
+    return make_step_response(state_, reward, terminated, timestep_ > 500, info);
 }
 
     void set_deformation(Vector2 stretch, Vector2 shear) {
