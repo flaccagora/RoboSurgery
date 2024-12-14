@@ -70,7 +70,7 @@ public:
     if (distance(next_state, transform(goal_)) < observation_radius_) {
         info = {{"goal", true}};
         reward = 1.0;
-        terminated = false;
+        terminated = true;
     }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
         info = {{"out", true}};
         reward = -2.0;
