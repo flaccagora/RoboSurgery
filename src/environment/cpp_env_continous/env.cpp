@@ -73,16 +73,17 @@ public:
         terminated = true;
     }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
         info = {{"out", true}};
-        reward = -2.0;
+        reward = -1.0;
         terminated = false;
         next_state = state_;
     }else if (is_collision(next_state)) {
         info = {{"collision", true}};
-        reward = -2.0;
+        reward = -1.0;
         terminated = false;
+        next_state = state_;
     }else {
         info = {};
-        reward = -0.5;
+        reward = -0.01;
         terminated = false;
     }
 
