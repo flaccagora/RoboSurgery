@@ -12,6 +12,34 @@ from utils.point_in import is_point_in_parallelogram, sample_in_parallelogram
 from environment.cpp_env_continous import gridworld
 
 
+###----------------------------DISCRETE----------------------------###
+def create_maze(dim):
+    maze = np.ones((dim*2+1, dim*2+1))
+    x, y = (0, 0)
+    maze[2*x+1, 2*y+1] = 0
+    stack = [(x, y)]
+    
+    while len(stack) > 0:
+        x, y = stack[-1]
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        random.shuffle(directions)
+
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if nx >= 0 and ny >= 0 and nx < dim and ny < dim and maze[2*nx+1, 2*ny+1] == 1:
+                maze[2*nx+1, 2*ny+1] = 0
+                maze[2*x+1+dx, 2*y+1+dy] = 0
+                stack.append((nx, ny))
+                break
+        else:
+            stack.pop()
+
+    # Create entrance and exit
+    # maze[1, 0] = 0
+    # maze[-2, -1] = 0
+
+    return maze[1:-1, 1:-1]
+
 class GridEnvDeform(gym.Env):
     def __init__(self, maze, l0,h0,l1,h1, render_mode=None):
 
@@ -1105,10 +1133,19 @@ class MDPGYMGridEnvDeform(gym.Env):
 
         return obs, {}           
 
+###----------------------------CONTINOUS----------------------------###
+
+DEFAULT_OBSTACLES = [((0.14625, 0.3325), (0.565, 0.55625)), 
+             ((0.52875, 0.5375), (0.7375, 0.84125)), 
+             ((0.0, 0.00125), (0.01625, 0.99125)), 
+             ((0.0075, 0.00125), (0.99875, 0.04)), 
+             ((0.98875, 0.0075), (0.99875, 1.0)), 
+             ((0.00125, 0.9825), (0.99875, 1.0))]
+
 class ObservableDeformedGridworld(gym.Env):
 
     def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), 
-                 obstacles=None, stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, render_mode=None,shear_range=(-0.2,0.2),stretch_range=(0.4,1)):
+                 obstacles=DEFAULT_OBSTACLES, stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, render_mode=None,shear_range=(-0.2,0.2),stretch_range=(0.4,1)):
         """
         Initialize the observable deformed continuous gridworld.
         :param grid_size: Size of the grid (width, height).
@@ -1560,10 +1597,39 @@ class ObservableDeformedGridworld(gym.Env):
                     return self.step(1)  # Down action
         return None, None, None, None, None
 
+    def set_pos_nodeform(self):
+        """
+        Set the agent's state to a new position.
+        
+        This function directly updates the agent's position (state) to the provided coordinates.
+
+        :param pos: A tuple or array representing the new position of the agent in the grid.
+        """
+        low, high = -.2, 1.2 # depends on the shear (nto stretch since compression)
+        pos = self.sample(2,limit=(low,high))
+        
+        # Update the state (agent's position)
+        self.state = np.array(pos)
+
+        # Optionally, print the new state for debugging
+        # print(f"New agent position: {self.state}")
+        return pos
+
+    def is_in_obstacle_nodeform(self, position):
+        """
+        Check if a given position is inside any obstacle.
+        :param position: The (x, y) coordinates to check in the original space.
+        :return: True if the position is inside an obstacle, False otherwise.
+        """
+        for obs in self.obstacles:
+            (x_min, y_min), (x_max, y_max) = obs
+            if x_min <= position[0] <= x_max and y_min <= position[1] <= y_max:            
+                return True
+        return False
 
 class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
    
-    def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), obstacles=None,
+    def __init__(self, grid_size=(1.0, 1.0), step_size=0.02, goal=(0.9, 0.9), obstacles=DEFAULT_OBSTACLES,
                   stretch=(1.0, 1.0), shear=(0.0, 0.0), observation_radius=0.05, shear_range=(-0.2,0.2), 
                   stretch_range=(0.4,1), render_mode=None,max_timesteps=500):
         super().__init__(grid_size, step_size, goal, obstacles, stretch, shear, observation_radius, shear_range, stretch_range)
@@ -1746,39 +1812,41 @@ class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
             self.render()
 
         return super().step(action)
-   
-        
+      
     def close(self):
         """
         Close the Pygame window.
         """
         pygame.quit()
 
-
-
-def create_maze(dim):
-    maze = np.ones((dim*2+1, dim*2+1))
-    x, y = (0, 0)
-    maze[2*x+1, 2*y+1] = 0
-    stack = [(x, y)]
+class POMDPDeformedGridworld(Grid):
+    def __init__(self, render_mode='human'):
+        super(POMDPDeformedGridworld, self).__init__(render_mode=render_mode)
+        
+        self.observation_space = Dict({
+            'obs': Discrete(2),
+            'pos': Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32)
+        })
     
-    while len(stack) > 0:
-        x, y = stack[-1]
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        random.shuffle(directions)
-
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if nx >= 0 and ny >= 0 and nx < dim and ny < dim and maze[2*nx+1, 2*ny+1] == 1:
-                maze[2*nx+1, 2*ny+1] = 0
-                maze[2*x+1+dx, 2*y+1+dy] = 0
-                stack.append((nx, ny))
-                break
-        else:
-            stack.pop()
-
-    # Create entrance and exit
-    # maze[1, 0] = 0
-    # maze[-2, -1] = 0
-
-    return maze[1:-1, 1:-1]
+    def reset(self):
+        state, _ = super().reset()
+        pomdp_state = {
+            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(state['pos']) else torch.tensor([0], dtype=torch.float32),
+            'pos': torch.tensor(state['pos'], dtype=torch.float32)
+            }
+        return pomdp_state, {}
+    
+    def step(self, action):
+        state, reward, terminated, truncated, info = super().step(action)
+        pomdp_state = {
+            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(state['pos']) else torch.tensor([0], dtype=torch.float32),
+            'pos': torch.tensor(state['pos'], dtype=torch.float32)
+            }
+        return pomdp_state, reward, terminated,truncated, info
+    
+    def get_state(self):
+        pomdp_state = {
+            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(self.state) else torch.tensor([0], dtype=torch.float32),
+            'pos': torch.tensor(self.state, dtype=torch.float32)
+            }
+        return pomdp_state

@@ -117,6 +117,20 @@ public:
     Vector2 shear_range_;
     Vector2 stretch_range_;
     Matrix2x2 transformation_matrix_;
+    
+    
+    bool is_collision(const Vector2& position) const {
+        for (const auto& obstacle : obstacles_) {
+            if (is_point_in_parallelogram(position, obstacle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
 private:
     std::array<Vector2, 2> corners_array_ ;
     double step_size_;
@@ -146,15 +160,6 @@ private:
 
     double distance(const Vector2& a, const Vector2& b) const {
         return std::sqrt(std::pow(a[0] - b[0], 2) + std::pow(a[1] - b[1], 2));
-    }
-
-    bool is_collision(const Vector2& position) const {
-        for (const auto& obstacle : obstacles_) {
-            if (is_point_in_parallelogram(position, obstacle)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     bool is_point_in_parallelogram(const Vector2& point, const std::array<Vector2,2>& parallelogram) const {
@@ -222,6 +227,8 @@ PYBIND11_MODULE(gridworld, m) {
         .def("reset", &ObservableDeformedGridworld::reset)
         .def("step", &ObservableDeformedGridworld::step)
         .def("transform", &ObservableDeformedGridworld::transform)
+        .def("is_collision", &ObservableDeformedGridworld::is_collision)
+        .def("set_deformation", &ObservableDeformedGridworld::set_deformation)
         .def_readonly("transformation_matrix", &ObservableDeformedGridworld::transformation_matrix_)
         .def_readonly("shear_range", &ObservableDeformedGridworld::shear_range_)
         .def_readonly("stretch_range", &ObservableDeformedGridworld::stretch_range_)
