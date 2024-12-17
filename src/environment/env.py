@@ -1820,9 +1820,15 @@ class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
         pygame.quit()
 
 class POMDPDeformedGridworld(Grid):
-    def __init__(self, render_mode='human'):
+    def __init__(self, render_mode='human', obs_type = 'single'):
         super(POMDPDeformedGridworld, self).__init__(render_mode=render_mode)
         
+        assert obs_type in ['single', 'cardinal']
+        if obs_type == 'single':
+            self.observe = super().is_collision
+        elif obs_type == 'cardinal':
+            self.observe = super().is_collision_cardinal
+
         self.observation_space = Dict({
             'obs': Discrete(2),
             'pos': Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32)
@@ -1831,7 +1837,7 @@ class POMDPDeformedGridworld(Grid):
     def reset(self, seed=None):
         state, _ = super().reset(seed=seed)
         pomdp_state = {
-            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(state['pos']) else torch.tensor([0], dtype=torch.float32),
+            'obs': torch.tensor(self.observe(state['pos']), dtype=torch.float32),
             'pos': torch.tensor(state['pos'], dtype=torch.float32)
             }
         return pomdp_state, {}
@@ -1839,14 +1845,14 @@ class POMDPDeformedGridworld(Grid):
     def step(self, action):
         state, reward, terminated, truncated, info = super().step(action)
         pomdp_state = {
-            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(state['pos']) else torch.tensor([0], dtype=torch.float32),
+            'obs': torch.tensor(self.observe(state['pos']), dtype=torch.float32),
             'pos': torch.tensor(state['pos'], dtype=torch.float32)
             }
         return pomdp_state, reward, terminated,truncated, info
     
     def get_state(self):
         pomdp_state = {
-            'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(self.state) else torch.tensor([0], dtype=torch.float32),
+            'obs': torch.tensor(self.observe(self.state), dtype=torch.float32),
             'pos': torch.tensor(self.state, dtype=torch.float32)
             }
         return pomdp_state
