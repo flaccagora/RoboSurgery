@@ -18,6 +18,6 @@ cd ./src
 
 export PYTHONPATH=$(pwd)
 
-python3 train/MDP/PPO_newenv.py --total_timesteps=10000000 --run_id="qmqiws99"
+python3 train/MDP/PPO_newenv.py --total_timesteps=20000000 --learning_rate=0.0005
 
 date

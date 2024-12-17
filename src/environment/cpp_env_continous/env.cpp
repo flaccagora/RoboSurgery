@@ -80,10 +80,10 @@ public:
         info = {{"collision", true}};
         reward = -1.0;
         terminated = false;
-        next_state = state_;
+        // next_state = state_;
     }else {
         info = {};
-        reward = -0.01;
+        reward = -0.02;
         terminated = false;
     }
 
