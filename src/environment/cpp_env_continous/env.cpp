@@ -136,6 +136,30 @@ public:
     }
 
 
+    // check if in direction \phi there is an obstacle inside the observation radius
+    bool is_collision_in_direction(const Vector2& position, double phi) const {
+        Vector2 direction = {std::cos(phi), std::sin(phi)};
+        // check at different distances
+        std::array<double, 10> distances = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+        for (const auto& distance : distances) {
+            Vector2 next_position = {position[0] + direction[0] * distance * observation_radius_,
+                                     position[1] + direction[1] * distance * observation_radius_};
+            if (is_collision(next_position)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // check if in direction N S W E there is an obstacle inside the observation radius return an array of 4 bools [E,W,N,S]
+    std::array<bool, 4> is_collision_in_cardinal_directions(const Vector2& position) const {
+        return {
+            is_collision_in_direction(position, 0),
+            is_collision_in_direction(position, M_PI),
+            is_collision_in_direction(position, M_PI / 2),
+            is_collision_in_direction(position, 3 * M_PI / 2)
+        };
+    }
+
 
 
 private:
@@ -236,6 +260,7 @@ PYBIND11_MODULE(gridworld, m) {
         .def("transform", &ObservableDeformedGridworld::transform)
         .def("is_collision", &ObservableDeformedGridworld::is_collision)
         .def("set_deformation", &ObservableDeformedGridworld::set_deformation)
+        .def("is_collision_cardinal", &ObservableDeformedGridworld::is_collision_in_cardinal_directions)
         .def_readonly("transformation_matrix", &ObservableDeformedGridworld::transformation_matrix_)
         .def_readonly("shear_range", &ObservableDeformedGridworld::shear_range_)
         .def_readonly("stretch_range", &ObservableDeformedGridworld::stretch_range_)
