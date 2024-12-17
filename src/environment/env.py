@@ -1794,11 +1794,11 @@ class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
                     return self.step(1)  # Down action
         return None, None, None, None, None
     
-    def reset(self, seed=555):
+    def reset(self, seed=None):
         """
         Reset the environment to the initial state.
         """
-        super().reset(42)
+        super().reset(seed=seed)
         
         state = OrderedDict({
             "pos": np.array(self.state),
@@ -1828,8 +1828,8 @@ class POMDPDeformedGridworld(Grid):
             'pos': Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32)
         })
     
-    def reset(self):
-        state, _ = super().reset()
+    def reset(self, seed=None):
+        state, _ = super().reset(seed=seed)
         pomdp_state = {
             'obs': torch.tensor([1], dtype=torch.float32) if super().is_collision(state['pos']) else torch.tensor([0], dtype=torch.float32),
             'pos': torch.tensor(state['pos'], dtype=torch.float32)

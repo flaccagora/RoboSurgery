@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <stdexcept>
+#include <chrono>
 
 namespace py = pybind11;
 
@@ -38,12 +39,18 @@ public:
 
         transformed_corners_ = transform_corners(corners_);
 
-        std::mt19937 rng(42);
-
+        std::random_device rd;         // Non-deterministic random seed
+        rng.seed(rd());               // Mersenne Twister generator
+    
     }
     std::mt19937 rng;
 
-    void reset(unsigned int seed = 0) {
+    void reset(std::optional<int> seed = std::nullopt) {
+        
+        if (seed.has_value()) {
+            rng.seed(seed.value());
+        }
+
         auto stretch = sample(rng, stretch_range_);
         auto shear = sample(rng, shear_range_);
         set_deformation(stretch, shear);
@@ -73,12 +80,12 @@ public:
         terminated = true;
     }else if (!is_point_in_parallelogram(next_state, corners_array_)) {
         info = {{"out", true}};
-        reward = -1.0;
+        reward = -2.0;
         terminated = false;
         next_state = state_;
     }else if (is_collision(next_state)) {
         info = {{"collision", true}};
-        reward = -1.0;
+        reward = -2.0;
         terminated = false;
         // next_state = state_;
     }else {
@@ -224,7 +231,7 @@ PYBIND11_MODULE(gridworld, m) {
                       std::vector<std::array<ObservableDeformedGridworld::Vector2, 2>>, 
                       ObservableDeformedGridworld::Vector2, ObservableDeformedGridworld::Vector2, 
                       double, ObservableDeformedGridworld::Vector2, ObservableDeformedGridworld::Vector2>())
-        .def("reset", &ObservableDeformedGridworld::reset)
+        .def("reset", &ObservableDeformedGridworld::reset, py::arg("seed") = py::none())
         .def("step", &ObservableDeformedGridworld::step)
         .def("transform", &ObservableDeformedGridworld::transform)
         .def("is_collision", &ObservableDeformedGridworld::is_collision)
