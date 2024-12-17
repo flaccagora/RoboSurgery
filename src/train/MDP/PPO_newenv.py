@@ -122,7 +122,7 @@ def train_dqn(args):
                       "stretch range":env.envs[0].unwrapped.stretch_range}, allow_val_change=True)
 
 
-    net_arch=[128, 128, 128]
+    net_arch=[128, 256, 256, 128]
     if args.run_id is not None:
         last_checkpoint = find_last_checkpoint(f"agents/pretrained/MDP/PPO_continous_{args.run_id}")
         model = PPO.load(f"./agents/pretrained/MDP/PPO_continous_{args.run_id}/{last_checkpoint}",env=env,)
