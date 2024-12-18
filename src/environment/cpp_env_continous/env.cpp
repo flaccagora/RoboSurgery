@@ -90,7 +90,7 @@ public:
         // next_state = state_;
     }else {
         info = {};
-        reward = -0.25;
+        reward = -0.5;
         terminated = false;
     }
 
