@@ -1,0 +1,10 @@
+Thu Nov 14 13:57:34 CET 2024
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Tracking run with wandb version 0.18.6
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+Using cpu device
+Logging to runs/o7ncwhb8/DQN_1
+/var/spool/slurmd/job9317298/slurm_script: line 21: 3738776 Killed                  python3 train/POMDP/DQN_sb3.py
+Thu Nov 14 14:13:38 CET 2024
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=9317298.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.
