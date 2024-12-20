@@ -14,9 +14,6 @@
     - [Reward Function](#reward-function)
   - [Agent and Training](#agent-and-training)
 - [Run](#run)
-- [TODO](#todo)
-- [Ideas](#ideas)
-- [performance test](#performance-test)
 
 # Surgical Robot Lung Exploration Simulation
 
@@ -115,20 +112,11 @@ A state is completely specified by the following dictionary:
     | 0   | Robot x coordinate  |
     | 1   | Robot y coordinate  |
 
-
-* `target`: its value is an `ndarray` of shape `(2,)`. The elements of the array correspond to the following:
-
-    | Num | Observation                                  |
-    |-----|----------------------------------------------|
-    | 0   | Target x coordinate position in the  |
-    | 1   | Target y coordinate position in the  |
-
-
-* `maze_map`: this key represents the *deformation parameter* for the maze map. The value is an `ndarray` with shape `(,)`, The elements of the array are the following:
+* `maze_deform`: this key represents the *deformation parameter* for the maze map. The value is an `ndarray` with shape `(,)`, The elements of the array are the following:
 
     | Num | Observation |
     |-----|-------------|
-    | 0   | x stretch    |
+    | 0   | x stretch   |
     | 0   | y stretch   |
 
 
@@ -163,33 +151,3 @@ $$b(s) = p_1(x,y)\cdot p_2(\underbar{$\theta$})\cdot p_3(t_x,t_y)$$
 
 
 # Run
-
-create conda environment
-```bash
-conda create -n RoboSurg python=3.9
-conda activate RoboSurg
-```
-install requirements
-```bash
-pip install -r requirements.txt
-```
-install the package as editable to register the environment
-```bash
-pip install -e .
-```
-
-open and run jupyter notebook [test.ipynb](./test.ipynb)
-
-# TODO
-- [ ] add observation of the maze in robot proximity
-- [ ] Maze deformation
-- [ ] POMDP
-
-# Ideas
-- https://isaac-sim.github.io/IsaacLab/source/overview/reinforcement-learning/rl_frameworks.html
-- https://github.com/Denys88/rl_games
-- https://deepmind.google/discover/blog/rt-2-new-model-translates-vision-and-language-into-action/
-
-# performance test
-
-- studio sulle value function ranking e comparazione delle V 
