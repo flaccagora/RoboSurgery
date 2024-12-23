@@ -127,6 +127,8 @@ for epoch in range(25):
         pbar.update(1)
     pbar.reset()
     print("runningLoss:", running_loss/len(data_loader))
+    if epoch + 1 % 5 == 0:
+        torch.save(model.state_dict(), f"obs_model_{epoch}.pth")
 
 # save model
 torch.save(model.state_dict(), "obs_model.pth")
