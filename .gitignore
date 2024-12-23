@@ -181,3 +181,5 @@ runs/
 DQN_contin*
 PPO_contin*
 dataset*
+
+old_discrete/

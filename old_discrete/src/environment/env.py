@@ -8,7 +8,6 @@ import pygame
 import imageio
 from gymnasium.spaces import Dict, Discrete, Box
 from collections import OrderedDict
-from utils.point_in import is_point_in_parallelogram, sample_in_parallelogram
 
 
 ###----------------------------DISCRETE----------------------------###
