@@ -17,6 +17,16 @@ class ObservableDeformedGridworld {
 public:
     using Vector2 = std::array<double, 2>;
     using Matrix2x2 = std::array<std::array<double, 2>, 2>;
+    std::mt19937 rng;
+    Vector2 grid_size_;
+    Vector2 state_;
+    std::vector<std::array<Vector2, 2>> obstacles_;
+    Vector2 goal_;
+    double observation_radius_;
+    Vector2 shear_range_;
+    Vector2 stretch_range_;
+    Matrix2x2 transformation_matrix_;
+
 
     ObservableDeformedGridworld(Vector2 grid_size, double step_size, Vector2 goal, 
                                 std::vector<std::array<Vector2, 2>> obstacles, Vector2 stretch,
@@ -43,7 +53,6 @@ public:
         rng.seed(rd());               // Mersenne Twister generator
     
     }
-    std::mt19937 rng;
 
     void reset(std::optional<int> seed = std::nullopt) {
         
@@ -115,16 +124,24 @@ public:
         return matrix_vector_multiply(inverse_transformation_matrix_, position);
     }
 
-
-    Vector2 grid_size_;
-    Vector2 state_;
-    std::vector<std::array<Vector2, 2>> obstacles_;
-    Vector2 goal_;
-    double observation_radius_;
-    Vector2 shear_range_;
-    Vector2 stretch_range_;
-    Matrix2x2 transformation_matrix_;
+    std::array<float,1> batchedobserve(Vector2& Pos, Matrix2x2& Theta) {
+        // invert the tensor Theta
+        auto inverse_theta = invert(Theta);
+        auto inv_point = matrix_vector_multiply(inverse_theta, Pos);
+        
+        for (const auto& obstacle : obstacles_) {
     
+         auto out =  obstacle[0][0] <= inv_point[0] && inv_point[0] <= obstacle[1][0] &&
+               obstacle[0][1] <= inv_point[1] && inv_point[1] <= obstacle[1][1];
+    
+            if (out) {
+                return {1};
+            }
+        }
+        return {0};
+
+    }
+        
     
     bool is_collision(const Vector2& position) const {
         for (const auto& obstacle : obstacles_) {
@@ -261,6 +278,7 @@ PYBIND11_MODULE(gridworld, m) {
         .def("is_collision", &ObservableDeformedGridworld::is_collision)
         .def("set_deformation", &ObservableDeformedGridworld::set_deformation)
         .def("is_collision_cardinal", &ObservableDeformedGridworld::is_collision_in_cardinal_directions)
+        .def("batchedobserve", &ObservableDeformedGridworld::batchedobserve)
         .def_readonly("transformation_matrix", &ObservableDeformedGridworld::transformation_matrix_)
         .def_readonly("shear_range", &ObservableDeformedGridworld::shear_range_)
         .def_readonly("stretch_range", &ObservableDeformedGridworld::stretch_range_)
