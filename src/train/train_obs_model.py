@@ -1,6 +1,6 @@
 import pickle
 # lod dataset
-with open("dataset0.pkl", "rb") as f:
+with open("large_bound_dataset.pkl", "rb") as f:
     dataset0 = pickle.load(f)
 
 import torch
@@ -85,7 +85,7 @@ from tqdm import tqdm
 # Instantiate the model
 model = NN()
 
-model.load_state_dict(torch.load("obs_model.pth"))
+model.load_state_dict(torch.load("obs_model_0.pth", weights_only=True))
 
 # Define the loss function
 criterion = nn.BCELoss()
