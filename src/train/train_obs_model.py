@@ -85,6 +85,7 @@ from tqdm import tqdm
 # Instantiate the model
 model = NN()
 
+model.load_state_dict(torch.load("obs_model.pth"))
 
 # Define the loss function
 criterion = nn.BCELoss()

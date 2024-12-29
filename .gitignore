@@ -182,4 +182,5 @@ DQN_contin*
 PPO_contin*
 dataset*
 *.pth
+*.pkl
 old_discrete/
