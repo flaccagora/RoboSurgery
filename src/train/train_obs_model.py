@@ -1,6 +1,6 @@
 import pickle
 # lod dataset
-with open("large_bound_dataset.pkl", "rb") as f:
+with open("dataset_cardinal.pkl", "rb") as f:
     dataset0 = pickle.load(f)
 
 import torch
@@ -68,7 +68,7 @@ class NN(nn.Module):
         self.f1 = nn.Linear(6, 128)
         self.f2 = nn.Linear(128, 128)
         self.f3 = nn.Linear(128, 128)
-        self.f4 = nn.Linear(128, 1)
+        self.f4 = nn.Linear(128, 4)
         
     def forward(self, pos,theta):
         x = torch.cat([pos,theta], dim=1)
@@ -85,7 +85,7 @@ from tqdm import tqdm
 # Instantiate the model
 model = NN()
 
-model.load_state_dict(torch.load("obs_model_0.pth", weights_only=True))
+# model.load_state_dict(torch.load("obs_model_cardinal_0.pth", weights_only=True))
 
 # Define the loss function
 criterion = nn.BCELoss()
@@ -130,8 +130,8 @@ for epoch in range(25):
     print("runningLoss:", running_loss/len(data_loader))
     if (epoch + 1) % 5 == 0:
         print(f"Epoch {epoch + 1}")
-        torch.save(model.state_dict(), f"obs_model_{epoch}.pth")
+        torch.save(model.state_dict(), f"obs_model_cardinal_{epoch}.pth")
 
 # save model
-torch.save(model.state_dict(), "obs_model.pth")
+torch.save(model.state_dict(), "obs_model_cardinal.pth")
 print("Model saved")
