@@ -69,7 +69,7 @@ from torch.optim import Adam
 import numpy as np
 
 class BetaVariationalBayesianInference:
-    def __init__(self, f, input_dim, latent_dim=1, hidden_dim=32):
+    def __init__(self, f, input_dim=2, latent_dim=4, debug=False):
         """
         Initialize the variational Bayesian inference model with Beta distributions.
         
@@ -77,11 +77,11 @@ class BetaVariationalBayesianInference:
             f: callable, the known function linking X and y through theta
             input_dim: int, dimension of input X
             latent_dim: int, dimension of latent parameter theta
-            hidden_dim: int, dimension of hidden layers in the neural network
         """
         self.f = f
         self.input_dim = input_dim
         self.latent_dim = latent_dim
+        self.debug = debug
         
         # Variational parameters (alpha and beta of q(theta))
         # Initialize to reasonable values (alpha=beta=2 gives a symmetric Beta)
@@ -122,8 +122,10 @@ class BetaVariationalBayesianInference:
         for i in range(n_samples):
             theta = theta_samples[i]
             y_pred = self.f(X, theta.expand(batch_size, -1)).squeeze()
-            log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y)
-        
+            if len(y_pred.shape) == 1:
+                log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y)
+            elif len(y_pred.shape) == 2:
+                log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y).sum(dim=1)
         # Average over samples
         expected_log_likelihood = torch.mean(log_likelihood, dim=0).sum()
         
@@ -134,6 +136,48 @@ class BetaVariationalBayesianInference:
         
         return expected_log_likelihood - kl_div
     
+    def fast_elbo(self, X, y, n_samples=10):
+        """
+        Compute the evidence lower bound (ELBO) with Beta distributions.
+
+        Args:
+            X: torch.Tensor, input data (batch_size, input_dim)
+            y: torch.Tensor, observations (batch_size,)
+            n_samples: int, number of Monte Carlo samples
+        """
+        batch_size = X.shape[0]
+
+        # Sample from variational distribution
+        theta_samples = self.sample_latent(n_samples).repeat_interleave(batch_size, dim=0)  # (n_samples, latent_dim)
+
+        # Expand input for vectorized computation
+        X_expanded = X.expand(n_samples, -1, -1)  # (n_samples, batch_size, input_dim)
+
+        print("X_expanded: ", X_expanded[:3])
+        print("X_expanded shape: ", X_expanded.shape)
+        print("theta_samples: ", theta_samples[:3])
+        print("theta_samples shape: ", theta_samples.shape)
+        # Compute predictions for all samples at once
+        y_preds = self.f(X_expanded, theta_samples)  # (n_samples, batch_size, output_dim)
+
+
+
+        # Compute log-likelihood in a vectorized manner
+        if len(y_preds.shape) == 2:  # Binary classification case
+            log_likelihood = dist.Bernoulli(y_preds).log_prob(y).sum(dim=-1)  # (n_samples, batch_size)
+        elif len(y_preds.shape) == 3:  # Multi-output case
+            log_likelihood = dist.Bernoulli(y_preds).log_prob(y.unsqueeze(-1)).sum(dim=-1).sum(dim=-1)  # (n_samples, batch_size)
+
+        # Average over samples and sum over batch
+        expected_log_likelihood = log_likelihood.mean(dim=0).sum()
+
+        # Compute KL divergence between Beta distributions
+        q_dist = dist.Beta(self.q_alpha, self.q_beta)
+        prior_dist = dist.Beta(self.prior_alpha, self.prior_beta)
+        kl_div = dist.kl_divergence(q_dist, prior_dist).sum()
+
+        return expected_log_likelihood - kl_div
+
     def fit(self, X, y, n_epochs=100, batch_size=64, lr=0.1):
         """
         Fit the model using variational inference
@@ -154,8 +198,12 @@ class BetaVariationalBayesianInference:
             epoch_loss = 0
             for batch_X, batch_y in dataloader:
                 optimizer.zero_grad()
+
                 loss = -self.elbo(batch_X, batch_y, n_samples=100)  # Negative because we minimize
+                # fast_loss = -self.fast_elbo(batch_X, batch_y, n_samples=100)
+                # assert torch.isclose(loss, fast_loss), f"ELBO values do not match: {loss} vs {fast_loss}"
                 loss.backward()
+
                 optimizer.step()
                 
                 # Ensure parameters stay positive
@@ -165,7 +213,7 @@ class BetaVariationalBayesianInference:
                 
                 epoch_loss += loss.item()
             
-            if (epoch + 1) % 10 == 0:
+            if self.debug and (epoch + 1) % 10 == 0:
                 mean = self.q_alpha.detach() / (self.q_alpha.detach() + self.q_beta.detach())
                 mean = self.low + (self.high - self.low) * mean
                 print(f"Epoch {epoch+1}/{n_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
@@ -179,3 +227,194 @@ class BetaVariationalBayesianInference:
             'mean': self.low + (self.high - self.low) * (self.q_alpha / (self.q_alpha + self.q_beta)).detach(),
             'mode': ((self.q_alpha - 1) / (self.q_alpha + self.q_beta - 2)).detach()
         }
+    
+    def entropy(self):
+
+        """Compute the entropy of the variational distribution"""
+        q_dist = dist.Beta(self.q_alpha, self.q_beta)
+        return q_dist.entropy().sum()
+    
+
+
+class BayesianParticleFilter:
+    def __init__(self, f, n_particles=1000, theta_dim=2):
+        """
+        Initialize the particle filter for Bayesian linear regression with 2D parameters.
+        
+        Args:
+            n_particles (int): Number of particles to use for approximating the posterior.
+            theta_dim (int): Dimensionality of the parameter vector (default is 2).
+        """
+        self.f = f
+        self.n_particles = n_particles
+        self.theta_dim = theta_dim
+        self.particles = None
+        self.weights = None
+
+        self.low = torch.tensor([.4, -.2, -.2, .4])
+        self.high = torch.tensor([1.0, .2, .2, 1.0])
+
+        
+    def initialize_particles(self, prior_mean=0.0, prior_std=1.0):
+        """
+        Initialize particles from the prior distribution.
+        
+        Args:
+            prior_mean (float): Mean of the prior distribution.
+            prior_std (float): Standard deviation of the prior distribution.
+        """
+        # Sample initial particles from a multivariate Gaussian prior
+        self.particles = torch.normal(
+            prior_mean, prior_std, size=(self.n_particles, self.theta_dim)
+        )
+
+        self.q_alpha = torch.nn.Parameter(2 * torch.ones(4))
+        self.q_beta = torch.nn.Parameter(2 * torch.ones(4))
+
+        beta = dist.Beta(self.q_alpha, self.q_beta)
+        self.particles = self.low + (self.high - self.low) * beta.sample((self.n_particles,))
+
+        # Initialize uniform weights
+        self.weights = torch.ones(self.n_particles) / self.n_particles
+        
+    def log_likelihood(self, X, y, theta, noise_std=0.1):
+        """
+        Compute the log likelihood log p(y|X,theta) assuming Gaussian noise.
+        
+        Args:
+            X (torch.Tensor): Input features (n_samples, 2).
+            y (torch.Tensor): Target values (n_samples,).
+            theta (torch.Tensor): Parameter particles (n_particles, theta_dim).
+            noise_std (float): Standard deviation of observation noise.
+        
+        Returns:
+            torch.Tensor: Log likelihood values for each particle.
+        """
+        batch_size = X.shape[0]
+        
+        # # Compute log likelihood for each sample
+        # log_likelihoods = torch.zeros(self.n_particles)
+        # for i in range(self.n_particles):
+        #     t = theta[i]
+        #     y_pred = self.f(X, t.expand(batch_size, -1)).squeeze()
+        #     log_likelihoods[i] = dist.Bernoulli(y_pred).log_prob(y).sum()
+        
+
+        ########### test
+        # Compute log likelihood for each sample in parallel
+        theta_expanded = theta.unsqueeze(1).expand(-1, batch_size, -1)  # Expand theta for batch computation
+        X_expanded = X.unsqueeze(0).expand(self.n_particles, -1, -1)  # Expand X for batch computation
+        with torch.no_grad():
+            y_pred = self.f(X_expanded, theta_expanded,dim=2)  # Shape: (n_particles, batch_size)
+        y_pred = y_pred.squeeze()  # Adjust shape if needed
+        log_likelihoods = dist.Bernoulli(y_pred).log_prob(y.unsqueeze(0)).sum(dim=-1)  # Sum over batch size
+        if len(log_likelihoods.shape) == 2:
+            log_likelihoods = log_likelihoods.sum(dim=1)
+        ###########
+        # Average over samples
+        return log_likelihoods
+        
+    def update(self, X, y, noise_std=0.1):
+        """
+        Update particle weights based on new observations.
+        
+        Args:
+            X (torch.Tensor): Input features (n_samples, theta_dim).
+            y (torch.Tensor): Target values (n_samples,).
+            noise_std (float): Standard deviation of observation noise.
+        """
+        # Compute log likelihood for each particle
+        log_likelihoods = self.log_likelihood(X, y, self.particles, noise_std)
+
+        # Update log weights
+        log_weights = torch.log(self.weights) + log_likelihoods
+        
+        # Subtract maximum for numerical stability before exp
+        log_weights_normalized = log_weights - torch.max(log_weights)
+        self.weights = torch.exp(log_weights_normalized)
+        
+        # Normalize weights
+        self.weights /= self.weights.sum()
+        
+        # Compute effective sample size
+        eff_sample_size = 1.0 / (self.weights ** 2).sum()
+        
+        # Resample if effective sample size is too low
+        if eff_sample_size < self.n_particles / 2:
+            self.resample()
+    
+    def resample(self):
+        """
+        Resample particles according to their weights using systematic resampling.
+        """
+        # Compute cumulative sum of weights
+        cumsum = torch.cumsum(self.weights, dim=0)
+        
+        # Generate systematic resampling points
+        u = torch.rand(1)
+        positions = (u + torch.arange(self.n_particles)) / self.n_particles
+        
+        # Resample particles
+        indices = torch.searchsorted(cumsum, positions)
+        self.particles = self.particles[indices]
+        
+        # Reset weights to uniform
+        self.weights = torch.ones(self.n_particles) / self.n_particles
+    
+    def estimate_posterior(self):
+        """
+        Compute posterior mean and variance from particles.
+        
+        Returns:
+            tuple: (posterior_mean, posterior_variance)
+        """
+        posterior_mean = (self.particles.T * self.weights).sum(dim=1)
+        posterior_var = ((self.particles - posterior_mean) ** 2).T * self.weights
+        posterior_var = posterior_var.sum(dim=1)
+        return posterior_mean.detach().numpy(), posterior_var.detach().numpy()
+    
+    def entropy(self):
+        """Compute the entropy of the variational distribution"""
+        posterior_mean = (self.particles.T * self.weights).sum(dim=1)
+        posterior_var = ((self.particles - posterior_mean) ** 2).T * self.weights
+ 
+        q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
+        return q_dist.entropy().sum()
+
+
+
+if __name__ == "__main__":
+    # Test the BetaVariationalBayesianInference class
+    def f(X, theta):
+        return torch.sigmoid(X @ theta.unsqueeze(-1)).squeeze()
+
+    # Generate synthetic data
+    np.random.seed(0)
+    torch.manual_seed(0)
+    n = 1000
+    X = torch.rand(n, 4)
+    theta_true = torch.tensor([0.5, 0.1, -0.1, 0.5])
+    y = dist.Bernoulli(f(X, theta_true)).sample()
+
+    # Fit the model
+    model = BetaVariationalBayesianInference(f, input_dim=2, latent_dim=4, debug=True)
+    model.fit(X, y, n_epochs=100, batch_size=64, lr=0.1)
+
+    # Get the posterior parameters
+    posterior = model.get_posterior_params()
+    print("Posterior parameters:")
+    print(posterior)
+
+    # Compute the entropy of the variational distribution
+    entropy = model.entropy()
+    print(f"Entropy of variational distribution: {entropy:.4f}")
+
+    # Sample from the variational distribution
+    theta_samples = model.sample_latent(n_samples=1000)
+    print(f"Sampled theta: {theta_samples[:5]}")
+
+    # Compute the mean and mode of the variational distribution
+    mean = model.low + (model.high - model.low) * (model.q_alpha / (model.q_alpha + model.q_beta))
+    mode = (model.q_alpha - 1) / (model.q_alpha + model.q_beta - 2)
+    print(f"Estimated theta mean: {mean}")
+    print(f"Estimated theta mode: {mode}")

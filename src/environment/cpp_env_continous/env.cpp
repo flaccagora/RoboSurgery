@@ -116,6 +116,10 @@ public:
         inverse_transformation_matrix_ = invert(transformation_matrix_);
     }
 
+    void set_position(Vector2 position) {
+        state_ = position;
+    }
+
     Vector2 transform(const Vector2& position) const {
         return matrix_vector_multiply(transformation_matrix_, position);
     }
@@ -277,6 +281,7 @@ PYBIND11_MODULE(gridworld, m) {
         .def("transform", &ObservableDeformedGridworld::transform)
         .def("is_collision", &ObservableDeformedGridworld::is_collision)
         .def("set_deformation", &ObservableDeformedGridworld::set_deformation)
+        .def("set_position", &ObservableDeformedGridworld::set_position)
         .def("is_collision_cardinal", &ObservableDeformedGridworld::is_collision_in_cardinal_directions)
         .def("batchedobserve", &ObservableDeformedGridworld::batchedobserve)
         .def_readonly("transformation_matrix", &ObservableDeformedGridworld::transformation_matrix_)

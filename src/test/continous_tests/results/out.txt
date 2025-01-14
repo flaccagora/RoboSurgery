@@ -1,0 +1,40 @@
+MDP Bound
+
+Target reached 991 out of 1000 episodes
+Mean episode Reward:  -19.944
+Mean number of steps:  30.516
+
+--------------------------------------------
+
+OBSERVATION_TYPE = 'single' # OR 'cardinal'
+RENDER_MODE = 'rgb_array' # OR 'rgb_array'
+BELIEF_UPDATE = 'discrete' # OR 'variational'
+DISCRETIZATION = 20
+DEBUG = True
+
+Target reached 86 out of 100 episodes
+Mean episode Reward:  -143.46
+Mean number of steps:  116.49
+time taken:  23min
+
+Escludendo gli episodi in cui non si raggiunge il target (probabilmente bloccato alla boundary):
+Mean episode Reward:  -31.095
+Mean number of steps:  46.35
+
+
+--------------------------------------------
+
+
+OBSERVATION_TYPE = 'cardinal' # OR 'cardinal'
+RENDER_MODE = 'rgb_array' # OR 'rgb_array'
+BELIEF_UPDATE = 'discrete' # OR 'variational'
+DISCRETIZATION = 20
+DEBUG = True
+
+100%|██████████| 100/100 [09:52<00:00,  5.92s/it]
+
+Target reached 100 out of 100 episodes
+Mean episode Reward:  -29.575
+Mean number of steps:  45.83
+time taken:  9min
+
