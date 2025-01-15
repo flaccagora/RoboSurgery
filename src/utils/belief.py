@@ -118,23 +118,32 @@ class BetaVariationalBayesianInference:
         theta_samples = self.sample_latent(n_samples)  # (n_samples, latent_dim)
         
         # Compute log likelihood for each sample
-        log_likelihood = torch.zeros(n_samples, batch_size)
-        for i in range(n_samples):
-            theta = theta_samples[i]
-            y_pred = self.f(X, theta.expand(batch_size, -1)).squeeze()
-            if len(y_pred.shape) == 1:
-                log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y)
-            elif len(y_pred.shape) == 2:
-                log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y).sum(dim=1)
-        # Average over samples
-        expected_log_likelihood = torch.mean(log_likelihood, dim=0).sum()
+        # log_likelihood = torch.zeros(n_samples, batch_size)
+        # for i in range(n_samples):
+        #     theta = theta_samples[i]
+        #     y_pred = self.f(X, theta.expand(batch_size, -1)).squeeze()
+        #     if len(y_pred.shape) == 1:
+        #         log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y)
+        #     elif len(y_pred.shape) == 2:
+        #         log_likelihood[i] = dist.Bernoulli(y_pred).log_prob(y).sum(dim=1)
+        # # Average over samples
+        # expected_log_likelihood = torch.mean(log_likelihood, dim=0).sum()
         
+        theta_expanded = theta_samples.unsqueeze(1).expand(-1, batch_size, -1)  # Expand theta for batch computation
+        X_expanded = X.unsqueeze(0).expand(n_samples, -1, -1)  # Expand X for batch computation
+        # print(X_expanded.shape, theta_expanded.shape)
+        y_pred = self.f(X_expanded, theta_expanded,dim=2)  # Shape: (n_particles, batch_size)
+        y_pred = y_pred.squeeze()  # Adjust shape if needed
+        # print(y_pred.shape, y.shape)
+        log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(n_samples,-1).reshape(-1)).reshape(n_samples,batch_size).sum(dim=-1)  # Sum over batch size
+        expected_log_likelihood0 = log_likelihoods.mean(dim=0).sum()
+
         # Compute KL divergence between Beta distributions
         q_dist = dist.Beta(self.q_alpha, self.q_beta)
         prior_dist = dist.Beta(self.prior_alpha, self.prior_beta)
         kl_div = dist.kl_divergence(q_dist, prior_dist).sum()
         
-        return expected_log_likelihood - kl_div
+        return expected_log_likelihood0 - kl_div
     
     def fast_elbo(self, X, y, n_samples=10):
         """
@@ -213,11 +222,11 @@ class BetaVariationalBayesianInference:
                 
                 epoch_loss += loss.item()
             
-            if self.debug and (epoch + 1) % 10 == 0:
-                mean = self.q_alpha.detach() / (self.q_alpha.detach() + self.q_beta.detach())
-                mean = self.low + (self.high - self.low) * mean
-                print(f"Epoch {epoch+1}/{n_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
-                print(f"Estimated theta mean: {mean}")
+            # if self.debug and (epoch + 1) % 10 == 0:
+            #     mean = self.q_alpha.detach() / (self.q_alpha.detach() + self.q_beta.detach())
+            #     mean = self.low + (self.high - self.low) * mean
+            #     print(f"Epoch {epoch+1}/{n_epochs}, Loss: {epoch_loss/len(dataloader):.4f}")
+            #     print(f"Estimated theta mean: {mean}")
     
     def get_posterior_params(self):
         """Return the learned posterior parameters"""
@@ -234,10 +243,12 @@ class BetaVariationalBayesianInference:
         q_dist = dist.Beta(self.q_alpha, self.q_beta)
         return q_dist.entropy().sum()
     
-
+import torch
+import torch.distributions as dist
+import numpy as np
 
 class BayesianParticleFilter:
-    def __init__(self, f, n_particles=1000, theta_dim=2):
+    def __init__(self, f, n_particles=1000, theta_dim=4):
         """
         Initialize the particle filter for Bayesian linear regression with 2D parameters.
         
@@ -263,13 +274,8 @@ class BayesianParticleFilter:
             prior_mean (float): Mean of the prior distribution.
             prior_std (float): Standard deviation of the prior distribution.
         """
-        # Sample initial particles from a multivariate Gaussian prior
-        self.particles = torch.normal(
-            prior_mean, prior_std, size=(self.n_particles, self.theta_dim)
-        )
-
-        self.q_alpha = torch.nn.Parameter(2 * torch.ones(4))
-        self.q_beta = torch.nn.Parameter(2 * torch.ones(4))
+        self.q_alpha = torch.nn.Parameter(torch.ones(4))
+        self.q_beta = torch.nn.Parameter(torch.ones(4))
 
         beta = dist.Beta(self.q_alpha, self.q_beta)
         self.particles = self.low + (self.high - self.low) * beta.sample((self.n_particles,))
@@ -293,25 +299,26 @@ class BayesianParticleFilter:
         batch_size = X.shape[0]
         
         # # Compute log likelihood for each sample
-        # log_likelihoods = torch.zeros(self.n_particles)
+        # log_likelihoods0 = torch.zeros(self.n_particles)
         # for i in range(self.n_particles):
         #     t = theta[i]
         #     y_pred = self.f(X, t.expand(batch_size, -1)).squeeze()
-        #     log_likelihoods[i] = dist.Bernoulli(y_pred).log_prob(y).sum()
+        #     log_likelihoods0[i] = dist.Bernoulli(y_pred).log_prob(y).sum()
         
 
         ########### test
         # Compute log likelihood for each sample in parallel
         theta_expanded = theta.unsqueeze(1).expand(-1, batch_size, -1)  # Expand theta for batch computation
         X_expanded = X.unsqueeze(0).expand(self.n_particles, -1, -1)  # Expand X for batch computation
-        with torch.no_grad():
-            y_pred = self.f(X_expanded, theta_expanded,dim=2)  # Shape: (n_particles, batch_size)
+        y_pred = self.f(X_expanded, theta_expanded,dim=2)  # Shape: (n_particles, batch_size)
         y_pred = y_pred.squeeze()  # Adjust shape if needed
-        log_likelihoods = dist.Bernoulli(y_pred).log_prob(y.unsqueeze(0)).sum(dim=-1)  # Sum over batch size
-        if len(log_likelihoods.shape) == 2:
-            log_likelihoods = log_likelihoods.sum(dim=1)
+        if y.shape[-1] == 4:
+            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1,-1).reshape(-1)).reshape(self.n_particles,batch_size,4).sum(dim=-1).sum(dim=-1)  # Sum over batch size
+        else:
+            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1).reshape(-1)).reshape(self.n_particles,batch_size).sum(dim=-1)  # Sum over batch size
         ###########
         # Average over samples
+        # assert torch.allclose(log_likelihoods0, log_likelihoods)
         return log_likelihoods
         
     def update(self, X, y, noise_std=0.1):
@@ -374,12 +381,14 @@ class BayesianParticleFilter:
         return posterior_mean.detach().numpy(), posterior_var.detach().numpy()
     
     def entropy(self):
-        """Compute the entropy of the variational distribution"""
-        posterior_mean = (self.particles.T * self.weights).sum(dim=1)
-        posterior_var = ((self.particles - posterior_mean) ** 2).T * self.weights
- 
-        q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
-        return q_dist.entropy().sum()
+        # """Compute the entropy of the variational distribution"""
+        # posterior_mean = (self.particles.T * self.weights).sum(dim=1)
+        # posterior_var = (((self.particles - posterior_mean) ** 2).T * self.weights).sum(dim=1)
+    
+        # q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
+        # return q_dist.entropy().sum().detach().numpy()
+        return (self.weights*torch.log(self.weights)).sum().detach().numpy()
+
 
 
 

@@ -38,3 +38,22 @@ Mean episode Reward:  -29.575
 Mean number of steps:  45.83
 time taken:  9min
 
+---------------------------------------------
+
+OBSERVATION_TYPE = 'cardinal' # 'single' or 'cardinal' 
+RENDER_MODE = 'rgb_array' # 'rgb_array' or 'human'
+BELIEF_UPDATE = 'particlefilters' # 'variational' 'discrete' or 'particlefilters'
+DISCRETIZATION = 7000
+DEBUG = True
+
+Using particlefilters belief update method
+  0%|          | 0/100 [00:00<?, ?it/s]100%|██████████| 100/100 [00:27<00:00,  3.58it/s]
+
+Target reached 98 out of 100 episodes
+Mean episode Reward:  -24.17
+Mean number of steps:  43.93
+
+Target reached 96 out of 100 episodes
+Mean episode Reward:  -45.405
+Mean number of steps:  58.74
+
