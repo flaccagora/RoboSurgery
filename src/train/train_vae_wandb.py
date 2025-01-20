@@ -110,7 +110,7 @@ custom_dataset = CustomDataset(images[:config['limit']], actions[:config['limit'
 train_loader = DataLoader(custom_dataset, config['batch_size'], shuffle=True)
 
 # Model, optimizer, and loss
-model = ConditionalVAE(latent_dim=config['latent_dim'], condition_dim=config['condition_dim'])
+model = ConditionalVAE()
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
 
