@@ -7,8 +7,90 @@ from torchvision.utils import make_grid
 wandb_log = True
 
 class ConditionalVAE(nn.Module):
-    # ... [previous ConditionalVAE class implementation remains the same]
-    pass
+    def __init__(self, latent_dim=128, condition_dim=4):
+        super(ConditionalVAE, self).__init__()
+        
+        # Further reduced number of filters in encoder (approximately 1/4)
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 8, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.Conv2d(8, 16, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.Conv2d(16, 32, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+        )
+        
+        # Reduced flatten size
+        self.flatten_size = 128 * 16 * 32
+        
+        # Further simplified condition encoder
+        self.condition_encoder = nn.Sequential(
+            nn.Linear(condition_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, 256),
+            nn.ReLU()
+        )
+        
+        # Reduced dimensions for mu and logvar layers
+        self.fc_mu = nn.Linear(self.flatten_size + 256, latent_dim)
+        self.fc_logvar = nn.Linear(self.flatten_size + 256, latent_dim)
+        
+        # Decoder input with reduced dimensions
+        self.decoder_input = nn.Linear(latent_dim + condition_dim, self.flatten_size)
+        
+        # Decoder with further reduced number of filters
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 8, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.ConvTranspose2d(8, 3, kernel_size=4, stride=2, padding=1),
+            nn.Sigmoid()
+        )
+    
+    def encode(self, x, c):
+        x = self.encoder(x)
+        x = x.view(x.size(0), -1)
+        c = self.condition_encoder(c)
+        x = torch.cat([x, c], dim=1)
+        mu = self.fc_mu(x)
+        logvar = self.fc_logvar(x)
+        return mu, logvar
+    
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+    
+    def decode(self, z, c):
+        z = torch.cat([z, c], dim=1)
+        x = self.decoder_input(z)
+        x = x.view(x.size(0), 128, 16, 32)
+        x = self.decoder(x)
+        return x
+    
+    def forward(self, x, c):
+        mu, logvar = self.encode(x, c)
+        z = self.reparameterize(mu, logvar)
+        return self.decode(z, c), mu, logvar
+
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -25,7 +107,7 @@ config = {
     "epochs": 100,
     "learning_rate": 1e-4,
     "limit": -1,
-    "save_interval": 2,
+    "save_interval": 10,
     "latent_dim": 128,
     "condition_dim": 4,
     "beta": 1.0
