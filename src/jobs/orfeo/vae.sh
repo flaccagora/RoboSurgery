@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=8 # 4 tasks out of 112
 #SBATCH --mem=64000          # memory per node out of 494000MB (481GB)
 #SBATCH --job-name=obs
-#SBATCH --output=obs.out 
+#SBATCH --output=vae.out
 #SBATCH --gres=gpu:1
 
 date
