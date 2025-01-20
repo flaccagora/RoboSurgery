@@ -192,7 +192,7 @@ model = ConditionalVAE()
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-from tqdm.notebook import tqdm    # Training loop
+from tqdm import tqdm
 print("------TRAINING STARTED-----")
 print(f"Model has {count_parameters(model):,} trainable parameters")
 print(f"Training on {device}")
