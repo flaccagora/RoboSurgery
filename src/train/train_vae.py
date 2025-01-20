@@ -113,6 +113,7 @@ save_interval = 2
 wandb = False
 save_dir = 'checkpoints'
 import os
+os.makedirs(save_dir, exist_ok=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
