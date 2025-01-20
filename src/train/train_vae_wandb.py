@@ -111,8 +111,8 @@ train_loader = DataLoader(custom_dataset, config['batch_size'], shuffle=True)
 
 # Model, optimizer, and loss
 model = ConditionalVAE()
-model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
+model.to(device)
 
 from tqdm import tqdm
 print("------TRAINING STARTED-----")
