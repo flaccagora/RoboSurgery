@@ -107,7 +107,7 @@ def vae_loss(recon_x, x, mu, logvar, beta=1.0):
 # Hyperparameters
 batch_size = 8
 epochs = 2
-learning_rate = 1e-3
+learning_rate = 1e-4
 limit = -1
 save_interval = 2
 wandb = False
