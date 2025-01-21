@@ -146,7 +146,7 @@ config = {
     "save_interval": 10,
     "latent_dim": 128,
     "condition_dim": 4,
-    "warmup_epochs": 3,
+    "warmup_epochs": 4,
     "default_beta": 1.0
 
 }
@@ -237,7 +237,7 @@ warmup_scheduler = lr_scheduler.LambdaLR(
     optimizer,
     lr_lambda=lambda e: min(1.0, (e + 1) / config["warmup_epochs"])
 )
-scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
+scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.95)
 model.to(device)
 
 from tqdm import tqdm
