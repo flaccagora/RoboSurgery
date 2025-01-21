@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import wandb
 from torchvision.utils import make_grid
+import torch.optim.lr_scheduler as lr_scheduler
 
 wandb_log = True
 
@@ -106,7 +107,7 @@ class ConditionalVAE(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
     
-    def vae_loss(self, x, c, epoch, beta=1):
+    def vae_loss(self, x, c, beta=1):
         
         # forward
         recon_x, mu, logvar = self.forward(x, c)
@@ -126,9 +127,7 @@ class ConditionalVAE(nn.Module):
             dim=1
         ).mean()
         
-        beta_warmup = min(1,epoch/20) * beta
-
-        return reconstruction_loss + beta_warmup * kl_loss, reconstruction_loss, kl_loss
+        return reconstruction_loss + beta * kl_loss, reconstruction_loss, kl_loss
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -136,8 +135,7 @@ def count_parameters(model):
 def vae_loss(recon_x, x, mu, logvar, beta=1.0):
     MSE = F.mse_loss(recon_x, x, reduction='sum')
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    beta_warmup = min(1.0, epoch / 10) * beta 
-    return MSE + beta_warmup * KLD, MSE, KLD
+    return MSE + beta * KLD, MSE, KLD
 
 # Hyperparameters
 config = {
@@ -148,7 +146,9 @@ config = {
     "save_interval": 10,
     "latent_dim": 128,
     "condition_dim": 4,
-    "beta": 1.0
+    "beta": 1.0,
+    "warmup_epochs": 2,
+
 }
 
 save_dir = 'checkpoints_wandb'
@@ -232,6 +232,12 @@ train_loader = DataLoader(custom_dataset, config['batch_size'], shuffle=True)
 # Model, optimizer, and loss
 model = ConditionalVAE()
 optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
+
+warmup_scheduler = lr_scheduler.LambdaLR(
+    optimizer,
+    lr_lambda=lambda e: min(1.0, (e + 1) / config["warmup_epochs"])
+)
+scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
 model.to(device)
 
 from tqdm import tqdm
@@ -257,7 +263,7 @@ def log_images(epoch, original, reconstructed, random_samples):
             "original_images": wandb.Image(orig_grid, caption=f"Original (Epoch {epoch})"),
             "reconstructed_images": wandb.Image(recon_grid, caption=f"Reconstructed (Epoch {epoch})"),
             "random_samples": wandb.Image(random_grid, caption=f"Random Samples (Epoch {epoch})")
-        }, step=epoch)
+        })
 
 for epoch in range(config['epochs']):
     model.train()
@@ -274,7 +280,9 @@ for epoch in range(config['epochs']):
         optimizer.zero_grad()
         # recon_batch, mu, logvar = model(obs, condition)
         # loss, recon, kl = vae_loss(recon_batch, obs, mu, logvar, config['beta'])
-        loss, recon, kl = model.vae_loss(obs, condition, epoch, config['beta'])
+        beta_warmup = min(1.0, epoch / 15) * config['beta'] 
+
+        loss, recon, kl = model.vae_loss(obs, condition, beta_warmup)
 
         loss.backward()
         optimizer.step()
@@ -298,6 +306,11 @@ for epoch in range(config['epochs']):
             'kl': total_kl / (batch_idx + 1)
         })
     
+    if epoch < config["warmup_epochs"]:
+        warmup_scheduler.step()
+    else:
+        scheduler.step()
+    
     # Calculate epoch metrics
     avg_loss = total_loss / len(train_loader)
     avg_recon = total_recon / len(train_loader)
@@ -310,7 +323,9 @@ for epoch in range(config['epochs']):
             "avg_loss": avg_loss,
             "avg_recon_loss": avg_recon,
             "avg_kl_loss": avg_kl,
-            "learning_rate": optimizer.param_groups[0]['lr']
+            "learning_rate": optimizer.param_groups[0]['lr'],
+            "beta": beta_warmup,
+
         })
     
     # Save model and generate samples at intervals
