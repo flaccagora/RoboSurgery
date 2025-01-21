@@ -76,7 +76,6 @@ class ConditionalVAE(nn.Module):
             nn.Sigmoid()
         )
     
-
     def encode(self, x, c):
         x = self.encoder(x)
         x = x.view(x.size(0), -1)
@@ -134,7 +133,7 @@ def count_parameters(model):
 
 # Hyperparameters
 config = {
-    "batch_size": 32,
+    "batch_size": 64,
     "epochs": 100,
     "learning_rate": 1e-4,
     "limit": -1,
@@ -232,7 +231,7 @@ warmup_scheduler = lr_scheduler.LambdaLR(
     optimizer,
     lr_lambda=lambda e: min(1.0, (e + 1) / config["warmup_epochs"])
 )
-scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.95)
+scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.97)
 model.to(device)
 
 from tqdm import tqdm
