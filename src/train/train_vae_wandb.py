@@ -290,7 +290,7 @@ for epoch in range(config['epochs']):
                 "batch_loss": loss.item(),
                 "batch_recon_loss": recon.item(),
                 "batch_kl_loss": kl.item(),
-            }, step = epoch * len(train_loader) + batch_idx + epoch)
+            })
         
         pbar.set_postfix({
             'loss': total_loss / (batch_idx + 1),
@@ -311,7 +311,7 @@ for epoch in range(config['epochs']):
             "avg_recon_loss": avg_recon,
             "avg_kl_loss": avg_kl,
             "learning_rate": optimizer.param_groups[0]['lr']
-        }, step=(epoch + 1) * len(train_loader))
+        })
     
     # Save model and generate samples at intervals
     if (epoch + 1) % config['save_interval'] == 0:

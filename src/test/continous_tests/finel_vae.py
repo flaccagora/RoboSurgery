@@ -164,7 +164,7 @@ def train_vae_based(device='cuda' if torch.cuda.is_available() else 'cpu'):
             images = images.to(device)
             states = labels.float().view(-1, 1).to(device)
             
-            loss, reconstruction_losses, kl_loss = model.vae_loss(images, states, epoch)
+            loss, reconstruction_loss, kl_loss = model.vae_loss(images, states, epoch)
             
             optimizer.zero_grad()
             loss.backward()
