@@ -55,7 +55,6 @@ class ConditionalVAE(nn.Module):
         self.prior_mean = nn.Linear(hidden_dim, latent_dim)
         self.prior_logvar = nn.Linear(hidden_dim, latent_dim)
 
-
         # Decoder input with reduced dimensions
         self.decoder_input = nn.Linear(latent_dim + condition_dim, self.flatten_size)
         
@@ -77,6 +76,7 @@ class ConditionalVAE(nn.Module):
             nn.Sigmoid()
         )
     
+
     def encode(self, x, c):
         x = self.encoder(x)
         x = x.view(x.size(0), -1)
@@ -132,14 +132,9 @@ class ConditionalVAE(nn.Module):
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-def vae_loss(recon_x, x, mu, logvar, beta=1.0):
-    MSE = F.mse_loss(recon_x, x, reduction='sum')
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    return MSE + beta * KLD, MSE, KLD
-
 # Hyperparameters
 config = {
-    "batch_size": 16,
+    "batch_size": 32,
     "epochs": 100,
     "learning_rate": 1e-4,
     "limit": -1,
