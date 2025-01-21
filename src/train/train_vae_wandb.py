@@ -146,8 +146,7 @@ config = {
     "save_interval": 10,
     "latent_dim": 128,
     "condition_dim": 4,
-    "beta": 1.0,
-    "warmup_epochs": 2,
+    "warmup_epochs": 3,
 
 }
 
