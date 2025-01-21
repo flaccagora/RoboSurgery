@@ -126,7 +126,7 @@ class ConditionalVAE(nn.Module):
             dim=1
         ).mean()
         
-        beta_warmup = min(1,epoch/10) * beta
+        beta_warmup = min(1,epoch/20) * beta
 
         return reconstruction_loss + beta_warmup * kl_loss, reconstruction_loss, kl_loss
 
@@ -141,7 +141,7 @@ def vae_loss(recon_x, x, mu, logvar, beta=1.0):
 
 # Hyperparameters
 config = {
-    "batch_size": 8,
+    "batch_size": 16,
     "epochs": 100,
     "learning_rate": 1e-4,
     "limit": -1,
