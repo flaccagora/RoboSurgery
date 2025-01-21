@@ -147,6 +147,7 @@ config = {
     "latent_dim": 128,
     "condition_dim": 4,
     "warmup_epochs": 3,
+    "default_beta": 1.0
 
 }
 
@@ -279,7 +280,7 @@ for epoch in range(config['epochs']):
         optimizer.zero_grad()
         # recon_batch, mu, logvar = model(obs, condition)
         # loss, recon, kl = vae_loss(recon_batch, obs, mu, logvar, config['beta'])
-        beta_warmup = min(1.0, epoch / 15) * config['beta'] 
+        beta_warmup = min(1.0, epoch / 15) * config['default_beta'] 
 
         loss, recon, kl = model.vae_loss(obs, condition, beta_warmup)
 
