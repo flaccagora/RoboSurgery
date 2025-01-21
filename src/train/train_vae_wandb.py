@@ -134,15 +134,14 @@ def count_parameters(model):
 # Hyperparameters
 config = {
     "batch_size": 64,
-    "epochs": 100,
+    "epochs": 200,
     "learning_rate": 1e-4,
     "limit": -1,
     "save_interval": 10,
     "latent_dim": 128,
     "condition_dim": 4,
-    "warmup_epochs": 4,
+    "warmup_epochs": 8,
     "default_beta": 1.0
-
 }
 
 save_dir = 'checkpoints_wandb'
