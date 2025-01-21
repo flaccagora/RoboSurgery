@@ -7,7 +7,7 @@ from torchvision.utils import make_grid
 wandb_log = True
 
 class ConditionalVAE(nn.Module):
-    def __init__(self, latent_dim=128, condition_dim=4):
+    def __init__(self, latent_dim=128, condition_dim=4, hidden_dim=256):
         super(ConditionalVAE, self).__init__()
         
         # Further reduced number of filters in encoder (approximately 1/4)
@@ -44,6 +44,17 @@ class ConditionalVAE(nn.Module):
         self.fc_mu = nn.Linear(self.flatten_size + 256, latent_dim)
         self.fc_logvar = nn.Linear(self.flatten_size + 256, latent_dim)
         
+        # Prior network p(z|s)
+        self.prior = nn.Sequential(
+            nn.Linear(4, hidden_dim),  # Input is just the label
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+        )
+        self.prior_mean = nn.Linear(hidden_dim, latent_dim)
+        self.prior_logvar = nn.Linear(hidden_dim, latent_dim)
+
+
         # Decoder input with reduced dimensions
         self.decoder_input = nn.Linear(latent_dim + condition_dim, self.flatten_size)
         
@@ -74,10 +85,6 @@ class ConditionalVAE(nn.Module):
         logvar = self.fc_logvar(x)
         return mu, logvar
     
-    def reparameterize(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
     
     def decode(self, z, c):
         z = torch.cat([z, c], dim=1)
@@ -86,11 +93,43 @@ class ConditionalVAE(nn.Module):
         x = self.decoder(x)
         return x
     
+    def get_prior(self,c):
+        c = self.prior(c)
+        return self.prior_mean(c), self.prior_logvar(c)
+
     def forward(self, x, c):
         mu, logvar = self.encode(x, c)
         z = self.reparameterize(mu, logvar)
         return self.decode(z, c), mu, logvar
 
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+    
+    def vae_loss(self, x, c, epoch, beta=1):
+        
+        # forward
+        recon_x, mu, logvar = self.forward(x, c)
+
+        # priors
+        p_mu, p_logvar = self.get_prior(c)
+
+        # Reconstruction loss
+        reconstruction_loss = F.binary_cross_entropy(
+            recon_x, x, reduction='none'
+        ).sum(dim=[1,2,3]).mean()
+         
+        kl_loss = -0.5 * torch.sum(
+            1 + logvar - p_logvar - 
+            (mu - p_mu)**2/torch.exp(p_logvar) - 
+            torch.exp(logvar)/torch.exp(p_logvar),
+            dim=1
+        ).mean()
+        
+        beta_warmup = min(1,epoch/10) * beta
+
+        return reconstruction_loss + beta_warmup * kl_loss, reconstruction_loss, kl_loss
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -203,7 +242,8 @@ print(f"Training on {device}")
 print(f"len Dataset: {len(custom_dataset)}")
 
 # Log model architecture
-wandb.watch(model, log="all", log_freq=100)
+if wandb_log:
+    wandb.watch(model, log="all", log_freq=100)
 
 def log_images(epoch, original, reconstructed, random_samples):
     """Helper function to log images to wandb"""
@@ -213,11 +253,12 @@ def log_images(epoch, original, reconstructed, random_samples):
     random_grid = make_grid(random_samples.cpu(), nrow=4, normalize=True)
     
     # Log to wandb
-    wandb.log({
-        "original_images": wandb.Image(orig_grid, caption=f"Original (Epoch {epoch})"),
-        "reconstructed_images": wandb.Image(recon_grid, caption=f"Reconstructed (Epoch {epoch})"),
-        "random_samples": wandb.Image(random_grid, caption=f"Random Samples (Epoch {epoch})")
-    }, step=epoch)
+    if wandb_log:
+        wandb.log({
+            "original_images": wandb.Image(orig_grid, caption=f"Original (Epoch {epoch})"),
+            "reconstructed_images": wandb.Image(recon_grid, caption=f"Reconstructed (Epoch {epoch})"),
+            "random_samples": wandb.Image(random_grid, caption=f"Random Samples (Epoch {epoch})")
+        }, step=epoch)
 
 for epoch in range(config['epochs']):
     model.train()
@@ -232,9 +273,10 @@ for epoch in range(config['epochs']):
         obs = data['deform_obs'].to(device)
         
         optimizer.zero_grad()
-        recon_batch, mu, logvar = model(obs, condition)
-        loss, recon, kl = vae_loss(recon_batch, obs, mu, logvar, config['beta'])
-        
+        # recon_batch, mu, logvar = model(obs, condition)
+        # loss, recon, kl = vae_loss(recon_batch, obs, mu, logvar, config['beta'])
+        loss, recon, kl = model.vae_loss(obs, condition, epoch, config['beta'])
+
         loss.backward()
         optimizer.step()
         
@@ -243,12 +285,13 @@ for epoch in range(config['epochs']):
         total_recon += recon.item()
         total_kl += kl.item()
         
-        # Log batch metrics
-        wandb.log({
-            "batch_loss": loss.item(),
-            "batch_recon_loss": recon.item(),
-            "batch_kl_loss": kl.item(),
-        }, step=epoch * len(train_loader) + batch_idx)
+        if wandb_log:
+            # Log batch metrics
+            wandb.log({
+                "batch_loss": loss.item(),
+                "batch_recon_loss": recon.item(),
+                "batch_kl_loss": kl.item(),
+            }, step=epoch * len(train_loader) + batch_idx)
         
         pbar.set_postfix({
             'loss': total_loss / (batch_idx + 1),
@@ -261,14 +304,15 @@ for epoch in range(config['epochs']):
     avg_recon = total_recon / len(train_loader)
     avg_kl = total_kl / len(train_loader)
     
-    # Log epoch metrics
-    wandb.log({
-        "epoch": epoch,
-        "avg_loss": avg_loss,
-        "avg_recon_loss": avg_recon,
-        "avg_kl_loss": avg_kl,
-        "learning_rate": optimizer.param_groups[0]['lr']
-    }, step=epoch)
+    if wandb_log:
+        # Log epoch metrics
+        wandb.log({
+            "epoch": epoch,
+            "avg_loss": avg_loss,
+            "avg_recon_loss": avg_recon,
+            "avg_kl_loss": avg_kl,
+            "learning_rate": optimizer.param_groups[0]['lr']
+        }, step=epoch)
     
     # Save model and generate samples at intervals
     if (epoch + 1) % config['save_interval'] == 0:
@@ -280,9 +324,9 @@ for epoch in range(config['epochs']):
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss,
         }, checkpoint_path)
-        
-        # Log model checkpoint to wandb
-        wandb.save(checkpoint_path)
+        if wandb_log:
+            # Log model checkpoint to wandb
+            wandb.save(checkpoint_path)
         
         # Generate and log sample images
         with torch.no_grad():
@@ -299,7 +343,8 @@ for epoch in range(config['epochs']):
             random_samples = model.decode(random_z, sample_condition[:8])
             
             # Log images to wandb
-            log_images(epoch, obs[:8], recon_data[:8], random_samples)
+            if wandb_log:
+                log_images(epoch, obs[:8], recon_data[:8], random_samples)
     
     # Print epoch summary
     print(f'Epoch {epoch+1}/{config["epochs"]}:')
@@ -308,4 +353,5 @@ for epoch in range(config['epochs']):
     print(f'Average KL Divergence: {avg_kl:.4f}')
 
 # Finish the wandb run
-wandb.finish()
+if wandb_log:
+    wandb.finish()
