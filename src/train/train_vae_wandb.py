@@ -6,8 +6,8 @@ from torchvision.utils import make_grid
 import torch.optim.lr_scheduler as lr_scheduler
 
 wandb_log = True
-wandb_run_name = "cvae_run_k6kfrpkd"
-continue_training = True
+wandb_run_name = None
+continue_training = False
 if continue_training == True and wandb_log == True:
     assert wandb_run_name is not None, "Please provide the name of the run to continue training or disable wandb logging"
 
@@ -232,8 +232,8 @@ model.to(device)
 start_epoch = 0
 if continue_training:
     import glob
-    last_checkpoint = max(glob.glob(HERE / f'checkpoint_epoch_*.pt'), key=os.path.getctime)
-    checkpoint = torch.load('checkpoint_epoch_120.ptrom')
+    # last_checkpoint = max(glob.glob(HERE + f'checkpoint_epoch_*.pt'), key=os.path.getctime)
+    checkpoint = torch.load(HERE + '/checkpoint_epoch_120.ptrom')
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
