@@ -245,7 +245,8 @@ if wandb_log:
     wandb.init(
         project="conditional-vae",
         config=config,
-        name=f"cvae_run_{wandb.util.generate_id()}" if wandb_run_name is None else wandb_run_name
+        name=f"cvae_run_{wandb.util.generate_id()}" if wandb_run_name is None else wandb_run_name,
+        resume=wandb_run_name is not None,
     )
 
 
