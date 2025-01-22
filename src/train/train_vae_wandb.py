@@ -5,7 +5,11 @@ import wandb
 from torchvision.utils import make_grid
 import torch.optim.lr_scheduler as lr_scheduler
 
-wandb_log = True
+wandb_log = False
+wandb_run_name = None
+continue_training = False
+if continue_training == True and wandb_log == True:
+    assert wandb_run_name is not None, "Please provide the name of the run to continue training or disable wandb logging"
 
 class ConditionalVAE(nn.Module):
     def __init__(self, latent_dim=128, condition_dim=4, hidden_dim=256):
@@ -155,14 +159,6 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
     torch.cuda.reset_accumulated_memory_stats()    
 
-# Initialize wandb
-if wandb_log:
-    wandb.init(
-        project="conditional-vae",
-        config=config,
-        name=f"cvae_run_{wandb.util.generate_id()}"
-    )
-
 # Load and prepare data
 import numpy as np
 images = np.load(HERE + '/dataset/images.npy')
@@ -233,6 +229,24 @@ warmup_scheduler = lr_scheduler.LambdaLR(
 scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.97)
 model.to(device)
 
+start_epoch = 0
+if continue_training:
+    checkpoint = torch.load('checkpoint_epoch_100.ptrom')
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+    start_epoch = checkpoint['epoch']
+    print(f"Continuing training from epoch {start_epoch}")
+
+# Initialize wandb
+if wandb_log:
+    wandb.init(
+        project="conditional-vae",
+        config=config,
+        name=f"cvae_run_{wandb.util.generate_id()}" if wandb_run_name is None else wandb_run_name
+    )
+
+
 from tqdm import tqdm
 print("------TRAINING STARTED-----")
 print(f"Model has {count_parameters(model):,} trainable parameters")
@@ -258,7 +272,7 @@ def log_images(epoch, original, reconstructed, random_samples):
             "random_samples": wandb.Image(random_grid, caption=f"Random Samples (Epoch {epoch})")
         })
 
-for epoch in range(config['epochs']):
+for epoch in range(start_epoch, config['epochs']):
     model.train()
     total_loss = 0
     total_recon = 0
@@ -318,7 +332,6 @@ for epoch in range(config['epochs']):
             "avg_kl_loss": avg_kl,
             "learning_rate": optimizer.param_groups[0]['lr'],
             "beta": beta_warmup,
-
         })
     
     # Save model and generate samples at intervals
@@ -329,6 +342,7 @@ for epoch in range(config['epochs']):
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
+            'scheduler_state_dict': scheduler.state_dict(),
             'loss': total_loss,
         }, checkpoint_path)
         if wandb_log:
