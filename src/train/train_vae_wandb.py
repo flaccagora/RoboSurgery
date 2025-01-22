@@ -246,7 +246,7 @@ if wandb_log:
         project="conditional-vae",
         config=config,
         name=f"cvae_run_{wandb.util.generate_id()}" if wandb_run_name is None else wandb_run_name,
-        resume=wandb_run_name is not None,
+        resume="must" if wandb_run_name is not None else False,
     )
 
 
