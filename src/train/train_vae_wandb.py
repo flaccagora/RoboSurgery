@@ -6,8 +6,8 @@ from torchvision.utils import make_grid
 import torch.optim.lr_scheduler as lr_scheduler
 
 wandb_log = True
-wandb_run_name = None
-continue_training = False
+wandb_run_name = "cvae_run_0j8decah"
+continue_training = True
 if continue_training == True and wandb_log == True:
     assert wandb_run_name is not None, "Please provide the name of the run to continue training or disable wandb logging"
 
