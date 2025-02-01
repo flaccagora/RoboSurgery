@@ -1,0 +1,112 @@
+\glsdefs@newdocentry{rl}%
+{%
+name={\acronymfont {\glsentryshort {rl}}},%
+sort={RL},%
+type={acronym},%
+first={RL},%
+firstplural={RLs},%
+text={RL},%
+plural={RLs},%
+description={Reinforcement Learning},%
+descriptionplural={Reinforcement Learning},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Reinforcement Learning},%
+longplural={Reinforcement Learnings},%
+short={RL},%
+shortplural={RLs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{mdp}%
+{%
+name={\acronymfont {\glsentryshort {mdp}}},%
+sort={MDP},%
+type={acronym},%
+first={MDP},%
+firstplural={MDPs},%
+text={MDP},%
+plural={MDPs},%
+description={Markov Decision Process},%
+descriptionplural={Markov Decision Process},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Markov Decision Process},%
+longplural={Markov Decision Processs},%
+short={MDP},%
+shortplural={MDPs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pomdp}%
+{%
+name={\acronymfont {\glsentryshort {pomdp}}},%
+sort={POMDP},%
+type={acronym},%
+first={POMDP},%
+firstplural={POMDPs},%
+text={POMDP},%
+plural={POMDPs},%
+description={Partially Observable Markov Decision Process},%
+descriptionplural={Partially Observable Markov Decision Process},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Partially Observable Markov Decision Process},%
+longplural={Partially Observable Markov Decision Processs},%
+short={POMDP},%
+shortplural={POMDPs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{llm}%
+{%
+name={\acronymfont {\glsentryshort {llm}}},%
+sort={LLM},%
+type={acronym},%
+first={LLM},%
+firstplural={LLMs},%
+text={LLM},%
+plural={LLMs},%
+description={Large Language Model},%
+descriptionplural={Large Language Model},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Large Language Model},%
+longplural={Large Language Models},%
+short={LLM},%
+shortplural={LLMs},%
+counter={page},%
+parent={},%
+%
+}%
+
