@@ -43,7 +43,7 @@ PLUGIN_LIST = (
     + VISUAL_PLUGIN_LIST
 )
 
-GRAVITY = 0# 9.810
+GRAVITY = 9.810
 
 
 def createScene(
@@ -112,6 +112,7 @@ def createScene(
         z_far=500,
         width_viewport=image_shape[0],
         height_viewport=image_shape[1],
+        vertical_field_of_view=70
     )
 
     root_node.addObject(
@@ -155,25 +156,24 @@ def createScene(
         rotation=random_rotation,
     )
 
-    pressure_node = liver.node.addChild("Pressure")
-    pressure_node.addObject(
-        "SurfacePressureConstraint",
-        triangles=HERE / "meshes/liver_collision.stl",  # Mesh file defining the surface (e.g., `.vtk` or `.stl`)
-        pressure=-5000.0,                     # Initial pressure (e.g., kPa)
-        minPressure=-5000.0,                # Minimum pressure for deflation
-        maxPressure=50.0,                 # Maximum pressure for inflation
-        name="LiverPressureConstraint",
-    )
-    liver.node.addObject("VisualStyle", displayFlags="showForceFields showNormals showCollisionModels")
+    # pressure_node = liver.node.addChild("Pressure")
+    # pressure_node.addObject(
+    #     "SurfacePressureConstraint",
+    #     triangles=HERE / "meshes/liver_collision.stl",  # Mesh file defining the surface (e.g., `.vtk` or `.stl`)
+    #     pressure=-5000.0,                     # Initial pressure (e.g., kPa)
+    #     minPressure=-5000.0,                # Minimum pressure for deflation
+    #     maxPressure=50.0,                 # Maximum pressure for inflation
+    #     name="LiverPressureConstraint",
+    # )
+    # liver.node.addObject("VisualStyle", displayFlags="showForceFields showNormals showCollisionModels")
 
-    gallbladder = Gallbladder(  
-        parent_node=liver.node,
+    gallbladder = Gallbladder(
+        parent_node=scene_node,
         liver_mesh_path=HERE / "meshes/liver_collision.stl",
         volume_mesh_path=HERE / "meshes/gallbladder_volumetric.vtk",
         collision_mesh_path=HERE / "meshes/gallbladder_collision.stl",
         visual_mesh_path=HERE / "meshes/gallbladder_visual.stl",
         animation_loop=animation_loop,
-        total_mass=1.5,
         rotation=random_rotation,
         scale=random_scale,
     )
@@ -185,12 +185,11 @@ def createScene(
         visual_mesh_path=MODEL_MESH_DIR / "unit_sphere.stl",
         scale=4.5,
         randomized_pose=randomize_poi_position,
-        liver_mesh_path= HERE / "meshes/liver_collision.stl",
     )
 
     # attach liver to gallbladder
-    # liver.node.addObject("FixedConstraint", indices="@gallbladder.indices")
-    # gallbladder.node.addObject("FixedConstraint", indices="@liver.indices")
+    liver.node.addObject("FixedConstraint", indices="@gallbladder.indices")
+    gallbladder.node.addObject("FixedConstraint", indices="@liver.indices")
     
     gripper = Gripper(
         parent_node=scene_node,
@@ -239,16 +238,13 @@ def createScene(
 
     scene_node.addObject(cauter)
 
-    
     scene_node.addObject(ToolController(gripper=gripper, cauter=cauter))
-    
 
-        # Replace gallbladder collision model
-    gallbladder_collision_model = gallbladder.node.addObject('SphereCollisionModel',
-        radius=.001,
-        group=1
-    )
-
+    # Replace gallbladder collision model
+    # gallbladder_collision_model = gallbladder.node.addObject('SphereCollisionModel',
+    #     radius=.001,
+    #     group=1
+    # )
 
     cauter_collision_model = cauter.sphere_collision_model.getLinkPath()
     gripper_collision_model = gripper.physical_shaft_node.approximated_collision_shaft_jaw.SphereCollisionModel.getLinkPath()
@@ -293,8 +289,8 @@ def createScene(
     # gallbladder_force_field = gallbladder.node.addObject('LinearForceField', name='GallbladderForceField', force=[0.0, 0.0, 0.0], arrowSizeCoef=1.0)
     # root_node.addObject('VisualStyle', displayFlags="showCollisionModels showForceFields showNormals")
 
-    liver_force_field = liver.node.addObject('ConstantForceField', name='LiverForceField', forces=[[0,0,0]]*len(liver.node.MechanicalObject.position))
-    liver_force_field.showArrowSize = .10  # Visualize forces
+    # liver_force_field = liver.node.addObject('ConstantForceField', name='LiverForceField', forces=[[0,0,0]]*len(liver.node.MechanicalObject.position))
+    # liver_force_field.showArrowSize = .10  # Visualize forces
 
     # For gallbladder:
     gallbladder_force_field = gallbladder.node.addObject('ConstantForceField', name='GallbladderForceField', forces=[[0,0,0]]*len(gallbladder.node.MechanicalObject.position))
@@ -312,7 +308,5 @@ def createScene(
         "camera": camera,
         "liver": liver,
         "gallbladder": gallbladder,
-        "liver_force_field": liver_force_field if 'liver_force_field' in locals() else None,
         "gallbladder_force_field": gallbladder_force_field if 'gallbladder_force_field' in locals() else None,
-
     }

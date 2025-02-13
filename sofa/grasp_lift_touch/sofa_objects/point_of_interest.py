@@ -37,7 +37,6 @@ class PointOfInterest(RigidObject):
         show_object: bool = False,
         show_object_scale: float = 7,
         non_default_target_positions: Optional[List] = None,
-        liver_mesh_path: Optional[Union[str, Path]] = None,
     ) -> None:
         self.randomized_pose = randomized_pose
         if non_default_target_positions is None:
@@ -74,9 +73,9 @@ class PointOfInterest(RigidObject):
             show_object_scale=show_object_scale,
         )
 
-        self.collision_spring_force_field_indices = [
-            1,
-        ]
+        # self.collision_spring_force_field_indices = [
+        #     1,
+        # ]
 
         # self.restSpringsForceField = add_restTrue_shape_spring_force_field_to_indices(
         #     attached_to=liver_mesh_path,
@@ -92,7 +91,6 @@ class PointOfInterest(RigidObject):
 
         Sets the color back to white and samples a new random pose (if ``randomized_pose``).
         """
-        
         self.set_color(color=(1.0, 1.0, 1.0))
         self.activated = False
         if self.randomized_pose:
@@ -102,8 +100,6 @@ class PointOfInterest(RigidObject):
         self.pose = np.array(self.possible_target_poses[self.pose_index])
         with self.mechanical_object.position.writeable() as positions:
             positions[0] = self.pose
-        
-        print("Resetting POI, index is: ", self.pose_index)
 
     def set_color(self, color: Tuple[float, float, float]) -> None:
         set_color(self.visual_model_node.OglModel, color=color)

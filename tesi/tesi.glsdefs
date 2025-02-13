@@ -26,6 +26,34 @@ parent={},%
 %
 }%
 
+\glsdefs@newdocentry{dl}%
+{%
+name={\acronymfont {\glsentryshort {dl}}},%
+sort={DL},%
+type={acronym},%
+first={DL},%
+firstplural={DLs},%
+text={DL},%
+plural={DLs},%
+description={Deep Learning},%
+descriptionplural={Deep Learning},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Deep Learning},%
+longplural={Deep Learnings},%
+short={DL},%
+shortplural={DLs},%
+counter={page},%
+parent={},%
+%
+}%
+
 \glsdefs@newdocentry{mdp}%
 {%
 name={\acronymfont {\glsentryshort {mdp}}},%
@@ -105,6 +133,146 @@ long={Large Language Model},%
 longplural={Large Language Models},%
 short={LLM},%
 shortplural={LLMs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ai}%
+{%
+name={\acronymfont {\glsentryshort {ai}}},%
+sort={AI},%
+type={acronym},%
+first={AI},%
+firstplural={AIs},%
+text={AI},%
+plural={AIs},%
+description={Artificial intelligence},%
+descriptionplural={Artificial intelligence},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Artificial intelligence},%
+longplural={Artificial intelligences},%
+short={AI},%
+shortplural={AIs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{vats}%
+{%
+name={\acronymfont {\glsentryshort {vats}}},%
+sort={VATs},%
+type={acronym},%
+first={VATs},%
+firstplural={VATss},%
+text={VATs},%
+plural={VATss},%
+description={video-assisted thoracic surgery},%
+descriptionplural={video-assisted thoracic surgery},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={video-assisted thoracic surgery},%
+longplural={video-assisted thoracic surgerys},%
+short={VATs},%
+shortplural={VATss},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{rats}%
+{%
+name={\acronymfont {\glsentryshort {rats}}},%
+sort={RATs},%
+type={acronym},%
+first={RATs},%
+firstplural={RATss},%
+text={RATs},%
+plural={RATss},%
+description={robotic-assisted thoracic surgery},%
+descriptionplural={robotic-assisted thoracic surgery},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={robotic-assisted thoracic surgery},%
+longplural={robotic-assisted thoracic surgerys},%
+short={RATs},%
+shortplural={RATss},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{drl}%
+{%
+name={\acronymfont {\glsentryshort {drl}}},%
+sort={DRL},%
+type={acronym},%
+first={DRL},%
+firstplural={DRLs},%
+text={DRL},%
+plural={DRLs},%
+description={Deep Reinforcement Learning},%
+descriptionplural={Deep Reinforcement Learning},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Deep Reinforcement Learning},%
+longplural={Deep Reinforcement Learnings},%
+short={DRL},%
+shortplural={DRLs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{gpi}%
+{%
+name={\acronymfont {\glsentryshort {gpi}}},%
+sort={GPI},%
+type={acronym},%
+first={GPI},%
+firstplural={GPIs},%
+text={GPI},%
+plural={GPIs},%
+description={Generalized Policy Iteration},%
+descriptionplural={Generalized Policy Iteration},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Generalized Policy Iteration},%
+longplural={Generalized Policy Iterations},%
+short={GPI},%
+shortplural={GPIs},%
 counter={page},%
 parent={},%
 %

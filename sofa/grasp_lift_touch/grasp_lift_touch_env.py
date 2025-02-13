@@ -1,5 +1,4 @@
 from collections import defaultdict
-import random
 import gymnasium.spaces as spaces
 import numpy as np
 
@@ -128,7 +127,7 @@ class GraspLiftTouchEnv(SofaEnv):
         observation_type: ObservationType = ObservationType.RGB,
         time_step: float = 0.1,
         frame_skip: int = 1,
-        settle_steps: int = 10,
+        settle_steps: int = 50,
         render_mode: RenderMode = RenderMode.HEADLESS,
         render_framework: RenderFramework = RenderFramework.PYGLET,
         start_in_phase: Phase = Phase.GRASP,
@@ -446,7 +445,6 @@ class GraspLiftTouchEnv(SofaEnv):
         self.poi: PointOfInterest = self.scene_creation_result["poi"]
         self.contact_listener: Dict[str, Sofa.Core.ContactListener] = self.scene_creation_result["contact_listener"]
         self.camera = self.scene_creation_result["camera"]
-        self.liver_force_field = self.scene_creation_result["liver_force_field"]
         self.gallbladder_force_field = self.scene_creation_result["gallbladder_force_field"]
 
         self.target_position = np.empty(3, dtype=np.float32)
@@ -544,8 +542,13 @@ class GraspLiftTouchEnv(SofaEnv):
 
         # random_force_field = np.random
         # # FORCES SETUP
-        self.liver_force_field.forces.value = [[0,0,0]]*len(self.liver_force_field.forces.value)
-        self.gallbladder_force_field.forces.value = [[0,0,110]]*len(self.gallbladder_force_field.forces.value)
+        # self.liver_force_field.forces.value = [[0,0,0]]*len(self.liver_force_field.forces.value)
+        
+        random_force_x = self.rng.uniform(-500, 500)
+        random_force_y = self.rng.uniform(-100, 500)
+        random_force_z = self.rng.uniform(-500, 500)
+
+        self.gallbladder_force_field.forces.value = [[random_force_x,random_force_y,random_force_z]]*len(self.gallbladder_force_field.forces.value)
 
 
         # Save the indices that describe indices on the gallbladder that might be suitable for grasping

@@ -43,7 +43,7 @@ class Gallbladder(DeformableObject):
         visual_mesh_path: Union[str, Path],
         liver_mesh_path: Union[str, Path],
         name: str = "gallbladder",
-        total_mass: float = 500.0,
+        total_mass: float = 5.0,
         scale: float = 1.0,
         rotation: Tuple[float, float, float] = (0.0, 0.0, 0.0),
         translation: Tuple[float, float, float] = (0.0, 0.0, 0.0),
@@ -51,12 +51,12 @@ class Gallbladder(DeformableObject):
         constraint_correction_type: ConstraintCorrectionType = ConstraintCorrectionType.PRECOMPUTED,
         animation_loop: AnimationLoopType = AnimationLoopType.DEFAULT,
     ) -> None:
-        material = Material(poisson_ratio=0.4, young_modulus=1500)
+        material = Material(poisson_ratio=0.4, young_modulus=3000)
 
         collision_model_func = partial(
             add_collision_model,
-            model_types=[CollisionModelType.TRIANGLE],
-            collision_group=8,
+            model_types=[CollisionModelType.TRIANGLE, CollisionModelType.POINT],
+            collision_group=1,
             check_self_collision=True,
             contact_stiffness=1e2,
         )

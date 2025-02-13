@@ -1,0 +1,496 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global/global}
+    \entry{SpinningUp2018}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e9029ecf4d7c873909e2074c987301f3}{%
+           family={Achiam},
+           familyi={A\bibinitperiod},
+           given={Joshua},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{fullhash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{fullhashraw}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{bibnamehash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{authorbibnamehash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{authornamehash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{authorfullhash}{e9029ecf4d7c873909e2074c987301f3}
+      \strng{authorfullhashraw}{e9029ecf4d7c873909e2074c987301f3}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{Spinning Up in Deep Reinforcement Learning}}
+      \field{year}{2018}
+    \endentry
+    \entry{96ef8573-56cc-3a43-a4c7-3c6543c30f4e}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=7bb51e859e70aaedef4ed1f3bb67779b}{%
+           family={Bellman},
+           familyi={B\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {National Academy of Sciences}%
+      }
+      \strng{namehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{fullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{fullhashraw}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{bibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authorbibnamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authornamehash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authorfullhash}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \strng{authorfullhashraw}{7bb51e859e70aaedef4ed1f3bb67779b}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{00278424, 10916490}
+      \field{journaltitle}{Proceedings of the National Academy of Sciences of the United States of America}
+      \field{number}{8}
+      \field{title}{On the Theory of Dynamic Programming}
+      \field{urlday}{11}
+      \field{urlmonth}{2}
+      \field{urlyear}{2025}
+      \field{volume}{38}
+      \field{year}{1952}
+      \field{urldateera}{ce}
+      \field{pages}{716\bibrangedash 719}
+      \range{pages}{4}
+      \verb{urlraw}
+      \verb http://www.jstor.org/stable/88493
+      \endverb
+      \verb{url}
+      \verb http://www.jstor.org/stable/88493
+      \endverb
+    \endentry
+    \entry{Hauskrecht_2000}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=8b100e16d329a77aec0fdd71f509a8b5}{%
+           family={Hauskrecht},
+           familyi={H\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {AI Access Foundation}%
+      }
+      \strng{namehash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{fullhash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{fullhashraw}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{bibnamehash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{authorbibnamehash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{authornamehash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{authorfullhash}{8b100e16d329a77aec0fdd71f509a8b5}
+      \strng{authorfullhashraw}{8b100e16d329a77aec0fdd71f509a8b5}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1076-9757}
+      \field{journaltitle}{Journal of Artificial Intelligence Research}
+      \field{month}{8}
+      \field{title}{Value-Function Approximations for Partially Observable Markov Decision Processes}
+      \field{volume}{13}
+      \field{year}{2000}
+      \field{pages}{33\bibrangedash 94}
+      \range{pages}{62}
+      \verb{doi}
+      \verb 10.1613/jair.678
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1613/jair.678
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1613/jair.678
+      \endverb
+    \endentry
+    \entry{Krishnamurthy_2016}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=59fb8bc312e0ac52e01cd093194d86b0}{%
+           family={Krishnamurthy},
+           familyi={K\bibinitperiod},
+           given={Vikram},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{fullhash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{fullhashraw}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{bibnamehash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{authorbibnamehash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{authornamehash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{authorfullhash}{59fb8bc312e0ac52e01cd093194d86b0}
+      \strng{authorfullhashraw}{59fb8bc312e0ac52e01cd093194d86b0}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Partially Observed Markov Decision Processes: From Filtering to Controlled Sensing}
+      \field{year}{2016}
+    \endentry
+    \entry{Silver2017}{article}{}{}
+      \name{author}{17}{}{%
+        {{un=0,uniquepart=base,hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8fad8df927bc0014c0bd6a9feb7aa71d}{%
+           family={Schrittwieser},
+           familyi={S\bibinitperiod},
+           given={Julian},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9d16b7284df92c9adaee86c37ab992df}{%
+           family={Simonyan},
+           familyi={S\bibinitperiod},
+           given={Karen},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=af540e84ef1ecdaa70b1f7c90f59fd7d}{%
+           family={Antonoglou},
+           familyi={A\bibinitperiod},
+           given={Ioannis},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ba4b200ce1412a2570cb113366cc9559}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Aja},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4131bd14e5ca890278ecd351e356dc34}{%
+           family={Guez},
+           familyi={G\bibinitperiod},
+           given={Arthur},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=80c63e95a9e243591a33a7e3156f1d78}{%
+           family={Hubert},
+           familyi={H\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe79638c2bf15e9cd4021e09ca0fa07b}{%
+           family={Baker},
+           familyi={B\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f311ac3fec4a3d3207fdec17a9887704}{%
+           family={Lai},
+           familyi={L\bibinitperiod},
+           given={Matthew},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fa98d81082da72fd49892566108f9cbe}{%
+           family={Bolton},
+           familyi={B\bibinitperiod},
+           given={Adrian},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5759ff4990bdd8c6f85835738834874a}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yutian},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3a6fdf4df9a25f1d2d506ad9e86e1f6c}{%
+           family={Lillicrap},
+           familyi={L\bibinitperiod},
+           given={Timothy},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=59f6c5b7be30cd01647770d56f297a69}{%
+           family={Hui},
+           familyi={H\bibinitperiod},
+           given={Fan},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=50d24de916599d306c5cb1a77156e4b9}{%
+           family={Sifre},
+           familyi={S\bibinitperiod},
+           given={Laurent},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=54c5c572d4fdc5d822c240b59fcadad4}{%
+           family={Driessche},
+           familyi={D\bibinitperiod},
+           given={George},
+           giveni={G\bibinitperiod},
+           givenun=0,
+           prefix={van\bibnamedelima den},
+           prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod},
+           prefixun=0}}%
+        {{un=0,uniquepart=base,hash=368b9b2de627b852658c433b062d4e1e}{%
+           family={Graepel},
+           familyi={G\bibinitperiod},
+           given={Thore},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b160026950ebb1e2286dfb40c15482f5}{%
+           family={Hassabis},
+           familyi={H\bibinitperiod},
+           given={Demis},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{fullhash}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \strng{fullhashraw}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \strng{bibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorbibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authornamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorfullhash}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \strng{authorfullhashraw}{34faf92840e9c6b68a2c64d4df1b42c3}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1476-4687}
+      \field{journaltitle}{Nature}
+      \field{number}{7676}
+      \field{title}{Mastering the game of Go without human knowledge}
+      \field{volume}{550}
+      \field{year}{2017}
+      \field{pages}{354\bibrangedash 359}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1038/nature24270
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1038/nature24270
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1038/nature24270
+      \endverb
+    \endentry
+    \entry{1307539f-051d-3d3c-a0d8-111443bed03f}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=b70b4b5a2027e5e8f39bc881efe46a00}{%
+           family={Smallwood},
+           familyi={S\bibinitperiod},
+           given={Richard\bibnamedelima D.},
+           giveni={R\bibinitperiod\bibinitdelim D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=96bc98b52dcec17421d6db92e2f9d83e}{%
+           family={Sondik},
+           familyi={S\bibinitperiod},
+           given={Edward\bibnamedelima J.},
+           giveni={E\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {INFORMS}%
+      }
+      \strng{namehash}{9689aee05d38b6f920178312c444f970}
+      \strng{fullhash}{9689aee05d38b6f920178312c444f970}
+      \strng{fullhashraw}{9689aee05d38b6f920178312c444f970}
+      \strng{bibnamehash}{9689aee05d38b6f920178312c444f970}
+      \strng{authorbibnamehash}{9689aee05d38b6f920178312c444f970}
+      \strng{authornamehash}{9689aee05d38b6f920178312c444f970}
+      \strng{authorfullhash}{9689aee05d38b6f920178312c444f970}
+      \strng{authorfullhashraw}{9689aee05d38b6f920178312c444f970}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper formulates the optimal control problem for a class of mathematical models in which the system to be controlled is characterized by a finite-state discrete-time Markov process. The states of this internal process are not directly observable by the controller; rather, he has available a set of observable outputs that are only probabilistically related to the internal state of the system. The formulation is illustrated by a simple machine-maintenance example, and other specific application areas are also discussed. The paper demonstrates that, if there are only a finite number of control intervals remaining, then the optimal payoff function is a piecewise-linear, convex function of the current state probabilities of the internal Markov process. In addition, an algorithm for utilizing this property to calculate the optimal control policy and payoff function for any finite horizon is outlined. These results are illustrated by a numerical example for the machine-maintenance problem.}
+      \field{issn}{0030364X, 15265463}
+      \field{journaltitle}{Operations Research}
+      \field{number}{5}
+      \field{title}{The Optimal Control of Partially Observable Markov Processes Over a Finite Horizon}
+      \field{urlday}{11}
+      \field{urlmonth}{2}
+      \field{urlyear}{2025}
+      \field{volume}{21}
+      \field{year}{1973}
+      \field{urldateera}{ce}
+      \field{pages}{1071\bibrangedash 1088}
+      \range{pages}{18}
+      \verb{urlraw}
+      \verb http://www.jstor.org/stable/168926
+      \endverb
+      \verb{url}
+      \verb http://www.jstor.org/stable/168926
+      \endverb
+    \endentry
+    \entry{Spaan12pomdp}{incollection}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ad28cffadc8b45d4a62acaa76fb688e6}{%
+           family={Spaan},
+           familyi={S\bibinitperiod},
+           given={Matthijs\bibnamedelimb T.\bibnamedelimi J.},
+           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=a6855779cbaaf0280e06a4d858e5136d}{%
+           family={Wiering},
+           familyi={W\bibinitperiod},
+           given={Marco},
+           giveni={M\bibinitperiod}}}%
+        {{hash=dde7efb52fcf5e2fad203f10f1ba90ce}{%
+           family={Otterlo},
+           familyi={O\bibinitperiod},
+           given={Martijn},
+           giveni={M\bibinitperiod},
+           prefix={van},
+           prefixi={v\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer Verlag}%
+      }
+      \strng{namehash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{fullhash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{fullhashraw}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{bibnamehash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{authorbibnamehash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{authornamehash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{authorfullhash}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{authorfullhashraw}{ad28cffadc8b45d4a62acaa76fb688e6}
+      \strng{editorbibnamehash}{b30b771391670cd7ae6157e722016025}
+      \strng{editornamehash}{b30b771391670cd7ae6157e722016025}
+      \strng{editorfullhash}{b30b771391670cd7ae6157e722016025}
+      \strng{editorfullhashraw}{b30b771391670cd7ae6157e722016025}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Reinforcement Learning: State of the Art}
+      \field{title}{Partially Observable {M}arkov Decision Processes}
+      \field{year}{2012}
+      \field{pages}{387\bibrangedash 414}
+      \range{pages}{28}
+    \endentry
+    \entry{Sutton1998}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=eb920e5277d3d5fd0903f3cd41e11871}{%
+           family={Sutton},
+           familyi={S\bibinitperiod},
+           given={Richard\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=32a0a208f8bcf56a13b0a8e618aa806a}{%
+           family={Barto},
+           familyi={B\bibinitperiod},
+           given={Andrew\bibnamedelima G.},
+           giveni={A\bibinitperiod\bibinitdelim G\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {The MIT Press}%
+      }
+      \strng{namehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{fullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{fullhashraw}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{bibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authorbibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authornamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authorfullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \strng{authorfullhashraw}{c6212f1a1407d96a3d9f4fefbb07eade}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Second}
+      \field{title}{Reinforcement Learning: An Introduction}
+      \field{year}{2018}
+      \verb{urlraw}
+      \verb http://incompleteideas.net/book/the-book-2nd.html
+      \endverb
+      \verb{url}
+      \verb http://incompleteideas.net/book/the-book-2nd.html
+      \endverb
+    \endentry
+    \entry{d1afac99aad548188c9d47063c7109df}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=a6855779cbaaf0280e06a4d858e5136d}{%
+           family={Wiering},
+           familyi={W\bibinitperiod},
+           given={Marco},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=da06a7e464ce6ca0971f7b94c39cfeb9}{%
+           family={{Van Otterlo}},
+           familyi={V\bibinitperiod},
+           given={Martijn},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{language}{1}{%
+        {English}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{fullhash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{fullhashraw}{9f3604a5720512340376f24e77adb1d5}
+      \strng{bibnamehash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{authorbibnamehash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{authornamehash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{authorfullhash}{9f3604a5720512340376f24e77adb1d5}
+      \strng{authorfullhashraw}{9f3604a5720512340376f24e77adb1d5}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-3-642-27644-6}
+      \field{title}{Reinforcement Learning: State of the Art}
+      \field{year}{2012}
+      \verb{doi}
+      \verb 10.1007/978-3-642-27645-3
+      \endverb
+      \keyw{Reinforcement learning}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
