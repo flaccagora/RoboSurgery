@@ -163,6 +163,55 @@
       \field{title}{Partially Observed Markov Decision Processes: From Filtering to Controlled Sensing}
       \field{year}{2016}
     \endentry
+    \entry{10.5555/1630659.1630806}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=5b77dedc7f77ff84caad46064e6e3cbb}{%
+           family={Pineau},
+           familyi={P\bibinitperiod},
+           given={Joelle},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=685e1c249c9cf9b84bcec19b01d8fef0}{%
+           family={Gordon},
+           familyi={G\bibinitperiod},
+           given={Geoff},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5112ea130eadef0764fce0145b8b9f91}{%
+           family={Thrun},
+           familyi={T\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Acapulco, Mexico}%
+      }
+      \list{publisher}{1}{%
+        {Morgan Kaufmann Publishers Inc.}%
+      }
+      \strng{namehash}{27dc2491d51da881064152445a5b9332}
+      \strng{fullhash}{27dc2491d51da881064152445a5b9332}
+      \strng{fullhashraw}{27dc2491d51da881064152445a5b9332}
+      \strng{bibnamehash}{27dc2491d51da881064152445a5b9332}
+      \strng{authorbibnamehash}{27dc2491d51da881064152445a5b9332}
+      \strng{authornamehash}{27dc2491d51da881064152445a5b9332}
+      \strng{authorfullhash}{27dc2491d51da881064152445a5b9332}
+      \strng{authorfullhashraw}{27dc2491d51da881064152445a5b9332}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper introduces the Point-Based Value Iteration (PBVI) algorithm for POMDP planning. PBVI approximates an exact value iteration solution by selecting a small set of representative belief points and then tracking the value and its derivative for those points only. By using stochastic trajectories to choose belief points, and by maintaining only one value hyper-plane per point, PBVI successfully solves large problems: we present results on a robotic laser tag problem as well as three test domains from the literature.}
+      \field{booktitle}{Proceedings of the 18th International Joint Conference on Artificial Intelligence}
+      \field{series}{IJCAI'03}
+      \field{title}{Point-based value iteration: an anytime algorithm for POMDPs}
+      \field{year}{2003}
+      \field{pages}{1025\bibrangedash 1030}
+      \range{pages}{6}
+    \endentry
     \entry{Silver2017}{article}{}{}
       \name{author}{17}{}{%
         {{un=0,uniquepart=base,hash=89dbd30410c2085cd059f32c57d4593e}{%
@@ -355,14 +404,64 @@
       \verb http://www.jstor.org/stable/168926
       \endverb
     \endentry
+    \entry{Spaan_2005}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=854d0115246fcaa452d73f77c4fe1059}{%
+           family={Spaan},
+           familyi={S\bibinitperiod},
+           given={M.\bibnamedelimi T.J.},
+           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=6cb1e3015f42c3a676e75e70220ab98e}{%
+           family={Vlassis},
+           familyi={V\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {AI Access Foundation}%
+      }
+      \strng{namehash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{fullhash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{fullhashraw}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{bibnamehash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{authorbibnamehash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{authornamehash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{authorfullhash}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \strng{authorfullhashraw}{be722abef2ed8f00bc83a94b4d54e6bd}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1076-9757}
+      \field{journaltitle}{Journal of Artificial Intelligence Research}
+      \field{month}{8}
+      \field{title}{Perseus: Randomized Point-based Value Iteration for POMDPs}
+      \field{volume}{24}
+      \field{year}{2005}
+      \field{pages}{195\bibrangedash 220}
+      \range{pages}{26}
+      \verb{doi}
+      \verb 10.1613/jair.1659
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1613/jair.1659
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1613/jair.1659
+      \endverb
+    \endentry
     \entry{Spaan12pomdp}{incollection}{}{}
       \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=ad28cffadc8b45d4a62acaa76fb688e6}{%
+        {{un=1,uniquepart=given,hash=ad28cffadc8b45d4a62acaa76fb688e6}{%
            family={Spaan},
            familyi={S\bibinitperiod},
            given={Matthijs\bibnamedelimb T.\bibnamedelimi J.},
            giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod\bibinitdelim J\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
       }
       \name{editor}{2}{}{%
         {{hash=a6855779cbaaf0280e06a4d858e5136d}{%

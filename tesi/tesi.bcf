@@ -2373,16 +2373,20 @@
     <bcf:datasource type="file" datatype="bibtex" glob="false">ref.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
-    <bcf:citekey order="2" intorder="1">d1afac99aad548188c9d47063c7109df</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">Sutton1998</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">96ef8573-56cc-3a43-a4c7-3c6543c30f4e</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">Silver2017</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">SpinningUp2018</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">Spaan12pomdp</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">10578312</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">d1afac99aad548188c9d47063c7109df</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">Sutton1998</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">96ef8573-56cc-3a43-a4c7-3c6543c30f4e</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">Silver2017</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">SpinningUp2018</bcf:citekey>
     <bcf:citekey order="8" intorder="1">Krishnamurthy_2016</bcf:citekey>
     <bcf:citekey order="9" intorder="1">Krishnamurthy_2016</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">Hauskrecht_2000</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">1307539f-051d-3d3c-a0d8-111443bed03f</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">Spaan12pomdp</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">Hauskrecht_2000</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">1307539f-051d-3d3c-a0d8-111443bed03f</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">10.5555/1630659.1630806</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">10.5555/1630659.1630806</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">Spaan_2005</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nyt">

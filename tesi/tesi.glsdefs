@@ -110,34 +110,6 @@ parent={},%
 %
 }%
 
-\glsdefs@newdocentry{llm}%
-{%
-name={\acronymfont {\glsentryshort {llm}}},%
-sort={LLM},%
-type={acronym},%
-first={LLM},%
-firstplural={LLMs},%
-text={LLM},%
-plural={LLMs},%
-description={Large Language Model},%
-descriptionplural={Large Language Model},%
-symbol={\relax },%
-symbolplural={\relax },%
-user1={},%
-user2={},%
-user3={},%
-user4={},%
-user5={},%
-user6={},%
-long={Large Language Model},%
-longplural={Large Language Models},%
-short={LLM},%
-shortplural={LLMs},%
-counter={page},%
-parent={},%
-%
-}%
-
 \glsdefs@newdocentry{ai}%
 {%
 name={\acronymfont {\glsentryshort {ai}}},%
@@ -169,12 +141,12 @@ parent={},%
 \glsdefs@newdocentry{vats}%
 {%
 name={\acronymfont {\glsentryshort {vats}}},%
-sort={VATs},%
+sort={VATS},%
 type={acronym},%
-first={VATs},%
-firstplural={VATss},%
-text={VATs},%
-plural={VATss},%
+first={VATS},%
+firstplural={VATSs},%
+text={VATS},%
+plural={VATSs},%
 description={video-assisted thoracic surgery},%
 descriptionplural={video-assisted thoracic surgery},%
 symbol={\relax },%
@@ -187,8 +159,8 @@ user5={},%
 user6={},%
 long={video-assisted thoracic surgery},%
 longplural={video-assisted thoracic surgerys},%
-short={VATs},%
-shortplural={VATss},%
+short={VATS},%
+shortplural={VATSs},%
 counter={page},%
 parent={},%
 %
@@ -197,12 +169,12 @@ parent={},%
 \glsdefs@newdocentry{rats}%
 {%
 name={\acronymfont {\glsentryshort {rats}}},%
-sort={RATs},%
+sort={RATS},%
 type={acronym},%
-first={RATs},%
-firstplural={RATss},%
-text={RATs},%
-plural={RATss},%
+first={RATS},%
+firstplural={RATSs},%
+text={RATS},%
+plural={RATSs},%
 description={robotic-assisted thoracic surgery},%
 descriptionplural={robotic-assisted thoracic surgery},%
 symbol={\relax },%
@@ -215,8 +187,8 @@ user5={},%
 user6={},%
 long={robotic-assisted thoracic surgery},%
 longplural={robotic-assisted thoracic surgerys},%
-short={RATs},%
-shortplural={RATss},%
+short={RATS},%
+shortplural={RATSs},%
 counter={page},%
 parent={},%
 %
@@ -273,6 +245,118 @@ long={Generalized Policy Iteration},%
 longplural={Generalized Policy Iterations},%
 short={GPI},%
 shortplural={GPIs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pbvi}%
+{%
+name={\acronymfont {\glsentryshort {pbvi}}},%
+sort={PBVI},%
+type={acronym},%
+first={PBVI},%
+firstplural={PBVIs},%
+text={PBVI},%
+plural={PBVIs},%
+description={Point Based Value Iteration},%
+descriptionplural={Point Based Value Iteration},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Point Based Value Iteration},%
+longplural={Point Based Value Iterations},%
+short={PBVI},%
+shortplural={PBVIs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{mc}%
+{%
+name={\acronymfont {\glsentryshort {mc}}},%
+sort={MC},%
+type={acronym},%
+first={MC},%
+firstplural={MCs},%
+text={MC},%
+plural={MCs},%
+description={Monte Carlo},%
+descriptionplural={Monte Carlo},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Monte Carlo},%
+longplural={Monte Carlos},%
+short={MC},%
+shortplural={MCs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{dp}%
+{%
+name={\acronymfont {\glsentryshort {dp}}},%
+sort={DP},%
+type={acronym},%
+first={DP},%
+firstplural={DPs},%
+text={DP},%
+plural={DPs},%
+description={Dynamic Programming},%
+descriptionplural={Dynamic Programming},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Dynamic Programming},%
+longplural={Dynamic Programmings},%
+short={DP},%
+shortplural={DPs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{td}%
+{%
+name={\acronymfont {\glsentryshort {td}}},%
+sort={TD},%
+type={acronym},%
+first={TD},%
+firstplural={TDs},%
+text={TD},%
+plural={TDs},%
+description={Temporal Difference},%
+descriptionplural={Temporal Difference},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Temporal Difference},%
+longplural={Temporal Differences},%
+short={TD},%
+shortplural={TDs},%
 counter={page},%
 parent={},%
 %

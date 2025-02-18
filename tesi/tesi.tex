@@ -4,8 +4,7 @@
 \usepackage[utf8]{inputenc} % UTF-8 encoding
 \usepackage[T1]{fontenc}   % Font encoding
 \usepackage{lmodern}       % Improved fonts
-\usepackage{geometry}      % Page layout
-\geometry{a4paper, margin=1.5in}
+\usepackage[a4paper,margin=1.4in]{geometry}      % Page layout
 \usepackage{setspace}      % Line spacing
 \setstretch{1.2}
 \usepackage{titlesec}      % Customizable section titles
@@ -46,6 +45,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
+\setlength{\marginparwidth}{2cm}
 \usepackage{todonotes}
 
 
@@ -79,16 +79,73 @@
     frame=single
 }
 
-% Document metadata
-\title{\textbf{Reinforcement Learning for Robotic Surgery}}
-\author{Matteo Nunziante}
-\date{\today}
+% Do not edit
+% Set up the transparent full-page background logo
+\newcommand\BackgroundPicFront{
+    \put(-4,0){
+        \parbox[b][\paperheight]{\paperwidth}{
+            \vfill
+            \centering
+            {\transparent{0.0}\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{images/units_logo.png}}
+            \vfill
+        }
+    }
+}
+% Provides the \thetitle and other useful macros
+\usepackage{titling}
+\usepackage{tabularx}
+
+% Needed for the transparent full-page background logo
+\usepackage{eso-pic}
+\usepackage{transparent}
+
+% Thesis's title and author
+\title{Reinforcement Learning applications to Minimally invasive Robotic Surgery}
+\author{Name Surname}
+
+
 
 \begin{document}
 \setlength{\parindent}{0pt}
 
-% Title page
-\maketitle
+\begin{titlepage}
+    \begin{center}
+    % Insert the background here
+    \AddToShipoutPicture{\BackgroundPicFront}
+    {\LARGE {\bfseries UNIVERSITY OF TRIESTE \\}}
+    \vspace{5mm}
+    {\Large {\bfseries Department of Mathematics, Informatics and Geoscience \\}}
+    \vspace{1cm}
+    \includegraphics[width=6cm,height=6cm]{images/units_logo.png}\\[1cm]
+
+    {\LARGE
+        Master's Degree in\\ Data Science \& Scientific Computing \\
+    }
+    \vspace{1cm}
+    {\LARGE 
+        {\bfseries \thetitle} %
+    }
+    \todo{trova titolo decente}
+    \vspace{1cm}
+
+    % Replace the date with the correct one before printing the final version!
+    {\large \today \\[1cm]
+    }
+
+    % Table for author's and (co-)supervisor's names
+        {\large
+            \setlength{\tabcolsep}{12pt}
+            \begin{tabularx}{\linewidth}{ >{\raggedleft}X >{\raggedright\arraybackslash}X}
+                Candidate & Supervisor \\
+                \bfseries Matteo Nunziante & \bfseries Prof. Antonio Celani \\ [2cm] 
+                % & Co-supervisor \\
+                % & \bfseries Title Name Surname \\ [1cm]
+            \end{tabularx}
+        }
+    A.Y. 2023/2024
+    \end{center}
+\end{titlepage}
+
 
 \pagenumbering{roman} % Start with Roman numerals
 % Abstract
@@ -104,7 +161,20 @@ Partially Observable Markov Decision Processes and Reinforcement Learning
 as frameworks for developing intelligent, adaptive, and safe intraoperative AI driven 
 systems to support surgeons in Robotic Assisted Surgery.
 
+
 \chapter*{Thesis Outline and Summary}
+
+There are two major areas that contribute to the advancement of automating surgical procedures: 
+perception and task automation. Perception aims at understanding the surgical situation based on 
+a variety of inputs during the surgery (endoscopic cameras, tactile feedback etc). This may also include 
+the detection, and tracking of surgical tools, as well as 3D reconstruction of the deformed tissue. 
+Task automation, on the other hand, involves automating the surgical robot to accomplish specific tasks, 
+given the knowledge of the surgical situation. 
+
+Our work focuses on brigding the gap between these two areas, by developing a framework that 
+integrates perception and task automation in a single pipeline through the use of Partially Observable 
+Markov Decision Processes (POMDPs) and Reinforcement Learning (RL).
+
 % Table of Contents
 \tableofcontents
 \clearpage
@@ -122,13 +192,15 @@ systems to support surgeons in Robotic Assisted Surgery.
 \newacronym{dl}{DL}{Deep Learning}
 \newacronym{mdp}{MDP}{Markov Decision Process}
 \newacronym{pomdp}{POMDP}{Partially Observable Markov Decision Process}
-\newacronym{llm}{LLM}{Large Language Model}
 \newacronym{ai}{AI}{Artificial intelligence}
-\newacronym{vats}{VATs}{video-assisted thoracic surgery}
-\newacronym{rats}{RATs}{robotic-assisted thoracic surgery}
+\newacronym{vats}{VATS}{video-assisted thoracic surgery}
+\newacronym{rats}{RATS}{robotic-assisted thoracic surgery}
 \newacronym{drl}{DRL}{Deep Reinforcement Learning}
 \newacronym{gpi}{GPI}{Generalized Policy Iteration}
-
+\newacronym{pbvi}{PBVI}{Point Based Value Iteration}
+\newacronym{mc}{MC}{Monte Carlo}
+\newacronym{dp}{DP}{Dynamic Programming}
+\newacronym{td}{TD}{Temporal Difference}
 \clearpage
 \pagenumbering{arabic} % switch to arabic numerals
 % Chapters
@@ -218,26 +290,39 @@ domains and applications [6]. Already in 2004, Fischer et al. [7]
 \end{itemize}
 
 While robotic systems have revolutionized minimally invasive surgery, they lack the 
-ability to adapt to unexpected intraoperative changes autonomously. POMDPs, with 
+ability to adapt to unexpected intraoperative changes autonomously. \gls{pomdp}s, with 
 their capacity to model uncertainty, and RL, with its learning-based adaptability, 
 present a promising synergy for addressing these challenges. However, their 
 application to real-time intraoperative decision-making remains unexplored.
+
+
+\paragraph{RL in Surgical Robotics}
+\textbf{preso da} \cite{10578312}
+ALarge number of recent research in surgical robotics
+focuses on the automation of surgical sub-tasks, such
+as needle manipulation [1], [2], [3], suturing [4], [5], cutting
+[6], [7], [8], vessel manipulation [9], tissue retraction and
+deformation [10], [11], [12], [13]. However, most of these
+studies focus on the manipulation of rigid and soft objects,
+although fluid-related tasks are also common in surgeries, due
+to the presence of body fluids, especially blood 
+
 
 \part{Theoretical Background}
 
 
 \chapter{Reinforcement Learning}
-
-\begin{itemize}
-    \item Bellman Operator is a contraction proof
-    \item Q learning convergence experience replay even though convergence
-    \item Transfer R Learning ??
-    \item 18 Reinforcement Learning in Robotics: A Survey Jens Kober, Jan Peters
-    \item Chapter 4
-            Learning and Using Models
-            Todd Hester and Peter Stone
-    \item (P-complete vs. PSPACE-complete)
-\end{itemize}
+\todo{controlla itemize}
+% \begin{itemize}
+%     \item Bellman Operator is a contraction proof
+%     \item Q learning convergence experience replay even though convergence
+%     \item Transfer R Learning ??
+%     \item 18 Reinforcement Learning in Robotics: A Survey Jens Kober, Jan Peters
+%     \item Chapter 4
+%             Learning and Using Models
+%             Todd Hester and Peter Stone
+%     \item (P-complete vs. PSPACE-complete)
+% \end{itemize}
 
 \gls{rl} is a subfield of machine learning focused on the problem of learning 
 optimal behaviors: agents repeatedly interact with the environment, balancing 
@@ -252,7 +337,7 @@ more effectively. \
 Differently from supervised learning, where the agent is trained on labeled data, 
 and from unsupervised learning, where the agent must find patterns in unlabeled data,
 \gls{rl} makes use of rewards and punishments, making it suitable for problems 
-where the agent (be it a baby or a \gls{llm}) must learn through trial and error, creating its own training data 
+where the agent (be it a baby or a Large Language Model) must learn through trial and error, creating its own training data 
 through interaction.
 
 % quclosa circa policy e value 
@@ -412,7 +497,7 @@ if it produces high rewards.
 % life is generally going to be very different from the way it chooses them when it has a long
 % life ahead of it. In the infinite-horizon discounted model, the agent always has a constant
 % expected amount of time remaining, so there is no reason to change action strategies: there
-% is a stationary optimal policy.
+% is a stationary optimal policy.   
 
 \paragraph{Value Function} The concept of value function is useful to evaluate the 
 quality of a policy. The value function of a state \(s\) under a policy \(\pi\), denoted \(V^{\pi}(s)\), 
@@ -512,7 +597,7 @@ The optimal value function satisfies the \textit{Bellman Optimality Equation}, g
 \end{align}
 
 \textbf{
-H (for MDPs) is an isotone mapping and that it is a contraction under the
+H (for MDPs) is an isotone mapping and that it is a contraction under the   
 supremum norm (see (Heyman Sobel, 1984; Puterman, 1994)).}
 \todo{isotone why? non mi sembra che puterman lo richieda}
 
@@ -538,7 +623,7 @@ is that between model-based and model-free algorithms.
 Model-based methods use the \gls{mdp} structure explicitly and find the best policy from the transition and reward functions.
 If these are known, this is a straightforward optimization problem that can be tackled using dynamic programming. 
 If they are unknown, they must first be estimated from observed trajectories.
-{\textbf{copiato da spinningup}
+{\todo{da spinningup}
 The main upside to having a model is that it allows the agent to plan by thinking ahead, 
 seeing what would happen for a range of possible choices, and explicitly deciding between its options. 
 Agents can then distill the results from planning ahead into a learned policy. 
@@ -603,6 +688,7 @@ This is motivated by the following theorem:
     or equal expected return from all states $s \in S$:
     $$V^{\pi'}(s) \geq V^\pi(s)$$
     If there is strict inequality at any state, $\pi'$ is superior to $\pi$.
+    \label{th:policy-improvement}
 \end{theorem}
 \begin{proof}
     \begin{align}
@@ -658,14 +744,63 @@ turn there is a value function that can be used by the policy to select good act
 
 
 
-\section{Temporal Difference Learning}
 \section{Monte Carlo Methods}
+Learning methods do not necessarly need to rely on the model of the environment. Model free techniques 
+are based on the idea of learning from experience - actual or simulated\footnote{Although a model is 
+needed for simulated experience, it can be a sample model which is way easier to obtain than a 
+full probabilistic specification of the environment dynamics} - in the form of sample sequence of states, 
+actions and rewards.
+Following the \gls{gpi} framework we breafly explore the main ideas behind \gls{mc} Methods.
+
+\paragraph{Policy Evaluation} The most simple strtegy for estimating the value function without a model 
+is to average rewards after visiting a state.
+In particular, if we had to estimate $V_{\pi}(s)$, given a set of episodes obtained by following ${\pi}$
+after s, since s may be visited multiple times in the same episode; denoting the first time it is 
+visited in an episode the \textit{first visit} to s, two options are available:
+\begin{itemize}
+    \item First-visit \gls{mc} method estimates V(s) as the average of the returns following first visits to s
+    \item Every-visit \gls{mc} method averages the returns following all visits to s.
+\end{itemize}
+
+Convergence of both methods is guaranteed by the law of large numbers.
+
+\paragraph{Policy improvement}
+It is worth noting that the absence of the model, state values alone are not sufficient to determine a 
+greedy policy wrt $V$, \gls{mc} methods are therefore used to estimate the action-value function
+$Q_{\pi} (s, a)$ for control tasks. 
+The concept of visits is redefined to apply to state-action pairs, rather than states alone. A state-action pair (s, a) is considered visited if action a was selected while in state s
+
+\paragraph{Monte Carlo Control}
+While Policy Evaluation and Improvement, we need to be cautious and ensure that all
+states will be visited, otherwise convergence is not guaranteed. To accomplish this we can generate the 
+episodes with \textit{exploring starts}, that is, all episodes begin with state-action pairs randomly
+selected to cover all possibilities.
+The second underlying assumption we made is that policy evaluation could be done over an infinite number of 
+episodes. Under theses assumptions, the value function converges to the true value function thanks to 
+the \textit{Policy Improvement Theorem} \ref{th:policy-improvement}. 
+
+Both assumptions can actually be relaxed by giving up on deterministic policies and only search over
+$\epsilon$-soft policies and by using allowing the value function to be updated after each episode and 
+not when convergence is met.
+
+$$
+\pi(a|s)=\left\{
+\begin{array}{ll}
+1-\epsilon+\frac{\epsilon}{|A|} & \mbox{if $a=\mbox{argmax}_{a'}Q_{\pi}(s,a')$} \\
+\frac{\epsilon}{|A|} & \mbox{otherwise}
+\end{array}
+\right.
+$$
+\section{Temporal Difference Learning}
+Combining the ideas of \gls{dp} and \gls{mc} methods, \gls{td} learning is a model-free method that 
+learns from experience (like \gls{mc}) but updates estimates based on other learned estimates 
+(like \gls{dp}), a technique known as bootstrapping.
+
 \section{Policy Gradient Methods}
 
 
 \chapter{Partially Observable Markov Decision Processes}
 
-\cite{Spaan12pomdp}
 
 Until now we have considered the case of fully observable \gls{mdp}s, 
 where the agent has access to the complete state of the environment. This is not always the case, 
@@ -681,6 +816,13 @@ As such \gls{pomdp}s are an extension of \gls{mdp}s to the case where the full o
 relaxed in favour of a more general and realistic assumption that the agent only has partial knowledge 
 of the state of the system but there exist observations/signals which yield probabilistic beliefs about 
 the hidden state.
+
+The next sections will be based on \cite{Spaan12pomdp} and \cite{Hauskrecht_2000} analysis of \gls{pomdp}s,
+originally introduced by Drake, 1962; Astrom, 1965; Sondik, 1971;
+Lovejoy, 1991b.
+\todo{aggiusta citazioni }
+
+
 
 \begin{definition}
 A \textit{Partially Observable Markov Decision Process} is a tuple $P = (S, A,\Omega, \mathcal{T}, \mathcal{R}, \mathcal{O})$ where:
@@ -704,12 +846,9 @@ A \textit{Partially Observable Markov Decision Process} is a tuple $P = (S, A,\O
 In the next sections we will introduce the main concepts and algorithms used to solve \gls{pomdp}s.
 
 \section{Belief State MDPs}
-(Stratonovich, 1960; Dynkin, 1965; Åström, 1965). original authors
-\cite{Hauskrecht_2000} definizioni prese da
+Since in \gls{pomdp}S the underliyng process states are unknown, the action choices will be based on the information available 
+to the agent in the form of past actions and observations, giving rise to the concept of \textit{Information State}.
 
-
-Each \gls{pomdp} is equivalent to a continous state \gls{mdp}, here we will present why this is the case 
-thanks to the following concept: 
 \begin{definition}
     (Complete Information State) the complete information state at time t denoted
     $I_t$ consists of:
@@ -721,13 +860,13 @@ thanks to the following concept:
 
 A sequence of information states defines a controlled Markov process called 
 information-state \gls{mdp}. In this context a policy $\pi: I \rightarrow A$ is mapping of 
-information states to actions.
+information states to actions (possibly distributions over actions).
 The new information state $I_{t+1}$ is obtained applying an update function $\tau$ to the
 the previous state $I_t$, previous action $a_{t-1}$  and  observation $o_t$:
 $$\tau: \mathcal{I} \times A \times O \rightarrow \mathcal{I}$$
 
 It's easy to see that a \gls{pomdp} can be cast into the information-state MDP by using complete 
-information states, revisiting the pomdp such that states become information-states while transitions 
+information states, revisiting the \gls{pomdp} such that states become information-states while transitions 
 and rewards are updated accordingly
 $$R(I,a) = \sum_{s s'} T(s,a,s')R(s,a,s')P(s|I) $$
 $$T(I,a,I') = \sum_o \tau(I,a,o)P(o|I,a) $$
@@ -735,7 +874,7 @@ $$T(I,a,I') = \sum_o \tau(I,a,o)P(o|I,a) $$
 
 It's also important to note that the information available can be also summarized in the 
 so called \textit{sufficient information states}. Such states must preserve
-the necessary information content and also the Markov property of the information-state
+the necessary information content as well as the Markov property of the information-state.
 \begin{definition}
     
     (Sufficient information state process). Let \(\mathcal{I}\) be an information state space 
@@ -747,12 +886,13 @@ the necessary information content and also the Markov property of the informatio
     where \(I_{t}^{C}\) and \(I_{t-1}^{C}\) are complete information states.
 
 \end{definition} 
-\todo{definisci meglio p(s|I) e p(o|I,a)?? è necessario?}
+% \todo{definisci meglio p(s|I) e p(o|I,a)?? è necessario?}
 
 Being able to define a sufficient information state process is crucial since it allows to avoid 
 the curse of dimensionality of enlarging complete information states.
 
-This brings us to the most common concept of \textit{belief state} as a form of sufficient information state.
+This brings us to the most common concept of \textit{belief state} as a form of sufficient information state
+cite{strm1965OptimalCO}.
 
 A belief is a probability distribution over the states of the system which summarizes the history of 
 actions and observations. Each \gls{pomdp} assumes an initial belief $b_0$, then at each time step
@@ -760,16 +900,12 @@ the belief is updated by the observation and the action taken through Baye's rul
 
 $$\tau(b,a,o) = b^{ao}(s')=\displaystyle\frac{p(o|s',a)}{p(o|b,a)}\sum_{s\in S}p(s'|s,a)b(s)$$
 
-where $p(s'|s,a)$ and $p(o|s',a)$ are defined by model parameters, and
-$$p(o|b,a)=\displaystyle\sum_{s'\in S}p(o|s',a)\sum_{s\in S}p(s'|s,a)b(s)$$
-is a normalization constant.
+where $p(s'|s,a) = T(s,a,s')$ and $p(o|s',a) = O(s,a,o)$, and
+$$p(o|b,a)=\displaystyle\sum_{s'\in S}p(o|s',a)\sum_{s\in S}p(s'|s,a)b(s)$$.
 
-\todo{cite astrom 1965}
-Astrom (1965) that a belief state constitutes a sufficient statistic for
-the agent’s observation history, and it is possible to define an MDP over belief states as
-follows
-This transformation requires that the transition and observation functions are known
-to the agent, and hence can be applied only in model-based \gls{rl} methods.
+It is thus possible to define an \gls{mdp} over belief states. 
+This transformation requires the transition and observation functions to be known
+to the agent, and hence can be applied only in model-based methods.
 
 The key point is that belief-state \gls{mdp}s are fully
 observable even though the original problem involves hidden quantities. This
@@ -777,11 +913,11 @@ formulation effectively turns the problem into a planning one in the space of be
 
 Belief-state MDPs are the primary object of study in the field of \gls{pomdp}s
 
-\section{Policies and Value functions}
+\section{Policies and Value Functions}
 As in the fully observable context, the goal of the agent is to find a policy that maximizes the expected 
-return. In the \gls{pomdp} case, the policy is a mapping from a acontinous set of probability distributions 
-over $S$ while the value function is $V^{\pi} : \Delta(S) \rightarrow \mathbb{R}$. 
-Again in infinite-horizon discounted case the value function is defined as:
+return. In the \gls{pomdp} case, the policy is a mapping from the set of probability distributions 
+over $S$ as the value function $V^{\pi} : \Delta(S) \rightarrow \mathbb{R}$. 
+In the infinite-horizon discounted case the value function is defined as:
 
 $$V^{\pi}(b) \doteq \mathbb{E}_{\pi}\left[ \sum ^\infty _{t=0} \gamma^k R(b_t,\pi(b_t)) | b_0 = b  \right]$$
 
@@ -795,17 +931,11 @@ $$V^* (b) = \max_a \left[\sum_s R(s,\pi(b_t))b_t(s) + \gamma\sum_o p(o|b,a) V^*(
 or alternatively $V^* = HV^*$ where $H$ is the Bellman backup operator for \gls{pomdp}s defined as:
 $$H V(b) = \max_a \left[\sum_s R(s,a)b(s) + \gamma\sum_o p(o|b,a) V(b'_{a,o}) \right]$$
 
-\todo{Check il risultato di contrazione vale solo per discrete or countable state spaces, while 
-belief-spaces are uncountable. FROM VALUEFUNCTIONAPPROXIMATIONSPOMDP}
-\textbf{The properties of the H operator are sufficient to guarantee the existence of a unique optimal value 
+The properties of the H operator are sufficient to guarantee the existence of a unique optimal value 
 function given the Banach contraction theorem. \textit{Exact Value Iteration} is therefore formulated 
 as the iterative application of the H operator to an initial value function until convergence - practically 
 until the difference between the value function at two consecutive iterations is below a given threshold.
-IN REALTÀ FUNZIONA BASTA DIMOSTRARE CHE SIA UNA CONTRAZIONE SENZA SFRUTTARE A MATRICI INUTILI ( O FORSE 
-ANCHE S+ IL PROBLMEA CHE CREDEVO DI AVERE CON IL CONTINUO NON ESISTE PERCHÉ SOMMO SULLE OSSERVAZIONI CHE SONO 
-FINITE)
-}
-
+\todo{serve una dimostrazione H contrazione}
 $$V_{n+1} = HV_n = H^n V_0$$ 
 
 
@@ -848,9 +978,33 @@ $$g_a^b = r_{a}+\gamma b \cdot \sum_o arg\max_{\{g_{a,o}^{i}\}_{i}}b\cdot g_{a,o
 therefore one can express the value function as stated.
 
 \end{proof}
-\todo{fix}
-"the expected discounted reward generally grows as the entropy
-of b decreases."
+
+The main idea behind most value iteration algorithms is that for a given value function 
+\(V_{n}\) and a single belief point \(b\) we can
+easily compute the vector \(\alpha_{n+1}^{b}\) of \(H V_{n}\) such that
+$$\alpha_{n+1}^{b}=\arg \max _{\left\{\alpha_{n+1}^{i}\right\}_{i}} b \cdot \alpha_{n+1}^{i}$$    
+where \(\left\{\alpha_{n+1}^{i}\right\}_{i=1}^{|H V_{n}|}\) is the (unknown) set of vectors for \(H V_{n}\). 
+We will denote this operation
+\(\alpha_{n+1}^{b}=\operatorname{backup}(b)\). 
+It computes the optimal vector for a given belief \(b\) by back-projecting
+\begin{equation}
+    {backup}(b)=\arg\max_{g_a^b} b\cdot g_a^b
+    \label{eq:backup}
+\end{equation}
+        
+% \todo{copiato da perseus dal teorema a qui}
+
+
+Convexity of the value function the expected discounted reward generally grows as the entropy
+of b decreases \ref{fig:pomdp-value}.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.2]{images/pomdp-value.png}
+    \caption{Convex Value function for a two states \gls{pomdp}.}
+    \label{fig:pomdp-value}
+\end{figure}
+
 Even though the optimal value function for an infinite-horizon
 \gls{pomdp} is convex, it may not be piecewise linear. Nontheless, it can be approximated
 arbitrarily closely by a piecewise linear and convex value function.
@@ -860,29 +1014,125 @@ for every combination of actions and permutations of $\alpha_i$ vectors of size 
 % per trovare il massmo dentro le [] devo fissare azione e per ogni osservazione trovare l'alpha vector
 % precedente associato che massimizza le somme su ss'
 
-However, the complete set of linear functions is rarely needed: some of the linear functions are 
+\paragraph{Policy}
+Similarly to the \gls{mdp} case, in \gls{pomdp}s the optimal policy with respect to the Value function $V$ is:
+$$\pi_{V}(b)=\underset{a}{\operatorname{argmax}} \left[R(b, a)+\gamma \sum_{o \in \Omega} \operatorname{Pr}\left(o \mid b, a\right) V\left(b^{a, o}\right)\right]$$
+defined over the belief space.
+
+Computing a policy for the current belief state \(b\) using the above equation requires computing
+all the \(|A| \times|\Omega|\) successors of \(b\), with a cost of \(|S|^{2}\) for each successor. 
+Then, computing the value at each successor requires \(|S| \times|V|\) operations 
+(using the \(\alpha\)-vector representation).
+
+However, we can label the vector resulting from the
+point-based backup operation with the action associated with it. 
+Then, all we need is to find the best $\alpha$-vector for the current
+belief state and execute the corresponding action, with a computation cost of only $|S|\times|V |$ for 
+finding the best action when following V.
+\section{Exact Value Iteration}
+
+The complete set of linear functions is rarely needed: some of the linear functions are 
 dominated by others therefore not affecting the value function.
-\todo{citation needed}
-This approach namely Exact Value Iteration - Sondik (1971) and Monahan (1982) - enumerates all possible linear functions
+This approach - Sondik (1971) and Monahan (1982) - enumerates all possible linear functions
 and then remove (prune) all redundant vectors. 
 % Recent extensions of the
 % method interleave the generate and test stages and do early pruning on a set of partially
 % constructed linear functions (Zhang  Liu, 1997a; Cassandra, Littman,  Zhang, 1997;
 % Zhang  Lee, 1998).
 
+\todo{aggiusta O()}
+This process is known as exact value iteration. In each iteration, the value function is
+updated across the entire belief space. There are \(|V| \times|A| \times|\Omega|\) vectors generated at Eq. 21,
+and computing each of these vectors takes \(|S|^{2}\) operations. In Eq. 19 we create \(|V|^{\Omega|}\) new
+vectors for each action, with a complexity of \(|S|\) for each new vector. Hence, the overall
+complexity of a single iteration is \(O\left(|V| \times|A| \times|\Omega| \times|S|^{2}+|A| \times|S| \times|V|^{\Omega|}\right)\).
 
-An alternative approach - builds on Sondik's idea of computing a useful linear function for a
+\paragraph{Monahan’s Enumeration Algorithm}
+\paragraph{Incremental Pruning}
+
+An alternative approach builds on Sondik's idea of computing a useful linear function for a
 single belief state (Sondik, 1971; Smallwood  Sondik, 1973), which can be done efficiently.
 The key problem here is to locate all belief points that seed useful linear functions. 
 Methods that implement this idea are Sondik's one- and two-pass algorithms (Sondik, 1971), 
 Cheng's methods (Cheng, 1988), and the Witness algorithm 
 (Kaelbling, Littman,  Cassandra, 1999; Littman, 1996; Cassandra,1998). 
 
-\section{Exact Value Iteration}
+\section{Point Based Value Iteration}
+Approximate solution methods are necessary to solve \gls{pomdp}s in practice, since even modest 
+sized problems are intractable with exact methods.
+The main assumption behind \gls{pbvi} by \cite{10.5555/1630659.1630806} is that
+it is unlikely to reach most of the points in the belief simplex.
+Computing solutions only for those parts of the belief simplex that are reachable, i.e.,
+that can be actually encountered by interacting with the environment, can drastically reduce 
+the computational complexity of the problem.
+
+the \gls{pbvi} algorithm solves a POMDP for a finite set of belief points $B$
+initializing a $\alpha$-vector for each $b \in B$, and repeatedly updating 
+(via value backups) the value of that $\alpha$-vector, preserving the piece-wise linearity 
+and convexity of the value function, and defining value
+function over the entire belief simplex.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.35]{images/pbvi.png}
+    \caption{Point-Based Value Iteration}
+    \label{fig:pbvi}
+\end{figure}
 
 
-\section{Approximate Value Iteration}
 
+The point Based update follows exactly Eq. \ref{eq:backup} for each belief point in the set $B$. 
+This is repeated h times for finite h-horizon problems, or a predefined number of iterations in the 
+infinte case.
+
+The next step is to enlarge the set of belief points by selecting for each belief \(b\) in \(B\) 
+a successor \(b^{\prime}\) that is the most distant from the set \(B\). That is, let \(L\) be a 
+distance metric, then define:
+\[
+\left|b^{\prime}-B\right|_{L}=\min _{b \in B}\left|b-b^{\prime}\right|_{L}
+\]
+
+and focus on candidate successors generated using forward simulation, thus:
+
+\[
+b^{\prime}=\max _{a, o}\left|b^{a, o}-B\right|_{L}
+\] 
+
+The set of successor points, one b for each b in Bi , are added into Bi (along with the previous
+points in Bi ) to create the new set Bi+1 . Experiments by various researchers show little, if
+any, sensitivity to the distance metric chosen, and L 1 has useful theoretical properties for the
+convergence of PBVI. The full procedure is formally described in Algorithm
+
+
+The complexity of computing $g_{a,o}^{i}$ is \(O\left(|S|^{2}\right)\), and it is done for every \(\alpha \in V\), hence
+ computing all $g^{a, o}$ requires \(O\left(|A| \times|\Omega| \times|V| \times|S|^{2}\right)\). Computing \(\alpha_{a}^{b}\) (Eq. 34) requires the
+ computation of all the relevant \(\alpha^{a, o}\), but then the summation and inner products require only
+ \(O(|S| \times|\Omega|)\) operations and another \(O(|S|)\) operations for adding the reward vector. Finally,
+ the backup operation requires for each \(\alpha_{a}^{b}\) another \(O(|S|)\) operations for the inner
+ product. Hence, the full complexity of the point-based backup requires \(O(|A| \times|\Omega| \times|V| \times\)
+ \(|S|^{2}+|A| \times|S| \times|\Omega|\) ).
+
+
+
+However, a full backup for the subset \(B\) will not require \(|B|\) times the complexity of a
+ single point-based backup, because the \(\alpha^{a, o}\) are independent of the current belief point \(b\).
+ Hence, executing a backup for \(|B|\) belief points over a single value function \(V\), where we
+ compute every \(\alpha^{a, o}\) only once and cache the result, requires only \(O(|A| \times|\Omega| \times|V| \times|S|^{2}+\)
+ \(|B| \times|A| \times|S| \times|\Omega|\) ), as compared with the \(O(|A| \times|\Omega| \times|V| \times|S|^{2}+|A| \times|S| \times|V|^{\Omega|})\)
+ of a single iteration of the exact backup. 
+
+ \paragraph{Proof of convergence bounds} \cite{10.5555/1630659.1630806}
+\subsection{Perseus}
+
+\cite{Spaan_2005}
+This scheme is a heuristic to let Bt cover a wide area of the belief space,
+but comes at a cost as it requires computing distances between all b Bt . By backing up
+all b Bt the PBVI algorithm generates at each stage approximately  vectors, which
+can lead to slow performance in domains requiring large Bt .
+In the next section we will present a point-based POMDP value iteration method which
+does not require backing up all b  B. We compute backups for a subset of B only, but
+seeing to it that the computed solution will be effective for the complete set B. As a result
+we limit the growth of the number of vectors in the successive value function estimates,
+leading to significant speedups.
 
 % As each b has a region in the belief space in which its
 % nb is maximal, a family of algorithms tries to identify these regions (Sondik, 1971;
@@ -899,13 +1149,43 @@ Cheng's methods (Cheng, 1988), and the Witness algorithm
 \subsection{QMDP}
 \subsection{action voting}
 \subsection{most likely state}
-\todo{entropy heuristics}
+\subsection{entropy heuristics}
 Cassandra [1998] shows how to use the entropy
 of b to switch between information gathering policies and exploitive policies.
 The entropy can also be used to weight two policies that trade off information
 gathering and exploitation. These heuristics may be misleading if the minimum
 of (b) does not occur at the point of greatest entropy, that is, the uniform
 belief state.
+
+\section{Model Free et al}
+
+2. Monte Carlo and Sampling-Based Methods
+
+These approaches approximate belief updates or policies using stochastic simulations.
+
+    Monte Carlo Tree Search (MCTS): Expands belief nodes based on sampled trajectories (e.g., POMCP – Partially Observable Monte Carlo Planning).
+    DESPOT (Determinized Sparse Partially Observable Trees): Uses sparse sampling to reduce tree expansion complexity.
+
+3. Policy-Based Approximation
+
+Instead of solving for a full value function, these methods approximate policies directly.
+
+    Finite-State Controllers (FSCs): Compact representation of policies as a finite-state machine.
+    Gradient-Based Policy Search: Uses reinforcement learning techniques to optimize policies.
+
+4. Online Solvers
+
+Rather than solving the entire problem offline, these solvers focus on finding good actions given the current belief.
+
+    POMCP (Partially Observable Monte Carlo Planning): Uses Monte Carlo sampling with an upper confidence bound exploration strategy.
+    ABT (Adaptive Belief Tree): Builds a belief tree dynamically using online lookahead search.
+
+5. Function Approximation Methods
+
+These methods use machine learning techniques to approximate value functions or policies.
+
+    Deep Reinforcement Learning (DRL) for POMDPs: Uses neural networks to approximate value functions or policies.
+    Deep Q-Networks (DQN) with Recurrent Layers: Uses LSTMs to track hidden states in partially observable environments.
 
 % Model-based approaches tend to be more complex
 % computationally than model-free ones, but they allow for prior knowledge of the
@@ -914,11 +1194,99 @@ belief state.
 \part{Experiments}
 
 \chapter{Methods}
-Bottom up approach, increasingly complex tasks in increasingly complex environments
+We adopted a bottom up approach, increasing the complexity of the task in increasingly complex environments.
+Recall that our objective was to explore the applicability of \gls{rl} to navigation in 
+deformable environment related to the surgical task of thoracic surgery.
+We therefore adopted a mixed approach assuming the model of the environment to be known or learnable, 
+given the preoperative imaging data available in the clinical setting. This would allow us to model 
+the problem as a \gls{pomdp} and apply the methods described in the previous sections.
+
 \section{Gridworld}
+The first task we considered was a simple gridworld, where the agent had to navigate from a random 
+starting position to a goal position. The twist is given by the deformable property of the environment.
+
+\paragraph{State Space}
+
+The state space is a 2D grid of size $10 \times 10$ where each cell can be either empty or occupied by an obstacle.
+the state is represented as a tuple $(x,y,\phi)$ where $x$ and $y$ are the coordinates of the agent in the grid.
+and $\phi$ is the orientation of the agent.
+
+\paragraph{Action Space}
+
+The agent can move in four directions: up, down, left, right. The action space is therefore $A = \{0,1,2,3\}$.
+
+\paragraph{Observation Space}
+
+Every time the agent moves, it receives an observation which corresponds to the type of adjacent cells 
+in the grid.  
+
+
+The **conditional observation probabilities** $O(o|s,a)$ are also deterministic.
+
+
+$$O(o|s,a)= O(o|s) = 
+\begin{cases}
+    1 &   \text{if } (x,y) \text{ adjacent cells for map } f_\theta(M) \text{are compatible with } o \\
+    0 &   \text{otherwise} \\
+\end{cases}
+$$
+
+\paragraph{Reward Function}
+
+
+The **reward function** $R(s,a,s')$ is defined as follows:
+
+
+ $$R(s,a,s') = 
+    \begin{cases}
+    \frac{-0.1}{mapsize} &   s' \neq s_{goal} \wedge \text{moved} \\ 
+    \frac{-0.2}{mapsize} &   s' \neq s_{goal}  \wedge \text{hit wall}\\
+    1 &   s' = s_{goal} \\
+    \end{cases}    
+$$
+
+\paragraph{Transition Function}
+Always assuming deterministic transitions, the transition function is defined as follows:
+$$T(s'|s,a) =
+\begin{cases}
+    1 &   \text{if } s' \text{ is the result of applying action } a \text{ to state } s \\
+    0 &   \text{otherwise} \\
+\end{cases}
+$$
+
+\paragraph{Observation Function}
+
+\paragraph{Belief State}
+Because the agent does not directly observe the environment's state, the agent must make decisions under uncertainty of the true environment state. The belief function is a probability distribution over the states of the environment.
+
+$$b : S \rightarrow [0,1] \text{ and } \sum_s b(s) = 1  $$
+
+By interacting with the environment and receiving observations, the agent may update its belief in the true state by updating the probability distribution of the current state
+
+$$ b'(s')=\eta O(o\mid s',a)\sum _{s\in S}T(s'\mid s,a)b(s)$$
+
+where $\eta = \frac{1}{Pr ( o | b , a )}$ is a normalizing constant with 
+$$Pr ( o | b , a ) = \sum_{s'\in S} O ( o | s' , a ) \sum_{s \in S}( s'|s,a)b(s)$$
+
+Discrete update of the belief state is done by the agent at each time step.
+
+
 \section{Deformable Maze}
+
+\paragraph{State Space}
+\paragraph{Action Space}
+\paragraph{Observation Space}
+\paragraph{Reward Function}
+\paragraph{Transition Function}
+\paragraph{Observation Function}
 \section{Surgical Task}
 
+\paragraph{State Space}
+\paragraph{Action Space}
+\paragraph{Observation Space}
+\paragraph{Reward Function}
+\paragraph{Transition Function}
+\paragraph{Observation Function}
 \chapter{Results}
 Presentation of results...
 GraspLiftAndTouchEnv models a sub-task from laparoscopic chole-
