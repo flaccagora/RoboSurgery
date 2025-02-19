@@ -2,11 +2,12 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Markov Decision Process}}{8}{figure.caption.16}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Evolution of Deep Reinforcement Learning Algorithms}}{12}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Evolution of Deep Reinforcement Learning Algorithms}}{12}{figure.caption.21}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Generalized Policy Iteration}}{17}{figure.caption.24}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Partially Observable Markov Decision Process \blx@tocontentsinit {0}\cite {Krishnamurthy_2016}}}{17}{figure.caption.28}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Convex Value function for a two states \gls {pomdp}.}}{22}{figure.caption.31}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Point-Based Value Iteration}}{23}{figure.caption.36}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Partially Observable Markov Decision Process}}{21}{figure.caption.28}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Convex Value function for a two states \gls {pomdp}.}}{26}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Point-Based Value Iteration}}{27}{figure.caption.36}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
