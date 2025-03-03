@@ -1,0 +1,110 @@
+% Packages for document formatting
+\usepackage[utf8]{inputenc} % UTF-8 encoding
+\usepackage[T1]{fontenc}   % Font encoding
+\usepackage{lmodern}       % Improved fonts
+\usepackage[a4paper,margin=1.4in]{geometry}      % Page layout
+\usepackage{setspace}      % Line spacing
+\setstretch{1.2}
+\usepackage{titlesec}      % Customizable section titles
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}{\chaptername\ \thechapter}{20pt}{\Huge}
+
+% Math and algorithms
+\usepackage{amsmath,amssymb,amsfonts} % Math symbols and fonts
+\usepackage{amsthm}          % Theorem environments
+\usepackage{mathtools}      % Additional math tools
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{braket}
+
+% Bibliography management
+% \usepackage[backend=biber,style=authoryear]{biblatex} % APA style, customizable
+% \addbibresource{ref.bib} % Bibliography file
+\usepackage[authoryear,round]{natbib}  % For author-year citations
+
+% Hyperlinks
+\usepackage{hyperref}
+\usepackage{cleveref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=teal,
+    filecolor=magenta,
+    urlcolor=cyan
+    }
+\usepackage{cleveref} % Smart referencing
+
+% Acronyms
+\usepackage[acronym,nonumberlist]{glossaries}
+\makeglossaries
+    
+% Graphics and tables
+\usepackage{graphicx}       % Include images
+\usepackage{float}          % Improved figure placement
+\usepackage{caption}        % Customizable captions
+\usepackage{subcaption}     % Subfigures
+\usepackage{booktabs}       % Improved tables
+\usepackage{longtable}      % Tables spanning multiple pages
+
+
+\setlength{\marginparwidth}{2cm}
+\usepackage{todonotes}
+
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{remark}  % Italicized title, upright text
+\newtheorem{remark}{Remark}[section]
+
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\newtheorem{example}{Example}[section]
+\allowdisplaybreaks
+
+
+% Code formatting
+\usepackage{listings}       % Include code
+\usepackage{xcolor}         % Colors for listings
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single
+}
+
+% Do not edit
+% Set up the transparent full-page background logo
+\newcommand\BackgroundPicFront{
+    \put(-4,0){
+        \parbox[b][\paperheight]{\paperwidth}{
+            \vfill
+            \centering
+            {\transparent{0.0}\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{images/units_logo.png}}
+            \vfill
+        }
+    }
+}
+% Provides the \thetitle and other useful macros
+\usepackage{titling}
+\usepackage{tabularx}
+
+% Needed for the transparent full-page background logo
+\usepackage{eso-pic}
+\usepackage{transparent}
+
+% Thesis's title and author
+\title{Leveraging POMDPs for Adaptive Decision-Making in Robotic-Assisted Surgery}
+\author{Name Surname}
+
+
+

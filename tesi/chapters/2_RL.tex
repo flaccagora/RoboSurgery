@@ -1,0 +1,56 @@
+
+\chapter{Reinforcement Learning}
+\todo{controlla itemize}
+% \begin{itemize}
+%     \item Bellman Operator is a contraction proof
+%     \item Q learning convergence experience replay even though convergence
+%     \item Transfer R Learning ??
+%     \item 18 Reinforcement Learning in Robotics: A Survey Jens Kober, Jan Peters
+%     \item Chapter 4
+%             Learning and Using Models
+%             Todd Hester and Peter Stone
+%     \item (P-complete vs. PSPACE-complete)
+%     \item Gradient and semigradient chap 9 sutton and barto
+% \end{itemize}
+
+\gls{rl} is a subfield of machine learning focused on the problem of learning 
+optimal behaviors: agents repeatedly interact with the environment, balancing 
+exploration (trying new strategies) and exploitation (using known strategies) 
+to maximize success rate through constant feedback. \
+
+For instance, consider a baby learning to walk: it repeatedly attempts to stand 
+and take steps, getting positive feedback for each successful movement and 
+negative feedback from falls. Over time, it refines its attempts to walk 
+more effectively. \
+
+Differently from supervised learning, where the agent is trained on labeled data, 
+and from unsupervised learning, where the agent must find patterns in unlabeled data,
+\gls{rl} makes use of rewards and punishments, making it suitable for problems 
+where the agent (be it a baby or a Large Language Model) must learn through trial and error, creating its own training data 
+through interaction.
+
+% quclosa circa policy e value 
+% The concepts of value and value function are key to most of the reinforcement learning
+% methods that we consider in this book. We take the position that value functions
+% are important for efficient search in the space of policies. The use of value functions
+% distinguishes reinforcement learning methods from evolutionary methods that search
+% directly in policy space guided by evaluations of entire policies.
+
+% related formal example 
+% 
+% 
+% 
+% 
+
+% online vs offline learning
+% 
+% 
+% 
+% 
+% 
+
+In the next sections, we will introduce the foundational concepts of \gls{rl}, 
+mathematical frameworks, and algorithms that enable agents to learn optimal behaviors for 
+a wide range of tasks.
+
+The following analysis of \glspl{mdp} is mostly based on \citet{d1afac99aad548188c9d47063c7109df} and \citep{Sutton1998}

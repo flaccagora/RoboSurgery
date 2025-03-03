@@ -362,3 +362,115 @@ parent={},%
 %
 }%
 
+\glsdefs@newdocentry{sgd}%
+{%
+name={\acronymfont {\glsentryshort {sgd}}},%
+sort={SGD},%
+type={acronym},%
+first={SGD},%
+firstplural={SGDs},%
+text={SGD},%
+plural={SGDs},%
+description={Stochastic Gradient Descent},%
+descriptionplural={Stochastic Gradient Descent},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Stochastic Gradient Descent},%
+longplural={Stochastic Gradient Descents},%
+short={SGD},%
+shortplural={SGDs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ppo}%
+{%
+name={\acronymfont {\glsentryshort {ppo}}},%
+sort={PPO},%
+type={acronym},%
+first={PPO},%
+firstplural={PPOs},%
+text={PPO},%
+plural={PPOs},%
+description={Proximal Policy Optimization},%
+descriptionplural={Proximal Policy Optimization},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Proximal Policy Optimization},%
+longplural={Proximal Policy Optimizations},%
+short={PPO},%
+shortplural={PPOs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{trpo}%
+{%
+name={\acronymfont {\glsentryshort {trpo}}},%
+sort={TRPO},%
+type={acronym},%
+first={TRPO},%
+firstplural={TRPOs},%
+text={TRPO},%
+plural={TRPOs},%
+description={Trust Region Policy Optimization},%
+descriptionplural={Trust Region Policy Optimization},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Trust Region Policy Optimization},%
+longplural={Trust Region Policy Optimizations},%
+short={TRPO},%
+shortplural={TRPOs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ddpg}%
+{%
+name={\acronymfont {\glsentryshort {ddpg}}},%
+sort={DDPG},%
+type={acronym},%
+first={DDPG},%
+firstplural={DDPGs},%
+text={DDPG},%
+plural={DDPGs},%
+description={Deep Deterministic Policy Gradient},%
+descriptionplural={Deep Deterministic Policy Gradient},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Deep Deterministic Policy Gradient},%
+longplural={Deep Deterministic Policy Gradients},%
+short={DDPG},%
+shortplural={DDPGs},%
+counter={page},%
+parent={},%
+%
+}%
+

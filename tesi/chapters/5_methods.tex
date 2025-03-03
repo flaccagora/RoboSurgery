@@ -1,0 +1,120 @@
+
+\chapter{Methods}
+We adopted a bottom up approach, increasing the complexity of the task in increasingly complex environments.
+Recall that our objective was to explore the applicability of \gls{rl} to navigation in 
+deformable environment related to the surgical task of thoracic surgery.
+We therefore adopted a mixed approach assuming the model of the environment to be known or learnable, 
+given the preoperative imaging data available in the clinical setting. This would allow us to model 
+the problem as a \gls{pomdp} and apply the methods described in the previous sections.
+
+\section{Gridworld}
+The first task we considered was a simple gridworld, where the agent had to navigate from a random 
+starting position to a goal position. The twist is given by the deformable property of the environment.
+
+\paragraph{Problem Description}
+Surgical robot navigation presents unique challenges, particularly when operating on soft, deformable organs. Unlike rigid environments, where a robot can rely on predefined maps and fixed obstacle positions, deformable organs continuously change shape due to external forces, physiological processes, and surgical interactions. This introduces uncertainty in navigation, making it difficult to plan and execute precise movements.
+
+\paragraph{Key Challenges}
+\begin{enumerate}
+\item \textbf{Deformation of Organs:} Soft tissues can shift, stretch, or compress unpredictably, leading to non-static obstacles and pathways.
+\item \textbf{Partial Observability:} Due to the limited field of view of endoscopic cameras, occlusions, and the dynamic nature of the surgical site, the robot does not have full knowledge of the environment at any given time.
+\item \textbf{Real-Time Adaptation:} The robot must continuously update its navigation strategy based on incomplete and evolving sensory data.
+\item \textbf{Safety Constraints:} Unlike traditional robotic navigation, errors in surgical settings can result in severe patient harm, requiring ultra-precise movement planning.
+\end{enumerate}
+
+\paragraph{Relation to a 2D Deformable Maze}
+A simplified analogy can be drawn between surgical robot navigation and a robot navigating a 2D deformable maze. In this case:
+\begin{itemize}
+\item The \textbf{maze walls} represent anatomical structures that move and deform in real-time.
+\item The \textbf{robot's sensors} are analogous to a surgical camera with a limited and dynamic field of view.
+\item The \textbf{pathfinding algorithm} must adapt to continuous environmental changes, rather than relying on a static map.
+\item The \textbf{goal} is to reach a target point while avoiding dynamically shifting obstacles and ensuring efficient movement.
+\end{itemize}
+
+This analogy highlights the importance of real-time sensing, dynamic path planning, and uncertainty management in both surgical robotics and general deformable environment navigation. Future advancements in soft-tissue modeling, AI-driven prediction, and sensor fusion will be crucial in improving the efficacy of surgical robot navigation under these constraints.
+
+
+
+\paragraph{State Space}
+
+The state space is a 2D grid of size $10 \times 10$ where each cell can be either empty or occupied by an obstacle.
+the state is represented as a tuple $(x,y,\phi)$ where $x$ and $y$ are the coordinates of the agent in the grid.
+and $\phi$ is the orientation of the agent.
+
+\paragraph{Action Space}
+
+The agent can move in four directions: up, down, left, right. The action space is therefore $A = \{0,1,2,3\}$.
+
+\paragraph{Observation Space}
+
+Every time the agent moves, it receives an observation which corresponds to the type of adjacent cells 
+in the grid.  
+
+
+The **conditional observation probabilities** $O(o|s,a)$ are also deterministic.
+
+
+$$O(o|s,a)= O(o|s) = 
+\begin{cases}
+    1 &   \text{if } (x,y) \text{ adjacent cells for map } f_\theta(M) \text{are compatible with } o \\
+    0 &   \text{otherwise} \\
+\end{cases}
+$$
+
+\paragraph{Reward Function}
+
+
+The **reward function** $R(s,a,s')$ is defined as follows:
+
+
+ $$R(s,a,s') = 
+    \begin{cases}
+    \frac{-0.1}{mapsize} &   s' \neq s_{goal} \wedge \text{moved} \\ 
+    \frac{-0.2}{mapsize} &   s' \neq s_{goal}  \wedge \text{hit wall}\\
+    1 &   s' = s_{goal} \\
+    \end{cases}    
+$$
+
+\paragraph{Transition Function}
+Always assuming deterministic transitions, the transition function is defined as follows:
+$$T(s'|s,a) =
+\begin{cases}
+    1 &   \text{if } s' \text{ is the result of applying action } a \text{ to state } s \\
+    0 &   \text{otherwise} \\
+\end{cases}
+$$
+
+\paragraph{Observation Function}
+
+\paragraph{Belief State}
+Because the agent does not directly observe the environment's state, the agent must make decisions under uncertainty of the true environment state. The belief function is a probability distribution over the states of the environment.
+
+$$b : S \rightarrow [0,1] \text{ and } \sum_s b(s) = 1  $$
+
+By interacting with the environment and receiving observations, the agent may update its belief in the true state by updating the probability distribution of the current state
+
+$$ b'(s')=\eta O(o\mid s',a)\sum _{s\in S}T(s'\mid s,a)b(s)$$
+
+where $\eta = \frac{1}{Pr ( o | b , a )}$ is a normalizing constant with 
+$$Pr ( o | b , a ) = \sum_{s'\in S} O ( o | s' , a ) \sum_{s \in S}( s'|s,a)b(s)$$
+
+Discrete update of the belief state is done by the agent at each time step.
+
+
+\section{Deformable Maze}
+
+\paragraph{State Space}
+\paragraph{Action Space}
+\paragraph{Observation Space}
+\paragraph{Reward Function}
+\paragraph{Transition Function}
+\paragraph{Observation Function}
+\section{Surgical Task}
+
+\paragraph{State Space}
+\paragraph{Action Space}
+\paragraph{Observation Space}
+\paragraph{Reward Function}
+\paragraph{Transition Function}
+\paragraph{Observation Function}
+

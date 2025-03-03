@@ -1,0 +1,74 @@
+\documentclass[a4paper,11pt]{report}
+
+\include{chapters/utils/import_incipit}
+
+\begin{document}
+\setlength{\parindent}{0pt}
+
+% Title Page
+\include{chapters/utils/titlepage}
+
+\pagenumbering{roman} % Start with Roman numerals
+% Abstract
+
+\include{chapters/0_abstract}
+\include{chapters/0_b_outline}
+
+% Table of Contents
+\tableofcontents
+\clearpage
+\addcontentsline{toc}{chapter}{List of Figures} % Add to TOC
+\listoffigures
+
+\clearpage
+\addcontentsline{toc}{chapter}{List of Tables} % Add to TOC
+\listoftables
+
+% Acronyms
+\addcontentsline{toc}{chapter}{Acronyms}
+\newacronym{rl}{RL}{Reinforcement Learning}
+\newacronym{dl}{DL}{Deep Learning}
+\newacronym{mdp}{MDP}{Markov Decision Process}
+\newacronym{pomdp}{POMDP}{Partially Observable Markov Decision Process}
+\newacronym{ai}{AI}{Artificial intelligence}
+\newacronym{vats}{VATS}{video-assisted thoracic surgery}
+\newacronym{rats}{RATS}{robotic-assisted thoracic surgery}
+\newacronym{drl}{DRL}{Deep Reinforcement Learning}
+\newacronym{gpi}{GPI}{Generalized Policy Iteration}
+\newacronym{pbvi}{PBVI}{Point Based Value Iteration}
+\newacronym{mc}{MC}{Monte Carlo}
+\newacronym{dp}{DP}{Dynamic Programming}
+\newacronym{td}{TD}{Temporal Difference}
+\newacronym{sgd}{SGD}{Stochastic Gradient Descent}
+\newacronym{ppo}{PPO}{Proximal Policy Optimization}
+\newacronym{trpo}{TRPO}{Trust Region Policy Optimization}
+\newacronym{ddpg}{DDPG}{Deep Deterministic Policy Gradient}
+\printglossary[type=\acronymtype]
+\clearpage
+
+
+\pagenumbering{arabic} % switch to arabic numerals
+
+
+% Chapters
+\include{chapters/Introduction}
+
+% Part 1
+\part{Theoretical Background}
+\include{chapters/3_mdp}
+\include{chapters/4_pomdp}
+
+% Part 2
+\part{Experiments}
+
+\include{chapters/5_methods}
+\include{chapters/6_results}
+\include{chapters/7_directions}
+
+
+
+% Bibliography
+\bibliographystyle{plainnat}  % or abbrvnat, unsrtnat, etc.
+\bibliography{chapters/utils/ref}  % Name of your .bib file (without extension)
+
+\end{document}
