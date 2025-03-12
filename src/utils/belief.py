@@ -363,6 +363,8 @@ class BayesianParticleFilter:
         
         # Resample particles
         indices = torch.searchsorted(cumsum, positions)
+        indices = torch.clamp(indices, max=self.n_particles - 1)  # Prevent out-of-bounds access
+        
         eps = torch.randn(self.n_particles, self.theta_dim) * 0.01
         self.particles = self.particles[indices] + eps
         

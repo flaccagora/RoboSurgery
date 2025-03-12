@@ -164,7 +164,7 @@ def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,ren
             episode_beliefs.append(next_belief)
 
             # print belief entropy
-            print("Belief entropy: ", agent.get_entropy(next_belief))
+            # print("Belief entropy: ", agent.get_entropy(next_belief))
             
             if render:
                 # print("State", s)

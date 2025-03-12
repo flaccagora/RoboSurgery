@@ -84,7 +84,7 @@ def train_dqn(args):
 
     # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
-                            save_freq=250000,
+                            save_freq= 250000 // 20, # in steps
                             save_path=f"agents/pretrained/MDP/DQN_continous_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,

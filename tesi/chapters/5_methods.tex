@@ -197,16 +197,23 @@ maze size 30x30
 \toprule
 \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} \\
 \midrule
-MDP (upper bound) & -18.454 & 18.188 \\
-QMDP & -24.715 & 23.75 \\
-TS & -28.01 & 25.75 \\
-MLS & -32.55 & 26.25 \\
+MDP (upper bound) & -19.44 & 18.51\\
+MLS & -26.47 & 23.93\\
+TS &-26.13 & 24.231\\
+QMDP & -24.71 & 23.75 \\
+FIB & -25.49 & 23.55 \\
 \bottomrule
 \end{tabular}
 \caption{Performance comparison of different algorithms on the Gridworld task. MDP represents the theoretical upper bound with perfect information.}
 \label{tab:gridworld_results}
 \end{table}
 
+FIB based MLS and TS (non so se abbia senso..)
+MLS
+-27.515 26.56
+
+TS
+-27.2625 24.312
 
 
 \section{Deformable Maze}
@@ -315,17 +322,19 @@ Mean number of steps:  43.746
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{lcc}
+    \begin{tabular}{lccc}
     \toprule
-    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} \\
+    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} & \textbf{Belief Update}\\
     \midrule
-    MDP (upper bound) & -27.8435 & 34.534 \\
+    MDP (upper bound) & -21.843 & 30.534 & None\\
     % QMDP & -24.715 & 23.75 \\
-    % TS & -28.01 & 25.75 \\
-    TS & -34.8965 & 46.342    \\
+    MLS & -39.866 & 56.818  & Particles (2000)  \\
+    TS & -28.491 & 43.474  & Particles (2000)  \\
+
     \bottomrule
     \end{tabular}
-    \caption{Performance comparison of different algorithms on the Maze task.}
+    \caption{Performance comparison of different algorithms on the Maze task averaged
+    over 1000 episodes.}
     \label{tab:maze_results}
 \end{table}
     
