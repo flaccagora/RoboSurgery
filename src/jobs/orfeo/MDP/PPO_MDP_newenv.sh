@@ -3,7 +3,7 @@
 #SBATCH -p EPYC
 #SBATCH --time 02:00:00     # format: HH:MM:SS
 #SBATCH -N 1                # 1 node
-#SBATCH --ntasks-per-node=4 # 4 tasks out of 112
+#SBATCH --ntasks-per-node=24 # 4 tasks out of 112
 #SBATCH --job-name=PPO_MDP
 #SBATCH --output=PPO_MDP.out 
 

@@ -1,107 +1,132 @@
-
 \chapter{Introduction}
 
-\gls{ai} applications in robotic surgery represent a transformative frontier in the medical field, 
-enhancing precision, safety, and efficiency in surgical procedures. 
-The integration of such technologies with robotic systems has significantly advanced minimally 
+The advancement of robotic systems has significantly improved minimally 
 invasive surgery, allowing for smaller incisions, reduced blood loss, and faster recovery times, 
 while enabling complex procedures that require exceptional dexterity and visualization capabilities.
+The marriage of robotic surgery and AI promises further innovations which could redefine 
+healthcare access and delivery on a global scale.
+Among these, remote surgical capabilities, enhanced imaging technologies, real-time decision 
+support, personalized treatments and autonomous surgical systems are some of the most promising applications
+of AI in healthcare. 
 
-Notable robotic systems, such as the da Vinci Surgical System, exemplify the evolution of surgical 
-practice through this innovative marriage of AI and robotics, paving the way for improved 
-patient outcomes across various specialties, including urology, gynecology, and cardiothoracic surgery.
+As robotic-assisted surgical techniques gain traction - increasingly relevant as the demand for minimally 
+invasive approaches grows -
+the integration of \gls{rl} algorithms into these workflows has become notable for its potential to 
+transform patient outcomes enhanceing once more surgical precision. 
 
-AI enhances several aspects of surgical practice, including preoperative planning, 
-real-time decision support, and postoperative analysis, thereby transforming the surgical landscape.
-
-These advancements underscore AI's potential to refine surgical techniques and foster a culture 
-of continuous improvement in surgical care. As the field progresses, the future of AI in robotic 
-surgery promises further innovations, such as remote surgical capabilities and enhanced imaging 
-technologies, which could redefine healthcare access and delivery on a global scale.
-
-
-
-The intersection of AI and robotic surgery not only marks a significant evolution in surgical practices but also holds the potential to fundamentally reshape patient care and outcomes in the coming years.
-\gls{rl} in thoracic microinvasive surgery represents a pioneering intersection of artificial intelligence 
-and surgical practice, aiming to enhance surgical precision and decision-making processes. 
-As robotic-assisted surgical techniques gain traction, particularly through methods like 
-\gls{vats} and \gls{rats}, 
-the integration of RL algorithms into these workflows has become notable for its potential to 
-transform patient outcomes. This application is increasingly relevant as the demand for minimally 
-invasive approaches grows, driven by their associated benefits such as reduced postoperative pain 
-and shorter recovery times.
-
-The development of \gls{rl} techniques in this field leverages the ability of these algorithms to learn 
-from complex interactions within dynamic surgical environments. By training robotic systems to 
-optimize intricate tasks through feedback mechanisms, RL not only enhances the operational efficiency 
+The development of \gls{rl} techniques in this field leverages the ability of algorithms to learn 
+from complex interactions within dynamic environments by training robotic systems to 
+optimize intricate tasks through feedback mechanisms, \gls{rl} not only enhances the operational efficiency 
 of surgical robots but also contributes to more informed preoperative planning through predictive 
 analytics. 
 These advancements allow for tailored risk assessments that improve decision-making in patient care.
 
 
-Despite its promise, integration of such techniques into thoracic microinvasive surgery faces
-challenges, including the need for robust regulatory frameworks and ongoing ethical scrutiny. 
-Discussions surrounding the implications of AI in surgical contexts emphasize the importance of 
-ensuring that healthcare providers remain central in the decision-making process while leveraging AI 
-technologies to enhance patient care.
+Despite its promise, integration of such techniques into minimally surgery faces
+challenges, including the need for robust regulatory frameworks and ongoing ethical scrutiny.
+Moreover manipulating and navigating in deformable environments, such as soft tissues, 
+remains a major challenge due to their dynamic and unpredictable nature. 
+Traditional control algorithms struggle to adapt to these uncertainties, leading to 
+suboptimal performance and potential risks during surgical procedures. 
 
-Overall, the ongoing research and development in reinforcement learning for thoracic microinvasive 
+Overall, the ongoing research and development in \gls{rl} for minimally 
 surgery exemplify a transformative potential in the healthcare landscape, with opportunities for 
 improving surgical techniques, outcomes, and training methods while navigating the complexities 
 of integrating AI into human-centered care.
 
 % Methodology
 \section{Problem Statement}
-Over the last decade, 3D models have entered oncologic surgery
-as a means to achieve better outcomes in renal and hepatic
-surgery [1, 2]. Nevertheless, the integration of 3D models into
-the operative field has been lacking due to three main reasons.
-Firstly, proper model alignment with the intraoperative anatomy
-has proven to be a major challenge due to shifting of organs
-during surgery and different patient positioning in surgery ver-
-sus during computed tomography [2, 3]. Secondly, automated
-organ registra-tion in a continuously moving surgical video
-has been another major challenge for many years [4]. Thirdly,
-3D model overlay obscures the surgical field, including sharp
-surgical instruments which are manipulated, hence creating a
-possible hazardous situation rather than facilitating surgery. The
-latter occlusion problem has been a longstanding study topic
-[5] which, if solved, would further advance various surgical
-domains and applications [6]. Already in 2004, Fischer et al. [7]
+\gls{rl} has emerged as a promising approach, 
+however, applying \gls{rl} to robotic surgery introduces additional challenges, since surgical environments 
+are inherently partially observable, as direct and complete state information is 
+often unavailable due to occlusions, sensor noise, and real-time constraints. 
+Existing \gls{rl} techniques often assume full observability, limiting their 
+effectiveness in real-world surgical applications.
 
-\paragraph{Navigation in deformable environments}
-% Related Work
+This thesis aims to address these challenges by developing \gls{rl}-based 
+strategies for minimally invasive robotic surgery, specifically focused on deformable environment navigation 
+and manipulation under partial observability. The research will explore 
+\gls{pomdp}-based RL frameworks, integrating advanced perception models, uncertainty-aware 
+decision-making, and efficient policy learning methods. The goal is to enhance 
+robotic surgical capabilities by improving adaptability, robustness, and precision 
+in deformable tissue interactions, ultimately contributing to safer and more reliable 
+autonomous surgical systems.
+
+
+% \paragraph{Research Context}
+% Robotic surgery represents a critical frontier in medical technology, where precise manipulation and navigation of surgical instruments in complex, deformable environments demand advanced computational approaches. Traditional control methods struggle to address the inherent uncertainties and dynamic challenges present in surgical scenarios, particularly when dealing with soft tissues and organs that exhibit non-linear deformation characteristics.
+
+% \paragraph{Current Limitations}
+% Existing robotic surgical systems face significant challenges in:
+% \begin{itemize}
+%     \item Accurately modeling and predicting soft tissue deformation during surgical interventions
+%     \item Handling partial observability of the surgical environment
+%     \item Adapting to real-time changes in tissue geometry and mechanical properties
+%     \item Developing robust control strategies that can generalize across different surgical tasks and anatomical configurations
+% \end{itemize}
+
+% \paragraph{Research Objectives}
+% The primary objectives of this research are to:
+% \begin{itemize}
+%     \item Develop a reinforcement learning framework specifically tailored to \glspl{pomdp} in robotic surgical navigation
+%     \item Create a computational model that can effectively learn and adapt to deformable environment dynamics
+%     \item Demonstrate improved precision and adaptability in robotic instrument manipulation compared to existing control methodologies
+%     \item Investigate the potential of deep reinforcement learning techniques in mitigating uncertainty in surgical navigation
+% \end{itemize}
+
+% \paragraph{Methodological Approach}
+% The proposed research will:
+% \begin{itemize}
+%     \item Utilize advanced deep reinforcement learning algorithms, with a focus on POMDP-based approaches
+%     \item Implement simulation-based training environments that accurately model soft tissue mechanical properties
+%     \item Develop state estimation and observation strategies to address partial observability challenges
+%     \item Evaluate performance through comprehensive metrics of navigation accuracy, adaptation speed, and generalization capability
+% \end{itemize}
+
+% \paragraph{Potential Impact}
+% By addressing these challenges, the research aims to:
+% \begin{itemize}
+%     \item Enhance the autonomy and precision of robotic surgical systems
+%     \item Provide a foundational framework for adaptive robotic manipulation in complex medical environments
+%     \item Contribute to the advancement of machine learning techniques in critical medical technologies
+% \end{itemize}
+
+% \gls{pomdp}s, with their capacity to model uncertainty, and RL, with its learning-based adaptability, 
+% present a promising synergy for addressing these challenges. However, their 
+% application to real-time intraoperative decision-making remains unexplored.
+
+
 \section{Related Work}
-% Deformable registration refers to the process of aligning multiple three-dimensional 
-% images into a common coordinate frame. It quantifies changes in organ shape, size,
-% and position, providing a comprehensive understanding of patient anatomy and 
-% function. This technique is particularly useful in image-guided surgery and 
-% radiotherapy to improve the accuracy of treatments.
-\begin{itemize}
-    \item Instrument occlusion
-    \item DL recognition of anatomical structures
-    \item Elastic Regristration
-    \item RL for simple surgical tasks
-\end{itemize}
 
-While robotic systems have revolutionized minimally invasive surgery, they lack the 
-ability to adapt to unexpected intraoperative changes autonomously. \gls{pomdp}s, with 
-their capacity to model uncertainty, and RL, with its learning-based adaptability, 
-present a promising synergy for addressing these challenges. However, their 
-application to real-time intraoperative decision-making remains unexplored.
+While robotic systems have drastically improved surgeon skills, they still 
+only replicate motions performed by surgeons in a console, lacking the 
+ability to adapt to unexpected intraoperative changes autonomously. 
 
+To address these limitations, integration of
+Computer vision, \gls{dl} and \gls{rl} has been explored to possibly enhance the 
+autonomy and adaptability of robotic systems in surgical environments.
 
-\paragraph{RL in Surgical Robotics}
-\textbf{preso da} \citet{10578312}
-ALarge number of recent research in surgical robotics
-focuses on the automation of surgical sub-tasks, such
-as needle manipulation [1], [2], [3], suturing [4], [5], cutting
-[6], [7], [8], vessel manipulation [9], tissue retraction and
-deformation [10], [11], [12], [13]. However, most of these
-studies focus on the manipulation of rigid and soft objects,
-although fluid-related tasks are also common in surgeries, due
-to the presence of body fluids, especially blood 
+Computer vision techniques such as classification, detection and segmentation, have been used to recognize anatomical structures
+and surgical instruments to provide support and valuable intraoperative information 
+to the surgeon and eventually to autonomous robotic systems 
+\citep{AMPARORE2022e312, cancers16051047}. 
+
+\gls{rl} algorithms have been tested in simulation based training 
+environments to directly control robotic systems for surgical tasks. 
+The need for simulation is dual, it provides a safe environment
+and it allows to circumvent the high costs of real-world needs amplifyed 
+by sample inefficience of \gls{rl}. 
+The policy learned in simulation can then be transferred to the real-world setting, 
+where it can be further fine-tuned to account for the discrepancies between 
+the two environments \citep{10065553}.
 
 
-\part{Theoretical Background}
+A large number of recent research focuses on the automation of surgical sub-tasks, 
+such as needle manipulation \citep{10100702}, suturing \citep{9223543}, cutting \citep{Shahkoo2023},
+vessel manipulation \citep{10160966}, blood suction \citep{10578312}, tissue retraction and
+deformation \citep{9976185}. Imitation Learning and expert demonstrations have shown to be effective in
+training robotic systems for surgical tasks \citep{kim2024surgicalrobottransformersrt}.
+
+% The formalization of the surgical task as a \gls{pomdp} has not been widely explored. 
+
 

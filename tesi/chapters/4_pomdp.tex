@@ -1,11 +1,10 @@
-
 \chapter{Partially Observable Markov Decision Processes}
 
 Until now we have considered the case of fully observable \glspl{mdp}, 
 where the agent has access to the complete state of the environment. However, this is not always the case, 
 and in many real-world scenarios, the agent has only partial information about its surroundings. 
 As \glspl{mdp} are controlled Markov Chains, \glspl{pomdp} are controlled Hidden Markov Models. \Cref{fig:pomdp}
-shows how the underliyng process states are hidden from the agent, which can only observe the environment 
+shows how the underlying process states are hidden from the agent, which can only observe the environment 
 through its sensors.
 \begin{figure}[H]
     \centering
@@ -13,14 +12,14 @@ through its sensors.
     \caption[Partially Observable Markov Decision Process]{Partially Observable Markov Decision Process \citep{Krishnamurthy_2016}}
     \label{fig:pomdp}
 \end{figure}
-As such \glspl{pomdp} are an extension of \glspl{mdp} to the case where the full observability assumption is 
+As such, \glspl{pomdp} are an extension of \glspl{mdp} to the case where the full observability assumption is 
 relaxed in favour of a more general and realistic assumption that the agent only has partial knowledge 
 of the state of the system but there exist observations/signals which yield probabilistic beliefs about 
 the hidden state.
 
 The next sections will be based on \cite{Spaan12pomdp} and \cite{Hauskrecht_2000} analysis of \glspl{pomdp},
 originally introduced by the work of \cite{drake1962observation} \cite{1307539f-051d-3d3c-a0d8-111443bed03f},
-\cite{ASTROM1965174} anc \cite{10.1007/BF02055574}.
+\cite{ASTROM1965174} and \cite{10.1007/BF02055574}.
 
 
 \begin{definition}
@@ -39,17 +38,17 @@ A \textit{Partially Observable Markov Decision Process} is a tuple $P = (S, A,\O
 \begin{example}    
     Consider the two-state infinite-horizon \gls{pomdp} by \cite{NIPS1994_1c1d4df5} depicted in \ref{fig:memory}. The \gls{pomdp} is 
     defined by two states and two possible actions in each state. The agent receives an observation 
-    independent of the state and the reward is $r$ if the agent changes state and $-r$ otherwise.
+    independent of the state, and the reward is $r$ if the agent changes state and $-r$ otherwise.
 
     The optimal policy in the underlying \gls{mdp} is to take action $a^2$ in state $s^1$ and 
-    action $a^1$ in state $s^2$, ielding a reward of $r$ in each time step and producing an 
+    action $a^1$ in state $s^2$, yielding a reward of $r$ in each time step and producing an 
     optimal value function $V^*(s)=\frac{r}{1-\gamma}$ by geometric series convergence. 
     
-    In the \gls{pomdp} the agent recieves the same observation in both states and 
-    as a result there are only two memoryless stationary deterministic policies possible: always taking action $a^1$ or always taking action $a^2$.
+    In the \gls{pomdp}, the agent receives the same observation in both states, and 
+    as a result, there are only two memoryless stationary deterministic policies possible: always taking action $a^1$ or always taking action $a^2$.
     Both policies yield a maximum expected reward of $r+\frac{\gamma r}{1-\gamma}$ if fortunate enough to take 
     the first action that leads to a different state. The best stationary stochastic policy would otherwise 
-    be able to achieve a an expected discounted reward of 0, when it chooses either action 50\% of the time, still 
+    be able to achieve an expected discounted reward of 0, when it chooses either action 50\% of the time, still 
     far from the optimal value of the \gls{mdp}.
 
     However, if the agent could remember what actions it had executed, it could execute a policy that 
@@ -64,16 +63,16 @@ A \textit{Partially Observable Markov Decision Process} is a tuple $P = (S, A,\O
 \end{figure}
 
 This example shows how the lack of memory can severely limit the agent's ability to solve the problem.
-In the next sections we will introduce the main concepts and algorithms used to solve \gls{pomdp}s based on 
+In the next sections, we will introduce the main concepts and algorithms used to solve \gls{pomdp}s based on 
 the formalization of the concept of memory.
 
 \section{Belief State MDPs}
-Since in \glspl{pomdp} the underliyng process states are unknown, the action choices will be based on the information available 
+Since in \glspl{pomdp}, the underlying process states are unknown, the action choices will be based on the information available 
 to the agent in the form of past actions and observations, giving rise to the concept of \textit{Information State}.
 
 \begin{definition}
-    (Complete Information State) the complete information state at time $t$ denoted
-    $I_t$ consists of:
+    (Complete Information State) The complete information state at time $t$, denoted
+    $I_t$, consists of:
     \begin{itemize}
         \item[-] prior belief $b_0$ on states in $S$ at time $t=0$;
         \item[-] a complete history of actions and observations $\{o_0,a_0,o_1, ..., o_{t-1},a_{t-1},o_t\}$
@@ -81,21 +80,21 @@ to the agent in the form of past actions and observations, giving rise to the co
 \end{definition}
 
 A sequence of information states defines a controlled Markov process called 
-information-state \gls{mdp}. In this context a policy $\pi: I \rightarrow A$ is mapping of 
+information-state \gls{mdp}. In this context, a policy $\pi: I \rightarrow A$ is a mapping of 
 information states to actions (possibly distributions over actions).
-The new information state $I_{t+1}$ is obtained applying an update function $\tau$ to the
-the previous state $I_t$, previous action $a_{t-1}$  and  observation $o_t$:
+The new information state $I_{t+1}$ is obtained by applying an update function $\tau$ to the
+the previous state $I_t$, previous action $a_{t-1}$ and observation $o_t$:
 $$\tau: \mathcal{I} \times A \times O \rightarrow \mathcal{I}$$
 
 It's easy to see that a \gls{pomdp} can be cast into the information-state MDP by using complete 
 information states, revisiting the \gls{pomdp} such that states become information-states while transitions 
-and rewards are updated according:
+and rewards are updated according to:
 $$\mathcal{R}(I,a) = \sum_{s s'} \mathcal{T}(s,a,s')\mathcal{R}(s,a,s')P(s|I) $$
 $$\mathcal{T}(I,a,I') = \sum_o \tau(I,a,o)P(o|I,a) $$
 
 
 It's also important to note that the information available can be also summarized in the 
-so called \textit{sufficient information states}. Such states must preserve
+so-called \textit{sufficient information states}. Such states must preserve
 the necessary information content as well as the Markov property of the information-state.
 \begin{definition}
     
@@ -110,7 +109,7 @@ the necessary information content as well as the Markov property of the informat
 \end{definition} 
 % \todo{definisci meglio p(s|I) e p(o|I,a)?? è necessario?}
 
-Being able to define a sufficient information state process is crucial since it allows to avoid 
+Being able to define a sufficient information state process is crucial since it allows us to avoid 
 the curse of dimensionality of enlarging complete information states.
 
 This brings us to the most common concept of \textit{belief state} as a form of sufficient information state
@@ -118,9 +117,11 @@ This brings us to the most common concept of \textit{belief state} as a form of 
 
 A belief is a probability distribution over the states of the system which summarizes the history of 
 actions and observations. Each \gls{pomdp} assumes an initial belief $b_0$, then at each time step
-the belief is updated by the observation and the action taken through Baye's rule:
-
-$$\tau(b,a,o) = b^{ao}(s')=\displaystyle\frac{p(o|s',a)}{p(o|b,a)}\sum_{s\in S}p(s'|s,a)b(s)$$
+the belief is updated by the observation and the action taken through Bayes' rule:
+\begin{equation}
+    \tau(b,a,o) = b^{ao}(s')=\displaystyle\frac{p(o|s',a)}{p(o|b,a)}\sum_{s\in S}p(s'|s,a)b(s)
+    \label{eq:beliefupdate}
+\end{equation}
 
 where $p(s'|s,a) = T(s,a,s')$ and $p(o|s',a) = O(s,a,o)$, and
 $$p(o|b,a)=\displaystyle\sum_{s'\in S}p(o|s',a)\sum_{s\in S}p(s'|s,a)b(s)$$.
@@ -140,18 +141,18 @@ As in the fully observable context, the goal of the agent is to find a policy th
 return. In the \gls{pomdp} case, the policy is a mapping from the set of probability distributions 
 over $S$ to a probability distribution over actions $\pi : \Delta(S) \rightarrow \Delta(A)$ 
 and the value function $V^{\pi} : \Delta(S) \rightarrow \mathbb{R}$. 
-In the infinite-horizon discounted case the value function is defined as:
+In the infinite-horizon discounted case, the value function is defined as:
 
 $$V^{\pi}(b) \doteq \mathbb{E}_{\pi}\left[ \sum ^\infty _{t=0} \gamma^k \mathcal{R}(b_t,\pi(b_t)) | b_0 = b  \right]$$
 
 where $\mathcal{R}(b_t,\pi(b_t)) = \sum_s \mathcal{R}(s,\pi(b_t))b_t(s)$.
 
 
-Revisiting equations in previous section, the Bellman optimality equation for the value function 
+Revisiting equations in the previous section, the Bellman optimality equation for the value function 
 in a belief space \gls{mdp} is given by:
-$$V^* (b) = \max_a \left[\sum_s R(s,\pi(b_t))b_t(s) + \gamma\sum_o p(o|b,a) V^*(b'_{a,o}) \right]$$
+$$V^* (b) = \max_a \left[\sum_s R(s,a)b_t(s) + \gamma\sum_o p(o|b,a) V^*(b'_{a,o}) \right]$$
 
-or alternatively $V^* = HV^*$ where $H$ is the Bellman backup operator for \gls{pomdp}s defined as:
+or alternatively, $V^* = HV^*$ where $H$ is the Bellman backup operator for \gls{pomdp}s defined as:
 $$H V(b) = \max_a \left[\sum_s \mathcal{R}(s,a)b(s) + \gamma\sum_o p(o|b,a) V(b'_{a,o}) \right]$$
 
 The properties of the H operator are sufficient to guarantee the existence of a unique optimal value 
@@ -162,9 +163,9 @@ until the difference between the value function at two consecutive iterations is
 $$V^{n+1} = HV_n = H^n V_0$$ 
 
 
-The major difficulty in applying exact value iteration is that the belief space is continuous and 
+The major difficulty in applying exact value iteration is that the belief space is continuous, and 
 updates over the whole space are infeasible. 
-Fortunately the value function can be parametrized by a finite set of vectors, the following result 
+Fortunately, the value function can be parameterized by a finite set of vectors; the following result 
 is originally from \cite{1307539f-051d-3d3c-a0d8-111443bed03f}.
 
 \begin{theorem}
@@ -204,13 +205,13 @@ therefore one can express the value function as stated.
 
 \begin{remark}
     Even though the optimal value function for an infinite-horizon
-    \gls{pomdp} is convex, it may not be piecewise linear. Nontheless, it can be approximated
+    \gls{pomdp} is convex, it may not be piecewise linear. Nonetheless, it can be approximated
     arbitrarily closely by a piecewise linear and convex value function.
 \end{remark}
 
 
 The main idea behind most value iteration algorithms is that for a given value function 
-\(V_{n}\) and a single belief point \(b\) we can
+\(V_{n}\) and a single belief point \(b\), we can
 easily compute the vector \(\alpha_{n+1}^{b}\) of \(H V_{n}\) such that:
 $$\alpha_{n+1}^{b}=\arg \max _{\left\{\alpha_{n+1}^{i}\right\}_{i}} b \cdot \alpha_{n+1}^{i}$$    
 where \(\left\{\alpha_{n+1}^{i}\right\}_{i=1}^{|H V_{n}|}\) is the (unknown) set of vectors for \(H V_{n}\). 
@@ -225,8 +226,8 @@ It computes the optimal vector for a given belief \(b\) by back-projecting:
 % \todo{copiato da perseus dal teorema a qui}
 
 Due to the convexity of the value function, the expected discounted reward typically increases 
-as the entropy of b decreases \Cref{fig:pomdp-value}, This remark is the basis for 
-many entropy regularized algorithms in \gls{pomdp}s.
+as the entropy of b decreases \Cref{fig:pomdp-value}. This remark is the basis for 
+many entropy-regularized algorithms in \gls{pomdp}s.
 
 \begin{figure}
     \centering
@@ -242,7 +243,7 @@ for every combination of actions and permutations of $\alpha_i$ vectors of size 
 % precedente associato che massimizza le somme su ss'
 
 \paragraph{Policy}
-Similarly to the \gls{mdp} case, in \glspl{pomdp} the optimal policy with respect to the Value function $V$ is:
+Similarly to the \gls{mdp} case, in \glspl{pomdp}, the optimal policy with respect to the Value function $V$ is:
 $$\pi_{V}(b)=\underset{a}{\operatorname{argmax}} \left[\mathcal{R}(b, a)+\gamma \sum_{o \in \Omega} P\left(o \mid b, a\right) V\left(b^{a, o}\right)\right]$$
 
 Computing a policy for the current belief state \(b\) using the above equation requires computing
@@ -264,15 +265,15 @@ starts by enumerating all possible linear functions:
     |\Omega|}r_{a}+\gamma g_{a,o}^{i}\Big\}_{i}  
 \]
 Since the complete set of linear functions is rarely needed (some of the linear functions are 
-dominated by others therefore not affecting the value function), redundant vectors are then pruned:
+dominated by others, therefore not affecting the value function), redundant vectors are then pruned:
 $$V_{n+1} = prune(H_{POMDP}V_n)$$
 
 Incremental pruning strategies by \cite{10.5555/2074226.2074233} can be adopted to reduce the computational 
-cost of the pruning linear program. Still the pruning steps are usually expensive and seem to make a difference
+cost of the pruning linear program. Still, the pruning steps are usually expensive and seem to make a difference
 only in the constant factors rather than the order of growth of needed vectors.
     
 In each iteration, the value function is updated across the entire belief space, vectors $G_a$ 
-are $|\Gamma| \times |A| \times |\Omega|$ and each one is computed in $|S|^2$ operations. Then we 
+are $|\Gamma| \times |A| \times |\Omega|$ and each one is computed in $|S|^2$ operations. Then, we 
 create \(|\Gamma|^{\Omega|}\) new vectors for each action, with a complexity of \(|S|\) for each new 
 vector. The overall complexity of a single iteration is \(O\left(|\Gamma| \times|A| \times|\Omega| \times|S|^{2}+|A| \times|S| \times|\Gamma|^{\Omega|}\right)\).
 
@@ -280,14 +281,14 @@ vector. The overall complexity of a single iteration is \(O\left(|\Gamma| \times
 % method interleave the generate and test stages and do early pruning on a set of partially
 % constructed linear functions (Zhang  Liu, 1997a; Cassandra, Littman,  Zhang, 1997;
 % Zhang  Lee, 1998).
-\todo{correggi ultima parte exact value iteration}
-\emph{An alternative approach builds on Sondik's idea of computing a useful linear function for a
-single belief state (Sondik, 1971; Smallwood  Sondik, 1973), which can be done efficiently.
-The key problem here is to locate all belief points that seed useful linear functions. 
-Methods that implement this idea are Sondik's one- and two-pass algorithms (Sondik, 1971), 
-Cheng's methods (Cheng, 1988), and the Witness algorithm 
-(Kaelbling, Littman,  Cassandra, 1999; Littman, 1996; Cassandra,1998). 
-}
+An alternative to this approach relies on the idea of computing a useful linear function for a
+single belief state, and then defining a set of constraints over the belief space where this vector 
+is guaranteed to be dominant (Sondik, 1971; Smallwood  Sondik, 1973).
+
+The main challenge is identifying all belief points that seed valuable linear functions. 
+Approaches to address this include Sondik's one- and two-pass algorithms \cite{c6635fb4-4e99-3bcb-ba95-fb8ac7476062}, 
+Cheng's methods \cite{Cheng_1988}, and the Witness algorithm 
+\cite{10.5555/864404,10.5555/2891730.2891888}.
 
 \section{Point Based Value Iteration}
 Approximate solution methods are necessary to solve \glspl{pomdp} in practice, since even modest 
@@ -299,9 +300,9 @@ that can be actually encountered by interacting with the environment, can drasti
 the computational complexity of the problem.
 
 The \gls{pbvi} algorithm solves a POMDP for a finite set of belief points $B$
-initializing a $\alpha$-vector for each $b \in B$, and repeatedly updating 
-(via value backups) the value of that $\alpha$-vector, preserving the piece-wise linearity 
-and convexity of the value function, and defining value
+initializing an $\alpha$-vector for each $b \in B$, and repeatedly updating 
+(via value backups) the value of that $\alpha$-vector, preserving the piecewise linearity 
+and convexity of the value function, and defining a value
 function over the entire belief simplex.
 \begin{figure}[H]
     \centering
@@ -312,9 +313,9 @@ function over the entire belief simplex.
 
 
 
-The point Based update follows exactly Eq. \ref{eq:backup} for each belief point in the set $B$. 
+The point-based update follows exactly Eq. \ref{eq:backup} for each belief point in the set $B$. 
 This is repeated h times for finite h-horizon problems, or a predefined number of iterations in the 
-infinte case.
+infinite case.
 
 The next step is to enlarge the set of belief points by selecting for each belief \(b\) in \(B\) 
 a successor \(b^{\prime}\) that is the most distant from the set \(B\). That is, let \(L\) be a 
@@ -353,8 +354,8 @@ compute every \(g^{a, o}\) only once, requires \(O(|A| \times|\Omega| \times|V| 
 of a single iteration of the exact backup. 
 
 For any belief set $B$ and horizon $n$, \gls{pbvi} produces an estimate \(V_{n}^{B}\) such that the 
-error between \(V_{n}^{B}\) and the true value function \(V^*_{n}\) is bounded and the bound 
-depends on how dense is $B$ in the Belief space \cite{10.5555/1630659.1630806}. \\
+error between \(V_{n}^{B}\) and the true value function \(V^*_{n}\) is bounded, and the bound 
+depends on how dense $B$ is in the Belief space \cite{10.5555/1630659.1630806}. \\
 
 \gls{pbvi} represents a class of algorithms based on the above ideas. They differ mainly in 
 in how new belief points are selected, in how belief points are updated in each
@@ -364,7 +365,7 @@ In general, these algorithms always interleave belief point collection and belie
 
 \subsection{Perseus}
 Perseus by \cite{Spaan_2005} introduces a method to reduce the number of belief updates required at each iteration,
-while still improving the value function for a large number of beliefs. With less belief point 
+while still improving the value function for a large number of beliefs. With fewer belief point 
 updates per step, there is room for many more iterations of belief point updates, for a given 
 time constraint. 
 
@@ -397,12 +398,12 @@ until a (relatively) large number of points are collected.
 
 Then, given a previous value function $V_n$, the Perseus backup stage is performed: 
 $$V_{n+1} = \tilde{H}_{Perseus} V_n$$ 
-The operator is built such that $V_{n+1}$ that improves the value of all $b \in B$:
+The operator is built such that $V_{n+1}$ improves the value of all $b \in B$:
 upper bounds $V_n$ over $B$ (but not necessarily over $\Delta(S)$ which would require linear programming):
 $$V_{n+1}(b) \geq V_n(b) \quad \forall b \in B$$
 
 $\tilde{H}_{Perseus}$ defines a set $\tilde{B} = B$ and a new empty
-value function $V_{n+1} = \emptyset$. A belief point $b \in \tilde{B}$ is then selected uniformly at random, and used to
+value function $V_{n+1} = \emptyset$. A belief point $b \in \tilde{B}$ is then selected uniformly at random and used to
 compute a new vector $\alpha_{new} = backup(b,V_n)$. If $\alpha_{new}\cdot b > V_n(b)$, then $\alpha_{new}$ is added into
 $V_{n+1}$, and we remove from $\tilde{B}$ all $b'$ such that $\alpha_{new} \cdot b' > V_{n+1}(b')$. 
 That is, all belief points whose value was improved by $\alpha_{new}$ will not be backed up at the 
@@ -416,27 +417,23 @@ This is only true if we initialize $V$ to a lower bound on $V^*$ . Therefore, un
 Perseus requires a lower bound initialization $V_0 = \set{\alpha_0}$ such that:
 $$\alpha_0 = \frac{1}{1-\gamma}min_{s,a}\mathcal{R}(s,a)$$
 
-\todo{correggi ultima parte perseus}
-Perseus has two key advantages; the belief collection step is fast, and the value function
-update tends to create value functions with a number of $\alpha$-vectors much smaller than $|B|$.
-Thus, Perseus can collect a set of belief points much larger than PBVI, and has thus the
-potential to cover more of the reachable belief space.
+The key advantages over \gls{pbvi} are that the belief collection step is fast, and the value function
+update tends to be represented by a number of $\alpha$-vectors much smaller than $|B|$.
+Thus, Perseus can collect a set of belief points much larger than \gls{pbvi}.
 
-There are a number of potential disadvantages, though; first, the random belief
-gathering assumes that it is relatively simple to obtain good belief points. That is, that a
-random exploration will eventually encounter most of the same points as the optimal policy.
-Even though, the value for every point $b \in B$ gets closer to $V^*(b)$ with every
-iteration, many belief points will not get backed up and the value function may remain
-relatively small. Finally, a practical limitation in large domains with long trajectories is that Perseus will
-need to collect a very large set of beliefs, causing the set B to become too large to maintain in
-memory.
+This comes at some cost; first, the random belief
+gathering assumes that it is relatively simple to obtain good belief points, 
+which also represents a practical limitation in domains that require long trajectories.
+Second, even though the value for every point $b \in B$ gets closer to $V^*(b)$ with every
+iteration, many belief points will not get backed up and the value function may remain far from
+optimal for many beliefs. 
 
 \section{MDP based Approximations}
 
 To address challenges arising from the curse of dimensionality (the belief space is continuous and high-dimensional) 
 and the curse of history (decisions must account for past observations), approximate solution methods that  
 leverage techniques from fully observable \glspl{mdp} have been proposed. 
-MDP-based approximations exploit the underlying state transition structure of the problem aiming 
+MDP-based approximations exploit the underlying state transition structure of the problem, aiming 
 to balance computational efficiency with solution quality by:
 Reducing complexity – treating the \gls{pomdp} as an \gls{mdp} (e.g., assuming full observability), avoiding costly belief-space computations.
 Leveraging Standard MDP Solvers – Many efficient algorithms exist for solving MDPs, and approximations allow their application to POMDPs.
@@ -538,7 +535,7 @@ The presented upper bounds do present some limitations, in particular they are a
 fail when the belief has a complex shape and when many information 
 gathering actions are needed to reduce the uncertainty of the belief state.
 
-\subsection{Entropy based Heuristics}
+\section{Entropy based Heuristics}
 \cite{10.5555/926710} showed how the dual problem of taking the action that ields the 
 greatest rewards and reduce the uncertanty on the information state could be tackled 
 using the entropy of the belief to go from 

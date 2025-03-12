@@ -316,7 +316,7 @@ class BayesianParticleFilter:
             log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1,-1).reshape(-1)).reshape(self.n_particles,batch_size,4).sum(dim=-1).sum(dim=-1)  # Sum over batch size
         else:
             log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1).reshape(-1)).reshape(self.n_particles,batch_size).sum(dim=-1)  # Sum over batch size
-        ###########
+        ##########
         # Average over samples
         # assert torch.allclose(log_likelihoods0, log_likelihoods)
         return log_likelihoods
@@ -363,7 +363,8 @@ class BayesianParticleFilter:
         
         # Resample particles
         indices = torch.searchsorted(cumsum, positions)
-        self.particles = self.particles[indices]
+        eps = torch.randn(self.n_particles, self.theta_dim) * 0.01
+        self.particles = self.particles[indices] + eps
         
         # Reset weights to uniform
         self.weights = torch.ones(self.n_particles) / self.n_particles
@@ -387,43 +388,82 @@ class BayesianParticleFilter:
     
         # q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
         # return q_dist.entropy().sum().detach().numpy()
-        return (self.weights*torch.log(self.weights)).sum().detach().numpy()
+        return -(self.weights*torch.log(self.weights + 1e-5)).sum().detach().numpy()
 
 
 
 
 if __name__ == "__main__":
-    # Test the BetaVariationalBayesianInference class
-    def f(X, theta):
-        return torch.sigmoid(X @ theta.unsqueeze(-1)).squeeze()
+    if True:
+        # Test the BetaVariationalBayesianInference class
+        def f(X, theta):
+            return torch.sigmoid(X @ theta.unsqueeze(-1)).squeeze()
 
-    # Generate synthetic data
-    np.random.seed(0)
-    torch.manual_seed(0)
-    n = 1000
-    X = torch.rand(n, 4)
-    theta_true = torch.tensor([0.5, 0.1, -0.1, 0.5])
-    y = dist.Bernoulli(f(X, theta_true)).sample()
+        # Generate synthetic data
+        np.random.seed(0)
+        torch.manual_seed(0)
+        n = 1000
+        X = torch.rand(n, 4)
+        theta_true = torch.tensor([0.5, 0.1, -0.1, 0.5])
+        y = dist.Bernoulli(f(X, theta_true)).sample()
 
-    # Fit the model
-    model = BetaVariationalBayesianInference(f, input_dim=2, latent_dim=4, debug=True)
-    model.fit(X, y, n_epochs=100, batch_size=64, lr=0.1)
+        # Fit the model
+        model = BetaVariationalBayesianInference(f, input_dim=2, latent_dim=4, debug=True)
+        model.fit(X, y, n_epochs=100, batch_size=64, lr=0.1)
 
-    # Get the posterior parameters
-    posterior = model.get_posterior_params()
-    print("Posterior parameters:")
-    print(posterior)
+        # Get the posterior parameters
+        posterior = model.get_posterior_params()
+        print("Posterior parameters:")
+        print(posterior)
 
-    # Compute the entropy of the variational distribution
-    entropy = model.entropy()
-    print(f"Entropy of variational distribution: {entropy:.4f}")
+        # Compute the entropy of the variational distribution
+        entropy = model.entropy()
+        print(f"Entropy of variational distribution: {entropy:.4f}")
 
-    # Sample from the variational distribution
-    theta_samples = model.sample_latent(n_samples=1000)
-    print(f"Sampled theta: {theta_samples[:5]}")
+        # Sample from the variational distribution
+        theta_samples = model.sample_latent(n_samples=1000)
+        print(f"Sampled theta: {theta_samples[:5]}")
 
-    # Compute the mean and mode of the variational distribution
-    mean = model.low + (model.high - model.low) * (model.q_alpha / (model.q_alpha + model.q_beta))
-    mode = (model.q_alpha - 1) / (model.q_alpha + model.q_beta - 2)
-    print(f"Estimated theta mean: {mean}")
-    print(f"Estimated theta mode: {mode}")
+        # Compute the mean and mode of the variational distribution
+        mean = model.low + (model.high - model.low) * (model.q_alpha / (model.q_alpha + model.q_beta))
+        mode = (model.q_alpha - 1) / (model.q_alpha + model.q_beta - 2)
+        print(f"Estimated theta mean: {mean}")
+        print(f"Estimated theta mode: {mode}")
+    
+    else:
+        # Test the BayesianParticleFilter class
+        def f(X, theta):
+            return torch.sigmoid(X @ theta.unsqueeze(-1)).squeeze()
+        
+        # Generate synthetic data
+        np.random.seed(1065)
+        torch.manual_seed(1056)
+        n = 1000
+        X = torch.rand(n, 4)
+        theta_true = torch.tensor([0.5, 0.4, -0.4, 0.5])
+        y = dist.Bernoulli(f(X, theta_true)).sample()
+
+        # Fit the model
+        model = BayesianParticleFilter(f, n_particles=1000, theta_dim=4)
+        model.initialize_particles()
+        for i in range(100):
+            model.update(X[i], y[i], noise_std=0.1)
+
+        # Compute the entropy of the variational distribution
+        entropy = model.entropy()
+        print(f"Entropy of variational distribution: {entropy:.4f}")
+
+        # Estimate the posterior mean and variance
+        posterior_mean, posterior_var = model.estimate_posterior()
+        print(f"Posterior mean: {posterior_mean}")
+        print(f"Posterior variance: {posterior_var}")
+
+        # Sample from the variational distribution
+        theta_samples = model.particles
+        print(f"Sampled theta: {theta_samples[:5]}")
+
+        # Compute the effective sample size
+        eff_sample_size = 1.0 / (model.weights ** 2).sum()
+        print(f"Effective sample size: {eff_sample_size:.2f}")
+
+

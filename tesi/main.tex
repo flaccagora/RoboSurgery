@@ -7,6 +7,10 @@
 
 % Title Page
 \include{chapters/utils/titlepage}
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
 
 \pagenumbering{roman} % Start with Roman numerals
 % Abstract
@@ -51,10 +55,11 @@
 
 
 % Chapters
-\include{chapters/Introduction}
+\include{chapters/1_Introduction}
 
 % Part 1
 \part{Theoretical Background}
+% \include{chapters/2_RL}
 \include{chapters/3_mdp}
 \include{chapters/4_pomdp}
 
@@ -63,12 +68,15 @@
 
 \include{chapters/5_methods}
 \include{chapters/6_results}
-\include{chapters/7_directions}
 
 
 
 % Bibliography
 \bibliographystyle{plainnat}  % or abbrvnat, unsrtnat, etc.
 \bibliography{chapters/utils/ref}  % Name of your .bib file (without extension)
+
+% \appendix
+% \addcontentsline{toc}{chapter}{Appendix}
+% \include{chapters/7_appendix}
 
 \end{document}

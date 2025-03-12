@@ -2,4 +2,6 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Performance comparison of different algorithms on the Gridworld task. MDP represents the theoretical upper bound with perfect information.}}{46}{table.caption.46}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Performance comparison of different algorithms on the Maze task.}}{48}{table.caption.54}%
 \addvspace {10\p@ }

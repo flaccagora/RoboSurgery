@@ -12,7 +12,7 @@ def eval_dqn_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,r
 
     
     total_rewards = []
-
+    steps  = []
     for episode in range(num_episodes):
         s, _ = env.reset()
         
@@ -21,6 +21,7 @@ def eval_dqn_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,r
         episode_reward = 0
         done = False
         c = max_episode_steps
+        step = 0
         while not done and c > 0:            
             
             state = (s[0][0],s[0][1],s[0][2],s[1][0],s[1][1])
@@ -45,22 +46,25 @@ def eval_dqn_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,r
                 # print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward}")
 
             c -= 1
+            step += 1
+        steps.append(step)
     avg_reward = np.mean(total_rewards)
+    avg_steps = np.mean(steps)
     # print(f"Average Reward over {num_episodes} episodes: {avg_reward}")
 
     if render:
         env.close_render()
         
-    return avg_reward
+    return avg_reward, avg_steps
 
 def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
-    print("QMDP")
+    print("MLS")
     
     if render:
         env.set_rendering()
 
-
     total_rewards = []
+    total_steps = []    
 
     for episode in range(num_episodes):
         s, _ = env.reset()
@@ -74,6 +78,7 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
         episode_reward = 0
         done = False
         c = max_episode_steps
+        steps = 0
         while not done and c > 0:            
             
             pos = s[0]
@@ -107,13 +112,17 @@ def eval_dqn_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps
                 # print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward}")
 
             c -= 1
+            steps += 1
+
+        total_steps.append(steps)
+    avg_steps = np.mean(total_steps)
     avg_reward = np.mean(total_rewards)
     # print(f"Average Reward over {num_episodes} episodes: {avg_reward}")
 
     if render:
         env.close_render()
         
-    return avg_reward
+    return avg_reward, avg_steps
 
 def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
     """Returns
@@ -126,6 +135,9 @@ def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,ren
 
     transitions = []
     beliefs = []
+    total_rewards = []
+    total_steps = []
+
 
     for i in trange(num_episodes):
 
@@ -150,16 +162,18 @@ def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,ren
             totalReward += reward
             next_belief = agent.update_belief(b,next_state[0], next_obs)
             episode_beliefs.append(next_belief)
-            
 
+            # print belief entropy
+            print("Belief entropy: ", agent.get_entropy(next_belief))
+            
             if render:
-                print("State", s)
-                print("Action: ", best_action)
-                print("Reward:     " + str(totalReward) + "  ")
-                print("Next State: ", next_state)
-                print("argmax and max Belief: ", env.deformations[torch.argmax(next_belief)], torch.max(next_belief))
-                print("Belief entropy: ", agent.get_entropy(next_belief))
-                print("\n")
+                # print("State", s)
+                # print("Action: ", best_action)
+                # print("Reward:     " + str(totalReward) + "  ")
+                # print("Next State: ", next_state)
+                # print("argmax and max Belief: ", env.deformations[torch.argmax(next_belief)], torch.max(next_belief))
+                # print("Belief entropy: ", agent.get_entropy(next_belief))
+                # print("\n")
             
                 env.render_bis()
 
@@ -167,13 +181,16 @@ def eval_agent_pomdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,ren
             b = next_belief
             steps += 1
 
-        transitions.append(episode_transitions)
-        beliefs.append(episode_beliefs)
+        # transitions.append(episode_transitions)
+        # beliefs.append(episode_beliefs)
+        total_rewards.append(totalReward)
+        total_steps.append(steps)
     
     if render:
         env.close_render()
 
-    return transitions, beliefs
+    return transitions, beliefs, np.mean(total_rewards), np.mean(total_steps)
+
 
 def eval_agent_mdp(agent,env: GridEnvDeform,num_episodes,max_episode_steps,render):
     """Returns
@@ -280,7 +297,7 @@ def eval_agent(observability,agent,env,num_episodes=100,max_episode_steps=10,ren
         if observability == "MDP":
             return eval_agent_mdp(agent,env,num_episodes,max_episode_steps,render)
         elif observability == "POMDP":
-            print("POMDP")
+            print("POMDP anyagent")
             return eval_agent_pomdp(agent,env,num_episodes,max_episode_steps,render)
 
     return "Invalid agent type"

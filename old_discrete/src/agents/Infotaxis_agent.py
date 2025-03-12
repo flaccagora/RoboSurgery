@@ -251,9 +251,13 @@ from environment.env import GridEnvDeform
 
 class ThetaInfotaxis():
   
-    def __init__(self, env: GridEnvDeform):
+    def __init__(self, env: GridEnvDeform, obs_model=None):
         self.env = env    
-    
+        if obs_model is not None:
+            self.obs_model = obs_model
+            self.obs_model.eval()
+            self.update_belief = self.update_belief_superbatched
+        
     def get_entropy(self, probabilities):
         
         # Calculate entropy, avoiding log(0) by adding a mask
@@ -280,6 +284,25 @@ class ThetaInfotaxis():
 
         return new_belief
     
+    def update_belief_superbatched(self, belief, pos, observation):
+        """"
+        perform update over theta
+        """
+        thetas = torch.tensor(self.env.deformations)
+        obs = torch.tensor(observation, dtype=torch.float32)
+        pos = torch.tensor(pos, dtype=torch.float32)
+
+        B = thetas.shape[0]
+        
+        P_o_s_theta = torch.distributions.Bernoulli(self.obs_model(pos.expand(B,-1),thetas)).log_prob(obs.expand(B,-1)).sum(dim=1)
+
+        belief = torch.exp(P_o_s_theta) * belief
+
+        belief = belief/belief.sum()
+
+        
+        return belief
+
     def G(self,b,pos):
         """"
         
@@ -333,16 +356,23 @@ class ThetaInfotaxis():
         """
         # Compute the expected entropy reduction for each action
         G = self.G(belief,pos)
+        print(G)
+        print(torch.argmax(G))
                       
         # Return the action that minimizes the expected entropy
         return torch.argmax(G).item()
 
 
+
 class IDS():
   
-    def __init__(self, env: GridEnvDeform):
+    def __init__(self, env: GridEnvDeform, obs_model = None):
         self.env = env
-    
+        if obs_model is not None:
+            self.obs_model = obs_model
+            self.obs_model.eval()
+            self.update_belief = self.update_belief_superbatched
+
     def set_belief(self,belief):
         self.belief = belief
 
@@ -372,6 +402,25 @@ class IDS():
 
         return new_belief
     
+    def update_belief_superbatched(self, belief, pos, observation):
+        """"
+        perform update over theta
+        """
+        thetas = torch.tensor(self.env.deformations)
+        obs = torch.tensor(observation, dtype=torch.float32)
+        pos = torch.tensor(pos, dtype=torch.float32)
+
+        B = thetas.shape[0]
+        
+        with torch.no_grad():
+            P_o_s_theta = torch.distributions.Bernoulli(self.obs_model(pos.expand(B,-1),thetas)).log_prob(obs.expand(B,-1)).sum(dim=1)
+
+        belief = belief* torch.exp(P_o_s_theta)
+
+        belief = belief/belief.sum()
+
+        return belief
+
     def G(self,b,pos):
         """"
         

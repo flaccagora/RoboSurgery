@@ -17,7 +17,7 @@ l1 = 1
 h1 = 10
 
 maze = np.load(f"maze/maze_{N}.npy")
-env = GridEnvDeform(maze,l0,h0,l1,h1, render_mode="human")
+env = GridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
 
 states = [((x,y,phi),(i,j)) for x in range(1,env.max_shape[0]-1) for y in range(1,env.max_shape[1]-1) for phi in range(4) for i in range(l0,h0) for j in range(l1,h1)] 
 actions = [0,1,2,3]
@@ -138,7 +138,7 @@ def train_dqn(args):
         progress_bar.update(1)
 
 
-        if episode != 0 and episode % 10 == 0:
+        if episode != 0 and episode % 100 == 0:
             # avg_reward = evaluate_agent_training(env, agent)
             # evalrewards.append(avg_reward)
             print(f"Episode {episode}, saving checkpoint")

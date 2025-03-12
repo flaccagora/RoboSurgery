@@ -59,7 +59,7 @@ def train_dqn(args):
 
 
     from stable_baselines3.common.monitor import Monitor
-    from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+    from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, SubprocVecEnv
 
     def make_env():
         N = 2
@@ -71,12 +71,13 @@ def train_dqn(args):
         h1 = 10
         
         maze = np.load(f"maze/maze_{N}.npy")
-        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="rgb_array")
+        env = MDPGYMGridEnvDeform(maze,l0,h0,l1,h1, render_mode="sbaruba")
 
         env = Monitor(env)  # record stats such as returns
         return env
 
-    env = DummyVecEnv([make_env])
+    # env = DummyVecEnv([make_env])
+    env = SubprocVecEnv([make_env]  * 20)
 
 
     model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 

@@ -321,7 +321,7 @@ class GridEnvDeform(gym.Env):
         
     def set_rendering(self):
         self.screen_width = 800
-        self.screen_height = 600
+        self.screen_height = 800
         pygame.init()  # Initialize all pygame modules
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Maze Environment")
@@ -380,6 +380,79 @@ class GridEnvDeform(gym.Env):
                 pygame.draw.rect(self.screen, color, (y * cell_size, x * cell_size, cell_size, cell_size))
 
         # Add text for controls
+        # font = pygame.font.Font(None, 36)
+        # controls = [
+        #     "Controls:",
+        #     "R - Reset",
+        #     "Q - Quit",
+        #     "Space - Pause/Resume",
+        #     "Arrows - Move agent"
+        # ]
+        
+        # for i, text in enumerate(controls):
+        #     text_surface = font.render(text, True, (0, 0, 0))
+        #     self.screen.blit(text_surface, (self.screen_width - 200, 20 + i * 30))
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.reset()
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    return
+                elif event.key == pygame.K_SPACE:
+                    self.pause()
+                elif event.key == pygame.K_LEFT:
+                    self.step(3,execute=True)
+                elif event.key == pygame.K_RIGHT:
+                    self.step(1,execute=True)
+                elif event.key == pygame.K_UP:
+                    self.step(0,execute=True)
+                elif event.key == pygame.K_DOWN:
+                    self.step(2,execute=True)
+                
+
+        # Update the display
+        pygame.display.flip()
+
+        # Capture the current frame and add it to the list of frames
+        frame = pygame.surfarray.array3d(self.screen)
+        self.frames.append(frame)
+    
+    def render_tris(self, s=None,additional_pos=None):
+        if s is not None:
+            self.set_state(s)
+
+        # Clear the screen
+        self.screen.fill((255, 255, 255))
+
+        # Draw the maze
+        cell_size = min(self.screen_width, self.screen_height) // max(self.max_shape)
+        for x in range(self.max_shape[0]):
+            for y in range(self.max_shape[1]):
+                if (x, y) == tuple(self.agent_pos):
+                    color = (255, 0, 0)  # Red for agent
+                elif additional_pos is not None and (x, y) == tuple(additional_pos):
+                    color = (255, 0, 0)  # Blue for additional agent
+                # color adjacent cells in yellow
+                elif (x-1, y) == tuple(self.agent_pos) or (x+1, y) == tuple(self.agent_pos) or (x, y-1) == tuple(self.agent_pos) or (x, y+1) == tuple(self.agent_pos):
+                    color = (255, 255, 0)
+                # do the same for the additional agent
+                elif additional_pos is not None and ((x-1, y) == tuple(additional_pos) or (x+1, y) == tuple(additional_pos) or (x, y-1) == tuple(additional_pos) or (x, y+1) == tuple(additional_pos)):
+                    color = (255, 255, 0)
+                elif (x, y) == tuple(self.goal_pos):
+                    color = (0, 255, 0)  # Green for goal
+                elif self.maze[x, y] == 1:
+                    color = (0, 0, 0)  # Black for walls
+                else:
+                    color = (255, 255, 255)  # White for free space
+                pygame.draw.rect(self.screen, color, (y * cell_size, x * cell_size, cell_size, cell_size))
+
+        # Add text for controls
         font = pygame.font.Font(None, 36)
         controls = [
             "Controls:",
@@ -422,7 +495,8 @@ class GridEnvDeform(gym.Env):
         # Capture the current frame and add it to the list of frames
         frame = pygame.surfarray.array3d(self.screen)
         self.frames.append(frame)
-    
+
+
     def save_gif(self):
         """
         Save the captured frames as a GIF file.

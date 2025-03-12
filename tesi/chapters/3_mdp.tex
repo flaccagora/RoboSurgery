@@ -1,5 +1,28 @@
-
 \chapter{Markov Decision Processes}
+
+\gls{rl} is a subfield of machine learning focused on the problem of learning 
+optimal behaviors: agents repeatedly interact with the environment, balancing 
+exploration (trying new strategies) and exploitation (using known strategies) 
+to maximize success rate through constant feedback. \
+
+For instance, consider a baby learning to walk: it repeatedly attempts to stand 
+and take steps, getting positive feedback for each successful movement and 
+negative feedback from falls. Over time, it refines its attempts to walk 
+more effectively. \
+
+Differently from supervised learning, where the agent is trained on labeled data, 
+and from unsupervised learning, where the agent must find patterns in unlabeled data,
+\gls{rl} makes use of rewards and punishments, making it suitable for problems 
+where the agent (be it a baby or a Large Language Model) must learn through trial and error, creating its own training data 
+through interaction.
+
+In the next sections, we will introduce the foundational concepts of \gls{rl}, 
+mathematical frameworks, and algorithms that enable agents to learn optimal behaviors for 
+a wide range of tasks.
+
+The following analysis of \glspl{mdp} is mostly based on \cite{d1afac99aad548188c9d47063c7109df} 
+and \cite{Sutton1998}. \\
+
 
 \gls{rl} leverages \glspl{mdp} to model interactions between 
 an agent and its environment in terms of states, actions, and rewards. 
@@ -8,13 +31,13 @@ uncertainty, and explicit objectives.
 Although general \glspl{mdp} may have infinite, possibly uncountable, state and action
 spaces, we limit the discussion to finite-state and finite-action problems.
 
-A \gls{mdp} is a model for sequential decision making in a probabilistic environment, it requires
+A \gls{mdp} is a model for sequential decision making in a probabilistic environment; it requires
 the following components:
 
 \paragraph{States}
 The set of environmental states $S$ is defined as the finite set $\{s_1 , . . . , s_N \}$ where the
 size of the state space is $|S| = N$. A state is a unique characterization of all
-that is important (at given time) of the problem that is modelled. For example, a chess game state 
+that is important (at a given time) of the problem that is modeled. For example, a chess game state 
 could be the position of all the pieces on the board.
 
 \paragraph{Actions}
@@ -22,9 +45,9 @@ The set of actions A is defined as the finite set $\{a_1 , . . . , a_K \}$ where
 action space is $|A| = K$. Actions can be used to control the system state.
 The set of actions that can be applied in some particular state $s \in S$, is denoted $A(s)$,
 where $A(s) \subset A$. In some systems, not all actions can be applied in every state, but in
-general we will assume that $A(s) = A$ for all $s \in S$.
+general, we will assume that $A(s) = A$ for all $s \in S$.
 
-\paragraph{Trasition Function}
+\paragraph{Transition Function}
 By applying action $a \in A$ in a state $s \in S$, the system makes a transition from s to a
 new state $s' \in S$, based on a probability distribution over the set of possible transitions. 
 The transition function $\mathcal{T}$ is defined as 
@@ -32,11 +55,11 @@ $$\mathcal{T} : S \times A \times S \rightarrow [0,1]$$ which represents the pro
 of ending up in state s' after doing action a in state s is denoted $ \mathcal{T}(s,a,s')$. It is required that 
 for all actions a, and all states s and s', $\mathcal{T} (s,a,s') \geq 0$ and for all states s and actions a, 
 $$\sum_{s' \in S} \mathcal{T} (s,a,s') = 1$$
-such that T defines a proper probability distribution over possible next states. \
+such that $\mathcal{T}$ defines a proper probability distribution over possible next states. \
 
 The sequential nature of the framework is captured by that of \textit{Markov chain}:
 a Markovian Stochastic Process. 
-Stochastic Processes araise in many problems from the natural sciences
+Stochastic Processes arise in many problems from the natural sciences
 in which one has to keep track of a value observed at time $t$. The process is Markovian if the result of an action does not
 depend on the previous actions and history of visited states, but only depends on the
 current state.
@@ -99,27 +122,27 @@ $$
 $$
 
 These formulations are useful for the analysis of \glspl{mdp} and the development of algorithms. 
-In such context, the goal of the agent is to learn an optimal behaviour, let's define behaviours and optimality.
+In such context, the goal of the agent is to learn an optimal behavior; let's define behaviors and optimality.
 
 \section{Policy and Value Function}
 \paragraph{Policy}
-The formalization of the naive concept of behaviour is that of policy. A policy is a function that 
-maps states into actions $\pi : S \rightarrow A$. It can be deterministic or stochastic, in 
-the latter case it is represented as a probability distribution over actions given states.
+The formalization of the naive concept of behavior is that of policy. A policy is a function that 
+maps states into actions $\pi : S \rightarrow A$. It can be deterministic or stochastic; in 
+the latter case, it is represented as a probability distribution over actions given states.
 
 $$\pi(a|s) = Pr\{A_t = a | S_t = s\}$$
 
 it holds that for all states $s \in S$, $\pi(a|s) \geq 0$ and $\sum_{a \in A} \pi(a|s) = 1$. 
-Another disctinction is made between stationary and nonstationary policies. A stationary policy
-does not change over time, it is a function of the current state only,
-while a nonstationary policy can be imagined as sequence of policies indexed time. 
+Another distinction is made between stationary and nonstationary policies. A stationary policy
+does not change over time; it is a function of the current state only,
+while a nonstationary policy can be imagined as a sequence of policies indexed by time. 
 In the \emph{finite-horizon} model, a \gls{mdp} in which the agent has a limited amount of time to achieve its goal, 
-the optimal policy is typically non stationary: the way an agent chooses its actions on the last step 
+the optimal policy is typically non-stationary: the way an agent chooses its actions on the last step 
 of its life is generally going to be very different from the way it chooses them when it has a long
 life ahead of it. In the \emph{infinite-horizon} discounted model, the agent always has a constant
 expected amount of time remaining, so there is no reason to change action strategies: there
 is a stationary optimal policy.   
-Such policies represent the strategy of the agent, it is the way the agent interacts with the environment
+Such policies represent the strategy of the agent; it is the way the agent interacts with the environment
 by iteratively selecting actions based on the current state of the system and thereby influencing the next state and 
 reward received. \\
 The main goal of \gls{rl} is to find "good" policies. It is intuitive to think that a policy is good 
@@ -197,7 +220,7 @@ $$\pi^* \text{ such that } \pi^* \geq \pi \text{ for all } \pi$$
 
 \glspl{mdp} (but not \glspl{pomdp}, we'll introduce them in the next chapter), always have\footnote{This 
 is true in discrete state space \gls{mdp}s when $\gamma < 1$. 
-Existence of optimal policies is not guaranteed in discrete problems for $\gamma = 1$. Generally, in a continous setting, 
+Existence of optimal policies is not guaranteed in discrete problems for $\gamma = 1$. Generally, in a continuous setting, 
 it is required $\gamma \in (0,1)$, and costs (negative rewards) to be bounded $|c(s,a)|<M$ for all s and a}
  is a 
 deterministic, stationary policy that maximizes the value of every state. \cite{96ef8573-56cc-3a43-a4c7-3c6543c30f4e}
@@ -277,7 +300,7 @@ that are the building blocks of more advanced techniques.
 \end{figure}
 
 \section{Dynamic Programming}
-Dynamic Programming (DP) is a class of algoritms of little practical use, nontheless of great theoretical 
+\gls{dp} is a class of algorithms of little practical use, nonetheless of great theoretical 
 importance in the field of model-based \gls{rl}. The assumption of the availability of the model is 
 crucial for the application of these methods as the finitenees of the state and action spaces, though 
 continous spaces can be discretized, exact solutions can be rarely found. 
@@ -873,7 +896,7 @@ approximating the objective \ref{eq:objective} to the first order and the constr
 
 \subsection{Proximal Policy Optimization}
 \gls{ppo} by \cite{schulman2017proximalpolicyoptimizationalgorithms} is a simplified version of \gls{trpo} that 
-uses different objective function to ensure that the policy update is not too large, while beeing 
+uses different objective function to ensure that the policy update is not too large, while being 
 computationally more efficient. 
 The clipped surrogate objective function is defined as follows:
 $$L(s,a,\theta_k,\theta) = \min\left( \frac{\pi_{\theta}(a|s)}{\pi_{\theta_k}(a|s)} A^{\pi_{\theta_k}}(s,a), \;\; \text{clip}\left(\frac{\pi_{\theta}(a|s)}{\pi_{\theta_k}(a|s)}, 1 - \epsilon, 1+\epsilon \right) A^{\pi_{\theta_k}}(s,a) \right)$$

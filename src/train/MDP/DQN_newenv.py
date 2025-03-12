@@ -100,7 +100,7 @@ def train_dqn(args):
 
 
     from stable_baselines3.common.monitor import Monitor
-    from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+    from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
     def make_env():
         env = Grid(
@@ -114,12 +114,12 @@ def train_dqn(args):
         env = Monitor(env)  # record stats such as returns
         return env
 
-    env = DummyVecEnv([make_env])
+    # env = DummyVecEnv([make_env])
+    env = SubprocVecEnv([make_env] * 20)
 
-
-    # update config
-    run.config.update({"shear range":env.envs[0].unwrapped.shear_range,
-                      "stretch range":env.envs[0].unwrapped.stretch_range}, allow_val_change=True)
+    # # update config
+    # run.config.update({"shear range":env.envs[0].unwrapped.shear_range,
+    #                   "stretch range":env.envs[0].unwrapped.stretch_range}, allow_val_change=True)
 
 
     net_arch=[128, 128, 128]
