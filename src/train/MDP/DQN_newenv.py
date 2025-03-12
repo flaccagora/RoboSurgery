@@ -50,6 +50,8 @@ def train_dqn(args):
     render_mode = args.render_mode
     run_id = args.run_id
 
+    n_envs = 20
+
     config = {
         "policy_type": "MultiInputPolicy",
         "env_name": "ObservableDeformedGridworld",
@@ -84,7 +86,7 @@ def train_dqn(args):
 
     # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
-                            save_freq= 250000 // 64, # in steps
+                            save_freq= 250000 // n_envs, # in steps
                             save_path=f"agents/pretrained/MDP/DQN_continous_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,
@@ -115,7 +117,7 @@ def train_dqn(args):
         return env
 
     # env = DummyVecEnv([make_env])
-    env = SubprocVecEnv([make_env] * 64)
+    env = SubprocVecEnv([make_env] * n_envs)
 
     # # update config
     # run.config.update({"shear range":env.envs[0].unwrapped.shear_range,
@@ -131,7 +133,7 @@ def train_dqn(args):
         model = DQN("MultiInputPolicy",env,batch_size=batch_size,gamma=gamma, 
                 target_update_interval=target_update, policy_kwargs=dict(net_arch=net_arch), verbose=1,
                 tensorboard_log=f"runs/{run.id}", device="cpu", learning_rate=lr,
-                train_freq=(10,"step"), gradient_steps=1)
+                train_freq=(5,"step"), gradient_steps=1, exploration_fraction=0.05)
     
     model.learn(total_timesteps,progress_bar=True, callback=callbacks, log_interval=55,reset_num_timesteps=False)
     model.save(f"agents/pretrained/MDP/DQN_continous_{run.id}")
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--total_timesteps", type=int, default=5000000) # env steps
-    parser.add_argument("--target_update", type=int, default=500) # in env steps
+    parser.add_argument("--target_update", type=int, default=1000) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--render_mode", type=str, default=None)
     parser.add_argument("--run_id", type=str, default=None)
