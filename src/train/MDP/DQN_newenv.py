@@ -56,7 +56,7 @@ def train_dqn(args):
         "total_timesteps": total_timesteps,
         "Batch_Size": batch_size,
         'grid_size': (1.0,1.0),
-        'step_size': 0.1,
+        'step_size': 0.02,
         'obstacles':obstacles,
         'observation_radius':0.2,
         "shear range":None,
@@ -84,7 +84,7 @@ def train_dqn(args):
 
     # Save a checkpoint every 10000 steps
     checkpoint_callback = CheckpointCallback(
-                            save_freq= 250000 // 20, # in steps
+                            save_freq= 250000 // 64, # in steps
                             save_path=f"agents/pretrained/MDP/DQN_continous_{run.id}",
                             name_prefix="rl_model",
                             save_replay_buffer=False,
@@ -115,7 +115,7 @@ def train_dqn(args):
         return env
 
     # env = DummyVecEnv([make_env])
-    env = SubprocVecEnv([make_env] * 20)
+    env = SubprocVecEnv([make_env] * 64)
 
     # # update config
     # run.config.update({"shear range":env.envs[0].unwrapped.shear_range,
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=0.001)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--total_timesteps", type=int, default=5000000) # env steps
-    parser.add_argument("--target_update", type=int, default=200) # in env steps
+    parser.add_argument("--target_update", type=int, default=500) # in env steps
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--render_mode", type=str, default=None)
     parser.add_argument("--run_id", type=str, default=None)
