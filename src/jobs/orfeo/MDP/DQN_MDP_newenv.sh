@@ -16,6 +16,6 @@ cd ./src
 
 export PYTHONPATH=$(pwd)
 
-python3 train/MDP/DQN_newenv.py --learning_rate=0.001 --total_timesteps=10000000
+python3 train/MDP/DQN_newenv.py --learning_rate=0.001
 
 date
