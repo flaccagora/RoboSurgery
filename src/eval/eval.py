@@ -7,11 +7,11 @@ import sys
 from tqdm import trange
 import json
 
-N_EPISODES = 10 # number of episodes to average over
+N_EPISODES = 1000 # number of episodes to average over
 OBSERVATION_TYPES = ['cardinal', 'single'] # 'cardinal' or  'single'
 BELIEF_UPDATES = ['discrete', 'particlefilters'] # variational escluso per ora
-DISCRETIZATION = {'discrete': [5], 'variational': 10, 'particlefilters': [1000]} 
-# DISCRETIZATION = {'discrete': [5,10,20], 'variational': 10, 'particlefilters': [1000,2000,5000,10000]} 
+# DISCRETIZATION = {'discrete': [5], 'variational': 10, 'particlefilters': [1000]} 
+DISCRETIZATION = {'discrete': [5,10,20], 'variational': 10, 'particlefilters': [1000,2000,5000,10000]} 
 DEBUG = True
 
 # Load MDP solution -------------------------------------------------------------------------
