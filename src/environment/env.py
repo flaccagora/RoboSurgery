@@ -2159,3 +2159,70 @@ class POMDPDeformedGridworld(Grid):
                     return self.step(1)  # Down action
         return None, None, None, None, None
     
+class BeliefSpacePOMDP(POMDPDeformedGridworld):
+    def __init__(self, obs_model, render_mode='human', obs_type = 'single', discretization=2000):
+        super(BeliefSpacePOMDP, self).__init__(render_mode=render_mode, obs_type=obs_type)
+        
+        self.obs_model = obs_model
+        
+        from utils.belief import BayesianParticleFilter
+        self.obs_model = obs_model
+        self.n_particles = discretization
+        self.PF = BayesianParticleFilter(f = obs_model, n_particles=self.n_particles, theta_dim=4)
+        self.belief_points, self.belief_values = self.PF.initialize_particles()
+
+        self.observation_space = Dict({
+            'obs': Box(low=0, high=1, shape=(4,), dtype=np.int32),
+            'pos': Box(low=-np.inf, high=np.inf, shape=(2,), dtype=np.float32),
+            'belief': Box(low=0, high=1, shape=(4,), dtype=np.float32)
+        })
+ 
+    def reset(self, seed=None):
+        pomdp_state, _ = super().reset(seed=seed)
+        
+        pomdp_state['belief'] = self.PF.estimate_posterior()[0]
+        
+        return pomdp_state, {}
+    
+    def step(self, action):
+        pomdp_state, reward, terminated, truncated, info = super().step(action)
+        
+        self.belief_update()
+        pomdp_state['belief'] = self.PF.estimate_posterior()[0]
+
+        return pomdp_state, reward, terminated,truncated, info
+    
+    def belief_update(self):
+        pomdp_state = self.get_state()
+        X, y = pomdp_state['pos'].unsqueeze(0), pomdp_state['obs'].unsqueeze(0)
+
+        self.PF.update(X, y)
+
+
+if __name__ == "__main__":
+
+    def load_obs_model(obs_type):
+        from observation_model.obs_model import singleNN, cardinalNN
+
+        if obs_type == 'single':
+            obs_model = singleNN()
+            obs_model.load_state_dict(torch.load("observation_model/obs_model_4.pth", weights_only=True,map_location=torch.device('cpu')))
+        elif obs_type == 'cardinal':
+            obs_model = cardinalNN()
+            obs_model.load_state_dict(torch.load("observation_model/obs_model_cardinal_4.pth", weights_only=True))
+        else:
+            raise ValueError("Observation type not recognized")
+        
+        return obs_model
+    
+    obs_model = load_obs_model('cardinal')
+
+    env = BeliefSpacePOMDP(obs_model=obs_model, obs_type='cardinal', render_mode='rgb_array')
+
+    # env = POMDPDeformedGridworld(obs_type='cardinal', render_mode='rgb_array')
+
+    env.reset()
+    print(env.step(int(0)))
+    print(env.observation_space.sample())
+
+
