@@ -424,6 +424,8 @@ def evaluate_statistics(transitions):
     
     return stats
 
+import pandas as pd
+data = pd.DataFrame(columns=['agent', 'model', 'obs_type', 'update', 'discretization', 'mean_episode_reward', 'std_episode_reward', 'mean_episode_steps', 'std_episode_steps', 'num_episodes', 'terminated_episodes', 'truncated_episodes', 'termination_rate', 'truncation_rate'])
 
 for obs_type in OBSERVATION_TYPES:
     obs_model = load_obs_model(obs_type)
@@ -450,6 +452,26 @@ for obs_type in OBSERVATION_TYPES:
                                         
                     transitions = eval_agent_pomdp(solver, env, num_episodes=N_EPISODES)
                     stats = evaluate_statistics(transitions)
+                    # insert stats into dataframe
+                    data = data._append({
+                        'agent': solver.__class__.__name__,
+                        'model': MDPmodel.__class__.__name__,
+                        'obs_type': obs_type,
+                        'update': update,
+                        'discretization': discretization,
+                        'mean_episode_reward': stats['mean_episode_reward'],
+                        'std_episode_reward': stats['std_episode_reward'],
+                        'mean_episode_steps': stats['mean_episode_steps'],
+                        'std_episode_steps': stats['std_episode_steps'],
+                        'num_episodes': stats['num_episodes'],
+                        'terminated_episodes': stats['terminated_episodes'],
+                        'truncated_episodes': stats['truncated_episodes'],
+                        'termination_rate': stats['termination_rate'],
+                        'truncation_rate': stats['truncation_rate']
+                    }, ignore_index=True)
+
+                    # save dataframe to file
+                    data.to_csv("results.csv", index=False)
 
                     print(json.dumps(stats, indent=4))
 

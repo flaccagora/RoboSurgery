@@ -1,0 +1,3 @@
+agent,model,obs_type,update,discretization,mean_episode_reward,std_episode_reward,mean_episode_steps,std_episode_steps,num_episodes,terminated_episodes,truncated_episodes,termination_rate,truncation_rate
+TS,PPO,cardinal,discrete,5,-145.2,281.1762080973424,140.7,182.70142309243244,10,8,2,0.8,0.2
+TS,PPO,cardinal,discrete,10,-16.6,6.468384651518491,33.2,12.983065893693986,10,10,0,1.0,0.0
