@@ -307,6 +307,7 @@ class QMDP(BaseAgent):
             return torch.multinomial(probs, 1).item(), actions
 
 AGENTS = [TS, MLS, QMDP]
+AGENTS = [QMDP]
 
 
 def load_obs_model(obs_type):

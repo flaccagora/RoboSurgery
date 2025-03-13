@@ -453,7 +453,6 @@ class BayesianParticleFilter:
         if 1.0 / (self.weights ** 2).sum() < self.n_particles / 2:
             self.resample()
 
-
         # Move inputs to model device
         X = X.to(self.device)
         y = y.to(self.device)
@@ -465,7 +464,6 @@ class BayesianParticleFilter:
         log_weights_normalized = log_weights - torch.max(log_weights)
         self.weights = torch.exp(log_weights_normalized)
         self.weights /= self.weights.sum()
-
             
         return self.particles, self.weights
 
