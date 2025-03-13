@@ -1819,6 +1819,154 @@ class Grid(gridworld.ObservableDeformedGridworld,gym.Env):
         """
         pygame.quit()
 
+    def create_obstacles_interactively(grid_size=(1.0, 1.0)):
+        """
+        Open a pygame window that allows the user to draw rectangular obstacles.
+        The user can click and drag to create obstacles, press 'z' to undo the last obstacle,
+        and press 'enter' to finish and return the list of obstacles.
+        
+        Returns:
+            list: A list of obstacles in the format [((x_min, y_min), (x_max, y_max)), ...]
+        """
+        import pygame
+        import numpy as np
+        
+        # Initialize pygame
+        pygame.init()
+        screen_width, screen_height = 1000, 1000
+        screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("Draw Obstacles - Click and drag to create, Z to undo, Enter to finish")
+        
+        # Colors
+        WHITE = (255, 255, 255)
+        BLACK = (0, 0, 0)
+        RED = (255, 0, 0)
+        BLUE = (0, 0, 255)
+        
+        # Scale factors
+        scale_x = screen_width / grid_size[0]
+        scale_y = screen_height / grid_size[1]
+        
+        # Convert screen coordinates to grid coordinates
+        def to_grid_coords(pos):
+            x_screen, y_screen = pos
+            x_grid = x_screen / scale_x
+            y_grid = (screen_height - y_screen) / scale_y  # Flip y-axis
+            return max(0, min(x_grid, grid_size[0])), max(0, min(y_grid, grid_size[1]))
+        
+        # Convert grid coordinates to screen coordinates
+        def to_screen_coords(pos):
+            x_grid, y_grid = pos
+            x_screen = int(x_grid * scale_x)
+            y_screen = int(screen_height - (y_grid * scale_y))  # Flip y-axis
+            return x_screen, y_screen
+        
+        # Draw grid lines
+        def draw_grid():
+            screen.fill(WHITE)
+            
+            # Draw grid lines
+            for i in range(int(grid_size[0]) + 1):
+                x = int(i * scale_x)
+                pygame.draw.line(screen, BLACK, (x, 0), (x, screen_height), 1)
+            
+            for j in range(int(grid_size[1]) + 1):
+                y = int(screen_height - (j * scale_y))
+                pygame.draw.line(screen, BLACK, (0, y), (screen_width, y), 1)
+        
+        # Function to draw existing obstacles
+        def draw_obstacles():
+            for obs in obstacles:
+                (x_min, y_min), (x_max, y_max) = obs
+                top_left = to_screen_coords((x_min, y_max))
+                width = int((x_max - x_min) * scale_x)
+                height = int((y_max - y_min) * scale_y)
+                pygame.draw.rect(screen, RED, (top_left[0], top_left[1], width, height))
+        
+        # Show instructions
+        font = pygame.font.SysFont(None, 24)
+        
+        def draw_instructions():
+            instructions = [
+                "Click and drag to create obstacles",
+                "Press Z to undo the last obstacle",
+                "Press Enter to finish",
+                f"Current obstacles: {len(obstacles)}"
+            ]
+            
+            for i, text in enumerate(instructions):
+                text_surface = font.render(text, True, BLACK)
+                screen.blit(text_surface, (10, 10 + i * 25))
+        
+        # Main loop
+        running = True
+        drawing = False
+        start_pos = None
+        current_rect = None
+        obstacles = []
+        
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse button
+                        drawing = True
+                        start_pos = to_grid_coords(event.pos)
+                        current_rect = None
+                
+                elif event.type == pygame.MOUSEMOTION:
+                    if drawing:
+                        current_pos = to_grid_coords(event.pos)
+                        # Create rectangle coordinates
+                        x_min = min(start_pos[0], current_pos[0])
+                        y_min = min(start_pos[1], current_pos[1])
+                        x_max = max(start_pos[0], current_pos[0])
+                        y_max = max(start_pos[1], current_pos[1])
+                        current_rect = ((x_min, y_min), (x_max, y_max))
+                
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1 and drawing:
+                        drawing = False
+                        if current_rect:
+                            (x_min, y_min), (x_max, y_max) = current_rect
+                            # Only add if the rectangle has some size
+                            if x_max > x_min and y_max > y_min:
+                                obstacles.append(current_rect)
+                        current_rect = None
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:  # Undo
+                        if obstacles:
+                            obstacles.pop()
+                    
+                    elif event.key == pygame.K_RETURN:  # Finish
+                        running = False
+            
+            # Draw background and grid
+            draw_grid()
+            
+            # Draw existing obstacles
+            draw_obstacles()
+            
+            # Draw current rectangle being created
+            if drawing and current_rect:
+                (x_min, y_min), (x_max, y_max) = current_rect
+                top_left = to_screen_coords((x_min, y_max))
+                width = int((x_max - x_min) * scale_x)
+                height = int((y_max - y_min) * scale_y)
+                pygame.draw.rect(screen, BLUE, (top_left[0], top_left[1], width, height), 2)
+            
+            # Draw instructions
+            draw_instructions()
+            
+            # Update display
+            pygame.display.flip()
+        
+        pygame.quit()
+        return obstacles
+
 class POMDPDeformedGridworld(Grid):
     def __init__(self, render_mode='human', obs_type = 'single'):
         super(POMDPDeformedGridworld, self).__init__(render_mode=render_mode)

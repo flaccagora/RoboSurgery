@@ -247,152 +247,250 @@ import torch
 import torch.distributions as dist
 import numpy as np
 
+# class BayesianParticleFilter:
+#     def __init__(self, f, n_particles=1000, theta_dim=4):
+#         """
+#         Initialize the particle filter for Bayesian linear regression with 2D parameters.
+        
+#         Args:
+#             n_particles (int): Number of particles to use for approximating the posterior.
+#             theta_dim (int): Dimensionality of the parameter vector (default is 2).
+#         """
+#         self.f = f
+#         self.n_particles = n_particles
+#         self.theta_dim = theta_dim
+#         self.particles = None
+#         self.weights = None
+
+#         self.low = torch.tensor([.4, -.2, -.2, .4])
+#         self.high = torch.tensor([1.0, .2, .2, 1.0])
+
+        
+#     def initialize_particles(self, prior_mean=0.0, prior_std=1.0):
+#         """
+#         Initialize particles from the prior distribution.
+        
+#         Args:
+#             prior_mean (float): Mean of the prior distribution.
+#             prior_std (float): Standard deviation of the prior distribution.
+#         """
+#         self.q_alpha = torch.nn.Parameter(torch.ones(4))
+#         self.q_beta = torch.nn.Parameter(torch.ones(4))
+
+#         beta = dist.Beta(self.q_alpha, self.q_beta)
+#         self.particles = self.low + (self.high - self.low) * beta.sample((self.n_particles,))
+
+#         # Initialize uniform weights
+#         self.weights = torch.ones(self.n_particles) / self.n_particles
+
+#         return self.particles, self.weights
+        
+#     def log_likelihood(self, X, y, theta, noise_std=0.1):
+#         """
+#         Compute the log likelihood log p(y|X,theta) assuming Gaussian noise.
+        
+#         Args:
+#             X (torch.Tensor): Input features (n_samples, 2).
+#             y (torch.Tensor): Target values (n_samples,).
+#             theta (torch.Tensor): Parameter particles (n_particles, theta_dim).
+#             noise_std (float): Standard deviation of observation noise.
+        
+#         Returns:
+#             torch.Tensor: Log likelihood values for each particle.
+#         """
+#         batch_size = X.shape[0]
+        
+#         # # Compute log likelihood for each sample
+#         # log_likelihoods0 = torch.zeros(self.n_particles)
+#         # for i in range(self.n_particles):
+#         #     t = theta[i]
+#         #     y_pred = self.f(X, t.expand(batch_size, -1)).squeeze()
+#         #     log_likelihoods0[i] = dist.Bernoulli(y_pred).log_prob(y).sum()
+        
+
+#         ########### test
+#         # Compute log likelihood for each sample in parallel
+#         theta_expanded = theta.unsqueeze(1).expand(-1, batch_size, -1).to(self.device)  # Expand theta for batch computation
+#         X_expanded = X.unsqueeze(0).expand(self.n_particles, -1, -1).to(self.device)  # Expand X for batch computation
+#         y_pred = self.f(X_expanded, theta_expanded,dim=2).to(self.device)  # Shape: (n_particles, batch_size)
+#         y_pred = y_pred.squeeze()  # Adjust shape if needed
+#         if y.shape[-1] == 4:
+#             log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1,-1).reshape(-1)).reshape(self.n_particles,batch_size,4).sum(dim=-1).sum(dim=-1)  # Sum over batch size
+#         else:
+#             log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1).reshape(-1)).reshape(self.n_particles,batch_size).sum(dim=-1)  # Sum over batch size
+#         ##########
+#         # Average over samples
+#         # assert torch.allclose(log_likelihoods0, log_likelihoods)
+#         return log_likelihoods
+        
+#     def update(self, X, y, noise_std=0.1):
+#         """
+#         Update particle weights based on new observations.
+        
+#         Args:
+#             X (torch.Tensor): Input features (n_samples, theta_dim).
+#             y (torch.Tensor): Target values (n_samples,).
+#             noise_std (float): Standard deviation of observation noise.
+#         """
+#         self.device = next(self.f.parameters()).device
+#         # Compute log likelihood for each particle
+#         log_likelihoods = self.log_likelihood(X.to(self.device), y.to(self.device), self.particles.to(self.device))
+
+#         # Update log weights
+#         log_weights = torch.log(self.weights.to(self.device)) + log_likelihoods
+        
+#         # Subtract maximum for numerical stability before exp
+#         log_weights_normalized = log_weights - torch.max(log_weights)
+#         self.weights = torch.exp(log_weights_normalized)
+        
+#         # Normalize weights
+#         self.weights /= self.weights.sum()
+        
+#         # Compute effective sample size
+#         eff_sample_size = 1.0 / (self.weights ** 2).sum()
+        
+#         # Resample if effective sample size is too low
+#         if eff_sample_size < self.n_particles / 2:
+#             self.resample()
+        
+#         return self.particles, self.weights
+    
+#     def resample(self):
+#         """
+#         Resample particles according to their weights using systematic resampling.
+#         """
+#         self.particles.to(self.device)
+#         self.weights.to(self.device)
+
+#         # Compute cumulative sum of weights
+#         cumsum = torch.cumsum(self.weights, dim=0).to(self.device)
+        
+#         # Generate systematic resampling points
+#         u = torch.rand(1).to(self.device)
+#         positions = (u + torch.arange(self.n_particles).to(self.device)) / self.n_particles
+
+#         # Resample particles
+#         indices = torch.searchsorted(cumsum, positions).to(self.device)
+#         indices = torch.clamp(indices, max=self.n_particles - 1).to(self.device)  # Prevent out-of-bounds access
+        
+#         eps = torch.randn(self.n_particles, self.theta_dim) * 0.01
+#         self.particles = self.particles[indices].to(self.device) + eps.to(self.device)
+        
+#         # Reset weights to uniform
+#         self.weights = torch.ones(self.n_particles).to(self.device) / self.n_particles
+    
+#     def estimate_posterior(self):
+#         """
+#         Compute posterior mean and variance from particles.
+        
+#         Returns:
+#             tuple: (posterior_mean, posterior_variance)
+#         """
+#         posterior_mean = (self.particles.T.to(self.device) * self.weights.to(self.device)).sum(dim=1)
+#         posterior_var = ((self.particles.to(self.device) - posterior_mean.to(self.device)) ** 2).T * self.weights
+#         posterior_var = posterior_var.sum(dim=1)
+#         return posterior_mean.cpu().detach().numpy(), posterior_var.cpu().detach().numpy()
+    
+#     def entropy(self):
+#         # """Compute the entropy of the variational distribution"""
+#         # posterior_mean = (self.particles.T * self.weights).sum(dim=1)
+#         # posterior_var = (((self.particles - posterior_mean) ** 2).T * self.weights).sum(dim=1)
+    
+#         # q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
+#         # return q_dist.entropy().sum().detach().numpy()
+#         return -(self.weights*torch.log(self.weights + 1e-5)).sum().cpu().detach().numpy()
+
 class BayesianParticleFilter:
     def __init__(self, f, n_particles=1000, theta_dim=4):
-        """
-        Initialize the particle filter for Bayesian linear regression with 2D parameters.
-        
-        Args:
-            n_particles (int): Number of particles to use for approximating the posterior.
-            theta_dim (int): Dimensionality of the parameter vector (default is 2).
-        """
         self.f = f
+        self.device = next(self.f.parameters()).device  # Get device from model
         self.n_particles = n_particles
         self.theta_dim = theta_dim
         self.particles = None
         self.weights = None
 
-        self.low = torch.tensor([.4, -.2, -.2, .4])
-        self.high = torch.tensor([1.0, .2, .2, 1.0])
+        # Initialize bounds on the correct device
+        self.low = torch.tensor([.4, -.2, -.2, .4], device=self.device)
+        self.high = torch.tensor([1.0, .2, .2, 1.0], device=self.device)
 
-        
     def initialize_particles(self, prior_mean=0.0, prior_std=1.0):
-        """
-        Initialize particles from the prior distribution.
-        
-        Args:
-            prior_mean (float): Mean of the prior distribution.
-            prior_std (float): Standard deviation of the prior distribution.
-        """
-        self.q_alpha = torch.nn.Parameter(torch.ones(4))
-        self.q_beta = torch.nn.Parameter(torch.ones(4))
+        """Initialize particles on the correct device using Beta distribution"""
+        # Parameters for Beta distribution (on correct device)
+        self.q_alpha = torch.nn.Parameter(torch.ones(4, device=self.device), requires_grad=False)
+        self.q_beta = torch.nn.Parameter(torch.ones(4, device=self.device), requires_grad=False)
 
         beta = dist.Beta(self.q_alpha, self.q_beta)
         self.particles = self.low + (self.high - self.low) * beta.sample((self.n_particles,))
+        
+        # Uniform weights on device
+        self.weights = torch.ones(self.n_particles, device=self.device) / self.n_particles
+        return self.particles, self.weights
 
-        # Initialize uniform weights
-        self.weights = torch.ones(self.n_particles) / self.n_particles
-        
     def log_likelihood(self, X, y, theta, noise_std=0.1):
-        """
-        Compute the log likelihood log p(y|X,theta) assuming Gaussian noise.
-        
-        Args:
-            X (torch.Tensor): Input features (n_samples, 2).
-            y (torch.Tensor): Target values (n_samples,).
-            theta (torch.Tensor): Parameter particles (n_particles, theta_dim).
-            noise_std (float): Standard deviation of observation noise.
-        
-        Returns:
-            torch.Tensor: Log likelihood values for each particle.
-        """
+        """All inputs should already be on correct device"""
         batch_size = X.shape[0]
         
-        # # Compute log likelihood for each sample
-        # log_likelihoods0 = torch.zeros(self.n_particles)
-        # for i in range(self.n_particles):
-        #     t = theta[i]
-        #     y_pred = self.f(X, t.expand(batch_size, -1)).squeeze()
-        #     log_likelihoods0[i] = dist.Bernoulli(y_pred).log_prob(y).sum()
+        # Vectorized computation
+        theta_expanded = theta.unsqueeze(1).expand(-1, batch_size, -1)
+        X_expanded = X.unsqueeze(0).expand(self.n_particles, -1, -1)
+        y_pred = self.f(X_expanded, theta_expanded, dim=2).squeeze()
         
-
-        ########### test
-        # Compute log likelihood for each sample in parallel
-        theta_expanded = theta.unsqueeze(1).expand(-1, batch_size, -1)  # Expand theta for batch computation
-        X_expanded = X.unsqueeze(0).expand(self.n_particles, -1, -1)  # Expand X for batch computation
-        y_pred = self.f(X_expanded, theta_expanded,dim=2)  # Shape: (n_particles, batch_size)
-        y_pred = y_pred.squeeze()  # Adjust shape if needed
+        # Calculate log probabilities
         if y.shape[-1] == 4:
-            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1,-1).reshape(-1)).reshape(self.n_particles,batch_size,4).sum(dim=-1).sum(dim=-1)  # Sum over batch size
+            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(
+                y.expand(self.n_particles,-1,-1).reshape(-1)
+            ).reshape(self.n_particles, batch_size,4).sum(dim=-1).sum(dim=-1)
         else:
-            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(y.expand(self.n_particles,-1).reshape(-1)).reshape(self.n_particles,batch_size).sum(dim=-1)  # Sum over batch size
-        ##########
-        # Average over samples
-        # assert torch.allclose(log_likelihoods0, log_likelihoods)
+            log_likelihoods = dist.Bernoulli(y_pred.view(-1)).log_prob(
+                y.expand(self.n_particles,-1).reshape(-1)
+            ).reshape(self.n_particles,batch_size).sum(dim=-1)
+            
         return log_likelihoods
-        
-    def update(self, X, y, noise_std=0.1):
-        """
-        Update particle weights based on new observations.
-        
-        Args:
-            X (torch.Tensor): Input features (n_samples, theta_dim).
-            y (torch.Tensor): Target values (n_samples,).
-            noise_std (float): Standard deviation of observation noise.
-        """
-        # Compute log likelihood for each particle
-        log_likelihoods = self.log_likelihood(X, y, self.particles, noise_std)
 
-        # Update log weights
+    def update(self, X, y, noise_std=0.1):
+        """Convert inputs to device and update weights"""
+        # Move inputs to model device
+        X = X.to(self.device)
+        y = y.to(self.device)
+
+        log_likelihoods = self.log_likelihood(X, y, self.particles)
         log_weights = torch.log(self.weights) + log_likelihoods
         
-        # Subtract maximum for numerical stability before exp
+        # Numerical stability
         log_weights_normalized = log_weights - torch.max(log_weights)
         self.weights = torch.exp(log_weights_normalized)
-        
-        # Normalize weights
         self.weights /= self.weights.sum()
-        
-        # Compute effective sample size
-        eff_sample_size = 1.0 / (self.weights ** 2).sum()
-        
-        # Resample if effective sample size is too low
-        if eff_sample_size < self.n_particles / 2:
+
+        # Resample if needed
+        if 1.0 / (self.weights ** 2).sum() < self.n_particles / 2:
             self.resample()
-    
+            
+        return self.particles, self.weights
+
     def resample(self):
-        """
-        Resample particles according to their weights using systematic resampling.
-        """
-        # Compute cumulative sum of weights
+        """Resampling with device-aware tensor creation"""
+        # Systematic resampling indices
         cumsum = torch.cumsum(self.weights, dim=0)
-        
-        # Generate systematic resampling points
-        u = torch.rand(1)
-        positions = (u + torch.arange(self.n_particles)) / self.n_particles
-        
-        # Resample particles
-        indices = torch.searchsorted(cumsum, positions)
-        indices = torch.clamp(indices, max=self.n_particles - 1)  # Prevent out-of-bounds access
-        
-        eps = torch.randn(self.n_particles, self.theta_dim) * 0.01
+        u = torch.rand(1, device=self.device)
+        positions = (u + torch.arange(self.n_particles, device=self.device)) / self.n_particles
+        indices = torch.searchsorted(cumsum, positions).clamp(max=self.n_particles-1)
+
+        # Add noise on correct device
+        eps = torch.randn(self.n_particles, self.theta_dim, device=self.device) * 0.01
         self.particles = self.particles[indices] + eps
         
-        # Reset weights to uniform
-        self.weights = torch.ones(self.n_particles) / self.n_particles
-    
+        # Reset weights
+        self.weights = torch.ones(self.n_particles, device=self.device) / self.n_particles
+
+    @torch.no_grad()
     def estimate_posterior(self):
-        """
-        Compute posterior mean and variance from particles.
-        
-        Returns:
-            tuple: (posterior_mean, posterior_variance)
-        """
+        """Device-aware mean/variance calculation"""
         posterior_mean = (self.particles.T * self.weights).sum(dim=1)
         posterior_var = ((self.particles - posterior_mean) ** 2).T * self.weights
-        posterior_var = posterior_var.sum(dim=1)
-        return posterior_mean.detach().numpy(), posterior_var.detach().numpy()
-    
+        return posterior_mean.cpu().numpy(), posterior_var.sum(dim=1).cpu().numpy()
+    @torch.no_grad()
     def entropy(self):
-        # """Compute the entropy of the variational distribution"""
-        # posterior_mean = (self.particles.T * self.weights).sum(dim=1)
-        # posterior_var = (((self.particles - posterior_mean) ** 2).T * self.weights).sum(dim=1)
-    
-        # q_dist = dist.Normal(posterior_mean, posterior_var.sqrt())
-        # return q_dist.entropy().sum().detach().numpy()
-        return -(self.weights*torch.log(self.weights + 1e-5)).sum().detach().numpy()
-
-
+        return -(self.weights * torch.log(self.weights + 1e-5)).sum().cpu().numpy()
 
 
 if __name__ == "__main__":
