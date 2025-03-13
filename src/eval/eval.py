@@ -43,6 +43,7 @@ DQN_model = DQN.load(f"agents/pretrained/MDP/{run}/{last_checkpoint}", env=env)
 
 env.close()
 MODELS = [PPO_model, DQN_model]
+MODELS = [DQN_model]
 
 # ------------------------------------------------------------------------------------------------
 
