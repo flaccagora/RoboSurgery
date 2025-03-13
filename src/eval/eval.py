@@ -9,7 +9,9 @@ import json
 
 N_EPISODES = 1000 # number of episodes to average over
 OBSERVATION_TYPES = ['cardinal', 'single'] # 'cardinal' or  'single'
-BELIEF_UPDATES = ['discrete', 'particlefilters'] # variational escluso per ora
+BELIEF_UPDATES = ['particlefilters'] # variational escluso per ora
+# BELIEF_UPDATES = ['discrete', 'particlefilters'] # variational escluso per ora
+
 # DISCRETIZATION = {'discrete': [5], 'variational': 10, 'particlefilters': [1000]} 
 DISCRETIZATION = {'discrete': [5,10], 'variational': 10, 'particlefilters': [1000,2000,5000,10000]} 
 DEBUG = True
@@ -440,6 +442,7 @@ for obs_type in OBSERVATION_TYPES:
                 if agent == QMDP and isinstance(MDPmodel, PPO):
                     print(f"Skipping QMDP with PPO model as QMDP requires a DQN model")
                     continue
+
                 
                 for discretization in DISCRETIZATION[update]:
                     

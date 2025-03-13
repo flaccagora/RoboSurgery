@@ -449,6 +449,11 @@ class BayesianParticleFilter:
 
     def update(self, X, y, noise_std=0.1):
         """Convert inputs to device and update weights"""
+        # Resample if needed
+        if 1.0 / (self.weights ** 2).sum() < self.n_particles / 2:
+            self.resample()
+
+
         # Move inputs to model device
         X = X.to(self.device)
         y = y.to(self.device)
@@ -461,9 +466,6 @@ class BayesianParticleFilter:
         self.weights = torch.exp(log_weights_normalized)
         self.weights /= self.weights.sum()
 
-        # Resample if needed
-        if 1.0 / (self.weights ** 2).sum() < self.n_particles / 2:
-            self.resample()
             
         return self.particles, self.weights
 

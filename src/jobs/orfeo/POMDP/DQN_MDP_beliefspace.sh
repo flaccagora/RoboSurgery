@@ -4,8 +4,8 @@
 #SBATCH --time 02:00:00     # format: HH:MM:SS
 #SBATCH -N 1                # 1 node
 #SBATCH --ntasks=12 # 4 tasks out of 112
-#SBATCH --job-name=DQN_MDP
-#SBATCH --output=DQN_MDP.out 
+#SBATCH --job-name=DQN_BS
+#SBATCH --output=DQN_BS.out 
 
 date
 

@@ -1,0 +1,31 @@
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} & \textbf{Belief Update} & \textbf{Success Rate}\\
+    \midrule
+    MDP & -21.843 & 30.534 & None & - \\
+    \midrule
+    TS & -55.92 & 70.60 & Discrete (5) & 0.93 \\
+    TS & -22.43 & 37.89 & Discrete (10) & 0.99 \\
+    MLS & -75.66 & 82.59 & Discrete (5) & 0.91 \\
+    MLS & -32.00 & 45.29 & Discrete (10) & 0.97 \\
+    QMDP & -85.39 & 108.67 & Discrete (5) & 0.84 \\
+    QMDP & -39.52 & 66.69 & Discrete (10) & 0.93 \\
+    TS & -28.60 & 44.67 & Discrete (1000) & 1.00 \\
+    TS & -26.05 & 42.73 & Discrete (2000) & 1.00 \\
+    TS & -27.88 & 44.91 & Discrete (5000) & 1.00 \\
+    TS & -27.33 & 44.51 & Discrete (10000) & 1.00 \\
+    MLS & -41.84 & 50.75 & Discrete (1000) & 0.96 \\
+    MLS & -34.87 & 45.37 & Discrete (2000) & 0.97 \\
+    MLS & -30.53 & 42.48 & Discrete (5000) & 0.97 \\
+    MLS & -36.37 & 45.46 & Discrete (10000) & 0.97 \\
+    QMDP & -46.86 & 72.39 & Discrete (1000) & 0.91 \\
+    QMDP & -51.49 & 68.61 & Discrete (2000) & 0.92 \\
+    QMDP & -39.76 & 62.99 & Discrete (5000) & 0.93 \\
+    \midrule
+    \bottomrule
+    \end{tabular}
+    \caption{Performance comparison of different algorithms using DQN on the Maze task averaged over 1000 episodes. Success Rate is derived from the termination rate.}
+    \label{tab:maze_results_dqn}
+\end{table}
