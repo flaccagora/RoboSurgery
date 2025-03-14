@@ -21,7 +21,7 @@ class BaseAgent():
             self.belief_points = positions.squeeze()
             self.belief_values = torch.ones(self.belief_points.shape[0], dtype=torch.float32, requires_grad=False) / len(positions)
             
-            self.original_def = env.transformation_matrix[0][0], env.transformation_matrix[1][1]
+            self.original_def = pomdp_env.transformation_matrix[0][0], pomdp_env.transformation_matrix[1][1]
 
         if update == 'discrete': 
             assert obs_model is not None, f'Need an observation model for discrete belief update, given {obs_model}'
