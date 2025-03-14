@@ -280,8 +280,6 @@ class IDS():
     
 
 
-
-
 # class Infotaxis():
   
 #     def __init__(self, T, O, R):

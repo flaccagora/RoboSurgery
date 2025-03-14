@@ -9,16 +9,16 @@ import json
 
 N_EPISODES = 1000 # number of episodes to average over
 OBSERVATION_TYPES = ['cardinal', 'single'] # 'cardinal' or  'single'
-BELIEF_UPDATES = ['particlefilters'] # variational escluso per ora
-# BELIEF_UPDATES = ['discrete', 'particlefilters'] # variational escluso per ora
+# BELIEF_UPDATES = ['particlefilters'] # variational escluso per ora
+BELIEF_UPDATES = ['discrete', 'particlefilters'] # variational escluso per ora
 
 # DISCRETIZATION = {'discrete': [5], 'variational': 10, 'particlefilters': [1000]} 
-DISCRETIZATION = {'discrete': [5,10], 'variational': 10, 'particlefilters': [1000,2000,5000,10000]} 
+DISCRETIZATION = {'discrete': [5,10], 'variational': 10, 'particlefilters': [1000,2000,5000]} 
 DEBUG = True
 
 # Load MDP solution -------------------------------------------------------------------------
 
-run = "PPO_continous_" + "enh53x0u"
+run = "PPO_continous_" + "exxq5no6"
 
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3 import PPO, DQN
@@ -43,7 +43,7 @@ DQN_model = DQN.load(f"agents/pretrained/MDP/{run}/{last_checkpoint}", env=env)
 
 env.close()
 MODELS = [PPO_model, DQN_model]
-MODELS = [DQN_model]
+MODELS = [PPO_model]
 
 # ------------------------------------------------------------------------------------------------
 
@@ -307,8 +307,6 @@ class QMDP(BaseAgent):
             return torch.multinomial(probs, 1).item(), actions
 
 AGENTS = [TS, MLS, QMDP]
-AGENTS = [QMDP]
-
 
 def load_obs_model(obs_type):
     from observation_model.obs_model import singleNN, cardinalNN
@@ -481,3 +479,7 @@ for obs_type in OBSERVATION_TYPES:
                     print(json.dumps(stats, indent=4))
 
                     
+
+# fix set of initial positions 
+# QMDP + INFOTAXIS
+# metrica di performance T_POMDP(x_0) / T_MDP(x_0)

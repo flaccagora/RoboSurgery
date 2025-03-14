@@ -197,16 +197,18 @@ maze size 30x30
 \toprule
 \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} \\
 \midrule
-MDP (upper bound) & -19.44 & 18.51\\
+MDP & -19.44 & 18.51\\
+\midrule
 MLS & -26.47 & 23.93\\
 TS &-26.13 & 24.231\\
-QMDP & -24.71 & 23.75 \\
-FIB & -25.49 & 23.55 \\
+QMDP & \textbf{-24.71} & \textbf{23.75} \\
+% FIB & -25.49 & 23.55 \\
 \bottomrule
 \end{tabular}
 \caption{Performance comparison of different algorithms on the Gridworld task. MDP represents the theoretical upper bound with perfect information.}
 \label{tab:gridworld_results}
 \end{table}
+
 
 FIB and QMDP are equivalent given the formulation of the problem. stiamo soltanto 
 testando l'imprecisione dell'observation model.
@@ -238,19 +240,19 @@ of the environment has to be estimated through observations.
     \centering
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=0.55\linewidth]{images/maze_0.9_-0.17_-0.09_0.82.png}
+        \includegraphics[width=0.6\linewidth]{images/maze_0.9_-0.17_-0.09_0.82.png}
         % \caption{$\theta$ = (5,8)}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=0.55\linewidth]{images/maze_1.png}
+        \includegraphics[width=0.6\linewidth]{images/maze_1.png}
         % \caption{$\theta = \mathcal{1}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=0.55\linewidth]{images/maze_0.62_0.07_0.15_0.56.png}
+        \includegraphics[width=0.6\linewidth]{images/maze_0.62_0.07_0.15_0.56.png}
         % \caption{$\theta$ = (9,4)}
     \end{subfigure}
     \caption{Maze Environment for different $\theta$}
@@ -312,27 +314,78 @@ DQN - PPO
 Belief update: dicrete variational inference laplace approximation particle filters 
 Different observation informativity.
 
-TS con 1000 particles
-Mean episode Reward:  -29.4585
-Mean number of steps:  43.746
-
-\begin{table}[h]
+\begin{table}[H]
     \centering
-    \begin{tabular}{lccc}
+    \begin{tabular}{lcccc}
     \toprule
-    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} & \textbf{Belief Update}\\
+    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} & \textbf{Belief Update} & \textbf{Success Rate}\\
     \midrule
-    MDP (upper bound) & -21.843 & 30.534 & None\\
-    % QMDP & -24.715 & 23.75 \\
-    MLS & -39.866 & 56.818  & Particles (2000)  \\
-    TS & -28.491 & 43.474  & Particles (2000)  \\
-
+    MDP & -21.843 & 30.534 & None & - \\
+    \midrule
+    MLS & -95.91 & 105.94 & Discrete (5) & 0.85 \\
+    TS & -80.56 & 92.39 & Discrete (5) & 0.89 \\
+    \midrule
+    MLS & -48.36 & 55.55 & Discrete - $10^4$ & 0.96 \\
+    TS & -35.81 & 47.61 & Discrete - $10^4$ & 0.98 \\
+    \midrule
+    MLS & -74.79 & 65.53 & Particles - 10e3 & 0.93 \\
+    TS & \textbf{-32.12} & \textbf{42.87} & Particles - 10e3 & \textbf{0.99} \\
+    \midrule
+    MLS & -72.90 & 67.44 & Particles - $2\cdot10^3$ & 0.93 \\
+    TS & -33.28 & 44.27 & Particles - $2\cdot10^3$ & 0.99 \\
+    % \midrule
+    % MLS & -68.25 & 62.30 & Particles (5000) & 0.93 \\
+    % TS & -28.07 & 41.82 & Particles (5000) & 0.99 \\
+    % \midrule
+    % TS & -27.31 & 41.18 & Particles (10000) & 1.00 \\
     \bottomrule
     \end{tabular}
-    \caption{Performance comparison of different algorithms on the Maze task averaged
-    over 1000 episodes.}
-    \label{tab:maze_results}
+    \caption{Performance comparison of different algorithms using PPO on the Maze task averaged over 1000 episodes.}
+    \label{tab:maze_results_ppo}
 \end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Algorithm} & \textbf{Avg. Reward} & \textbf{Avg. Steps} & \textbf{Belief Update} & \textbf{Success Rate}\\
+    \midrule
+    MDP & -14.55 & 28.29 & None & 0.99 \\
+    \midrule
+    TS & -55.92 & 70.60 & Discrete - $5^4$ & 0.93 \\
+    MLS & -75.66 & 82.59 & Discrete - $5^4$ & 0.91 \\
+    QMDP & -85.39 & 108.67 & Discrete - $5^4$ & 0.84 \\
+    \midrule
+    MLS & -32.00 & 45.29 & Discrete - $10^4$ & 0.97 \\
+    TS & \textbf{-22.43} & \textbf{37.89} & Discrete - $10^4$ & 0.99 \\
+    QMDP & -39.52 & 66.69 & Discrete - $10^4$ & 0.93 \\
+    \midrule
+    MLS & -41.84 & 50.75 & Particles - $10^3$ & 0.96 \\
+    TS & -28.60 & 44.67 & Particles - $10^3$ & \textbf{1.00} \\
+    QMDP & -42.24 & 61.84 & Particles - $10^3$ & 0.93 \\
+    \midrule
+    MLS & -34.87 & 45.37 & Particles - $2\cdot10^3$ & 0.97 \\
+    TS & -26.05 & 42.73 & Particles - $2\cdot10^3$ & 1.00 \\
+    QMDP & -38.972 & 67.756 & Particles - $2\cdot10^3$ & 0.92 \\
+    % \midrule
+    % MLS & -30.53 & 42.48 & Particles (5000) & 0.97 \\
+    % TS & -27.88 & 44.91 & Particles (5000) & 1.00 \\
+    % QMDP & -39.76 & 62.99 & Particles (5000) & 0.93 \\
+    % \midrule
+    % MLS & -36.37 & 45.46 & Particles (10000) & 0.97 \\
+    % TS & -27.33 & 44.51 & Particles (10000) & 1.00 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Performance comparison of different algorithms using DQN on the Maze task averaged over 1000 episodes.}
+    \label{tab:maze_results_dqn}
+\end{table}
+
+MDP DQN on 10000 episodes  
+Target reached 9965 out of 10000 episodes
+Mean episode Reward:  -14.55225
+Mean number of steps:  28.2915
+
+
     
 
 \section{Surgical Task}

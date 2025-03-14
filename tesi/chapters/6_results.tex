@@ -1,18 +1,57 @@
 
 \chapter{Results and Future Directions}
 
-Simulation-based pretraining to reduce real-world data collection costs.
-Transfer learning from simpler robotic tasks (e.g., grasping) to more complex surgical tasks.
-Safety-aware RL methods (constrained policies) to minimize surgical risk.
-Domain adaptation techniques to handle variations in patient anatomy and real-time changes.
-Hybrid approaches that blend model-based and model-free RL for adaptive decision-making and uncertainty handling.
+% Simulation-based pretraining to reduce real-world data collection costs.
+% Transfer learning from simpler robotic tasks (e.g., grasping) to more complex surgical tasks.
+% Safety-aware RL methods (constrained policies) to minimize surgical risk.
+% Domain adaptation techniques to handle variations in patient anatomy and real-time changes.
+% Hybrid approaches that blend model-based and model-free RL for adaptive decision-making and uncertainty handling.
 
 
 
-\textbf{ASSUMPTIONS THROUHGOUT THE EXPERIMENTS}
-PRIMI DUE ENV
-- deformation of the environment is the only source of uncertainty
-- the agent doesn't affect deformation 
-- deformation are topologically sound
-LAST ENV
+% \textbf{ASSUMPTIONS THROUHGOUT THE EXPERIMENTS}
+% PRIMI DUE ENV
+% - deformation of the environment is the only source of uncertainty
+% - the agent doesn't affect deformation 
+% - deformation are topologically sound
+% LAST ENV
 
+This thesis explored the application of Partially Observable Markov Decision Processes (POMDPs) to enhance decision-making in robotic-assisted surgery, specifically addressing the challenges posed by deformable environments and partial observability. The research focused on developing RL-based strategies to improve the adaptability, robustness, and precision of robotic surgical systems in deformable tissue interactions.
+
+\section{Summary of Results}
+
+The study began by establishing a theoretical foundation in Markov Decision Processes (MDPs) and POMDPs, discussing key concepts such as policy and value functions, Bellman equations, and various solution methods including dynamic programming, Monte Carlo methods, and temporal difference learning.
+
+The experimental section of the thesis involved testing RL algorithms in increasingly complex simulated environments.
+
+\begin{itemize}
+    \item \textbf{Gridworld Environment:} Initial tests in a gridworld environment demonstrated the feasibility of applying POMDP-based RL with exact belief updates. The results highlighted the ability of the algorithms to handle the deformable property of the environment, with MDP representing the theoretical upper bound with perfect information.
+    \item \textbf{Deformable Maze:} The complexity was increased by introducing a continuous state and deformation parameter. In this setting, PPO and DQN algorithms were tested. The results from these tests illustrated the challenges of scaling POMDP-based RL to continuous environments.
+\end{itemize}
+
+\section{Limitations}
+
+While this thesis provides a foundational step toward applying POMDPs in robotic-assisted surgery, it is important to acknowledge its limitations:
+
+\begin{itemize}
+    \item \textbf{Simplified Environments:} The simulated environments, while progressively more complex, are still simplifications of the real-world challenges in surgical settings. Factors such as irregular tissue deformation, complex anatomical structures, and real-time constraints were not fully captured in the simulations.
+    \item \textbf{Computational Complexity:} POMDP solutions, particularly exact methods, suffer from high computational costs, limiting their applicability in real-time surgical scenarios. The transition to continuous state spaces further exacerbates this issue.
+    \item \textbf{Model Assumptions:} The study assumed the model of the environment to be known or learnable from preoperative imaging data. In practice, accurate modeling of deformable tissues remains a significant challenge.
+    \item \textbf{Belief State Estimation:} The accuracy of POMDP-based RL heavily depends on effective belief state estimation. In the continuous deformable maze environment, belief update methods require further investigation.
+\end{itemize}
+
+\section{Future Directions}
+
+This research opens several avenues for future work:
+
+\begin{itemize}
+    \item \textbf{Advanced Simulation Techniques:} Future research should focus on developing more realistic surgical simulations that incorporate complex tissue behavior, fluid dynamics, and instrument interactions. This could involve using finite element methods to model tissue deformation and developing more sophisticated sensor models.
+    \item \textbf{Efficient POMDP Solvers:} Research should explore more efficient POMDP solving techniques to address the computational challenges. This could include the development of hybrid methods that combine POMDPs with other RL techniques or the use of function approximation methods to represent value functions.
+    \item \textbf{Integration of Computer Vision:} Integrating computer vision techniques with POMDP-based RL can improve the accuracy of belief state estimation. This could involve using deep learning models to process visual information from surgical cameras and provide more informative observations to the RL agent.
+    \item \textbf{Real-World Validation:} The ultimate goal is to translate these research findings into real-world surgical applications. Future work should focus on validating the proposed methods in pre-clinical settings using animal models or cadavers, with the long-term aim of clinical trials.
+    \item \textbf{Safe RL:} Given the critical nature of surgical tasks, future research must prioritize the development of safe RL algorithms. This includes incorporating safety constraints into the learning process, using techniques such as safe exploration and formal verification to ensure the reliability and safety of RL-driven surgical robots.
+\end{itemize}
+
+\section{Conclusion}
+
+This thesis contributes to the ongoing effort to integrate advanced AI techniques into robotic-assisted surgery. By exploring the use of POMDPs for decision-making under uncertainty in deformable environments, this research provides a foundation for developing more intelligent and adaptive surgical robotic systems. While significant challenges remain, the potential benefits of improved surgical precision, patient safety, and procedural efficiency motivate continued research in this promising field.

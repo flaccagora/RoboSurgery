@@ -102,6 +102,17 @@
 \usepackage{eso-pic}
 \usepackage{transparent}
 
+
+% topline
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark} % Show chapter name on the left
+\renewcommand{\headrulewidth}{0.4pt} % Thin line
+
+
 % Thesis's title and author
 \title{Leveraging POMDPs for Adaptive Decision-Making in Robotic-Assisted Surgery}
 \author{Name Surname}

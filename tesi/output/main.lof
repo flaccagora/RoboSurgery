@@ -2,15 +2,15 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Markov Decision Process}}{7}{figure.caption.12}%
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Evolution of Deep Reinforcement Learning Algorithms}}{12}{figure.caption.15}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Generalized Policy Iteration}}{17}{figure.caption.18}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Generalized Policy Iteration}}{15}{figure.caption.18}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Partially Observable Markov Decision Process}}{28}{figure.caption.22}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces The need for Memory}}{29}{figure.caption.23}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Convex Value function for a two states \gls {pomdp}.}}{33}{figure.caption.25}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Point-Based Value Iteration}}{35}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Partially Observable Markov Decision Process}}{27}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces The need for Memory}}{28}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Convex Value function for a two states \gls {pomdp}.}}{32}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Point-Based Value Iteration}}{34}{figure.caption.27}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Gridworld Environment for $s = (1,1,0,\theta $)}}{44}{figure.caption.38}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Observations in Gridworld}}{45}{figure.caption.41}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Maze Environment for different $\theta $}}{47}{figure.caption.48}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Surgical Environment}}{49}{figure.caption.55}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Gridworld Environment for $s = (1,1,0,\theta $)}}{43}{figure.caption.38}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Observations in Gridworld}}{44}{figure.caption.41}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Maze Environment for different $\theta $}}{46}{figure.caption.48}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Surgical Environment}}{49}{figure.caption.56}%
 \addvspace {10\p@ }

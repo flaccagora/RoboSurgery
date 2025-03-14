@@ -384,23 +384,23 @@ The algorithm is summarized in \ref{alg:policy-iteration}.
 
 
 
-\begin{algorithm}[H]
-    \caption{Policy Iteration}\label{alg:policy-iteration}
-    \begin{algorithmic}
-    \Require A finite \gls{mdp} with states $S$, actions $A$, transition probabilities $T$, rewards $R$, and discount factor $\gamma \in [0,1]$
-    \Ensure Optimal policy $\pi^*$
-    \State Initialize an arbitrary policy $\pi$
-    \Repeat
-        \State \textbf{Policy Evaluation:} Compute the state-value function $V^\pi$
-        \State Solve $V^\pi(s) = \sum_{a \in A} \pi(a|s) \sum_{s' \in S} \mathcal{T}(s' | s, a) \left[ \mathcal{R}(s, a, s') + \gamma V^\pi(s') \right]$ for all $s \in S$
-        \State \textbf{Policy Improvement:} Compute a new policy $\pi'$
-        \ForAll{$s \in S$}
-            \State $\pi'(s) \gets \arg\max_{a \in A} \sum_{s' \in S} \mathcal{T}(s' | s, a) \left[ \mathcal{R}(s, a, s') + \gamma V^\pi(s') \right]$
-        \EndFor
-    \Until{$\pi' = \pi$}  \Comment{Stop when policy converges}
-    \State \Return $\pi^*$
-    \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}[H]\small
+%     \caption{Policy Iteration}\label{alg:policy-iteration}
+%     \begin{algorithmic}
+%     \Require A finite \gls{mdp} with states $S$, actions $A$, transition probabilities $T$, rewards $R$, and discount factor $\gamma \in [0,1]$
+%     \Ensure Optimal policy $\pi^*$
+%     \State Initialize an arbitrary policy $\pi$
+%     \Repeat
+%         \State \textbf{Policy Evaluation:} Compute the state-value function $V^\pi$
+%         \State Solve $V^\pi(s) = \sum_{a \in A} \pi(a|s) \sum_{s' \in S} \mathcal{T}(s' | s, a) \left[ \mathcal{R}(s, a, s') + \gamma V^\pi(s') \right]$ for all $s \in S$
+%         \State \textbf{Policy Improvement:} Compute a new policy $\pi'$
+%         \ForAll{$s \in S$}
+%             \State $\pi'(s) \gets \arg\max_{a \in A} \sum_{s' \in S} \mathcal{T}(s' | s, a) \left[ \mathcal{R}(s, a, s') + \gamma V^\pi(s') \right]$
+%         \EndFor
+%     \Until{$\pi' = \pi$}  \Comment{Stop when policy converges}
+%     \State \Return $\pi^*$
+%     \end{algorithmic}
+% \end{algorithm}
 
 \subsection{Value Iteration}
 The main drawback of Policy Iteration is the need to perform the time consuming policy 
@@ -460,27 +460,27 @@ value function $V^*$ as $k \rightarrow \infty$.
 \end{proof}
 The algorithm is summarized in \ref{alg:value_iteration}.
 
-\begin{algorithm}[H]
-    \caption{Value Iteration}\label{alg:value_iteration}
-    \begin{algorithmic}
-    \Require A finite \gls{mdp} with states $S$, actions $A$, transition probabilities $T$, rewards $R$, discount factor $\gamma \in [0,1]$, and a small threshold $\theta > 0$
-    \Ensure Optimal policy $\pi^*$
-    \State Initialize value function $V(s) \gets 0$ for all $s \in S$
-    \Repeat
-        \State $\Delta \gets 0$
-        \ForAll{$s \in S$}
-            \State $v \gets V(s)$
-            \State $V(s) \gets \max_{a \in A} \sum_{s' \in S} \mathcal{T}(s, a,s') \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]$
-            \State $\Delta \gets \max(\Delta, |v - V(s)|)$
-        \EndFor
-    \Until{$\Delta < \theta$}  \Comment{Stop when value function converges}
-    \State \textbf{Extract Policy:}
-    \ForAll{$s \in S$}
-        \State $\pi^*(s) \gets \arg\max_{a \in A} \sum_{s' \in S} \mathcal{T}(s,a,s') \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]$
-    \EndFor
-    \State \Return $\pi^*$
-    \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}[H]
+%     \caption{Value Iteration}\label{alg:value_iteration}
+%     \begin{algorithmic}
+%     \Require A finite \gls{mdp} with states $S$, actions $A$, transition probabilities $T$, rewards $R$, discount factor $\gamma \in [0,1]$, and a small threshold $\theta > 0$
+%     \Ensure Optimal policy $\pi^*$
+%     \State Initialize value function $V(s) \gets 0$ for all $s \in S$
+%     \Repeat
+%         \State $\Delta \gets 0$
+%         \ForAll{$s \in S$}
+%             \State $v \gets V(s)$
+%             \State $V(s) \gets \max_{a \in A} \sum_{s' \in S} \mathcal{T}(s, a,s') \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]$
+%             \State $\Delta \gets \max(\Delta, |v - V(s)|)$
+%         \EndFor
+%     \Until{$\Delta < \theta$}  \Comment{Stop when value function converges}
+%     \State \textbf{Extract Policy:}
+%     \ForAll{$s \in S$}
+%         \State $\pi^*(s) \gets \arg\max_{a \in A} \sum_{s' \in S} \mathcal{T}(s,a,s') \left[ \mathcal{R}(s, a, s') + \gamma V(s') \right]$
+%     \EndFor
+%     \State \Return $\pi^*$
+%     \end{algorithmic}
+% \end{algorithm}
 
 \subsection{Generalized Policy Iteration}
 A very important underlying mechanism, common to most methods, is the so-called \gls{gpi} principle. 
@@ -553,31 +553,31 @@ not when convergence is met.
 \end{equation}
 
 
-\begin{algorithm}
-    \caption{Monte Carlo Control with Exploring Starts}\label{alg:monte_carlo}
-    \begin{algorithmic}
-    \Require A finite \gls{mdp} with states $S$, actions $A$, rewards $R$, discount factor $\gamma \in [0,1]$, and an exploring-starts assumption
-    \Ensure Optimal policy $\pi^*$
+% \begin{algorithm}
+%     \caption{Monte Carlo Control with Exploring Starts}\label{alg:monte_carlo}
+%     \begin{algorithmic}
+%     \Require A finite \gls{mdp} with states $S$, actions $A$, rewards $R$, discount factor $\gamma \in [0,1]$, and an exploring-starts assumption
+%     \Ensure Optimal policy $\pi^*$
     
-    \State Initialize arbitrary action-value function $Q(s, a)$ for all $s \in S$, $a \in A$
-    \State Initialize returns list $\text{Returns}(s, a) \gets \emptyset$ for all $s, a$
-    \State Initialize policy $\pi$ arbitrarily
-    \Repeat
-        \State Generate an episode: $(s_0, a_0, r_1, s_1, a_1, r_2, \dots, s_T)$ following $\pi$
-        \State $G \gets 0$
-        \For{$t = T-1$ to $0$}  \Comment{Process the episode in reverse}
-            \State $G \gets \gamma G + r_{t+1}$
-            \If{$(s_t, a_t)$ is the first occurrence in the episode}
-                \State Append $G$ to $\text{Returns}(s_t, a_t)$
-                \State $Q(s_t, a_t) \gets \frac{1}{|\text{Returns}(s_t, a_t)|} \sum \text{Returns}(s_t, a_t)$
-                \State Update policy: $\pi(s_t) \gets \arg\max_{a \in A} Q(s_t, a)$
-            \EndIf
-        \EndFor
-    \Until{Q-values converge}
+%     \State Initialize arbitrary action-value function $Q(s, a)$ for all $s \in S$, $a \in A$
+%     \State Initialize returns list $\text{Returns}(s, a) \gets \emptyset$ for all $s, a$
+%     \State Initialize policy $\pi$ arbitrarily
+%     \Repeat
+%         \State Generate an episode: $(s_0, a_0, r_1, s_1, a_1, r_2, \dots, s_T)$ following $\pi$
+%         \State $G \gets 0$
+%         \For{$t = T-1$ to $0$}  \Comment{Process the episode in reverse}
+%             \State $G \gets \gamma G + r_{t+1}$
+%             \If{$(s_t, a_t)$ is the first occurrence in the episode}
+%                 \State Append $G$ to $\text{Returns}(s_t, a_t)$
+%                 \State $Q(s_t, a_t) \gets \frac{1}{|\text{Returns}(s_t, a_t)|} \sum \text{Returns}(s_t, a_t)$
+%                 \State Update policy: $\pi(s_t) \gets \arg\max_{a \in A} Q(s_t, a)$
+%             \EndIf
+%         \EndFor
+%     \Until{Q-values converge}
     
-    \State \Return $\pi^*$
-    \end{algorithmic}
-\end{algorithm}
+%     \State \Return $\pi^*$
+%     \end{algorithmic}
+% \end{algorithm}
 
 \section{Temporal Difference Learning}
 Combining the ideas of \gls{dp} and \gls{mc} methods, \gls{td} learning is a model-free method that 
